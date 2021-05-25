@@ -3,6 +3,6 @@
 
 @import "{{ site.theme }}";
 
-div.theme-default-content:not(.custom) {
-    max-width: 100%;
+wrapper {
+    width: 100%;
 }
