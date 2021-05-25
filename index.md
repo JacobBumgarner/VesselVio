@@ -12,7 +12,7 @@
 VesselVio works with any binarized and segmented vasculature dataset to provide large-scale and individual-segment qualitative features. We have tested analysis on datasets acquired with light-sheet microscopy, micro-computed tomography, and magnetic resonance angiography. Examples of dataset analysis can be found in our recent [pre-print publication](). 
 
 ### Visualization
-Visualization of analyzed datasets can also be completed to manually inspect the results with the original- and mesh-based datasets.
+Visualization of analyzed datasets can also be completed to manually inspect the results with the original and mesh-surface smoothed datasets.
 
 Currently, VesselVio is available for download as a standalone application for computers running MacOS 10.15.17+ and Windows 10. If you would rather run the VesselVio from the command-line, instructions for python virtual environment builds on MacOS and Windows are found on the left side-bar.
 
