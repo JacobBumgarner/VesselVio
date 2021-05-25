@@ -3,21 +3,3 @@
 
 @import "{{ site.theme }}";
 
-.wrapper {
-  width: 100%;
-}
-
-header {
-  padding-right: 20px;
-  position: unset;
-}
-
-section {
-  width: 75%;
-  float: left;
-}
-
-footer {
-  margin-top: auto;
-  position: unset;
-}
