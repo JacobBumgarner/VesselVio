@@ -4,21 +4,4 @@
 @import "{{ site.theme }}";
 
 
-.wrapper {
-  width: 100%;
-}
 
-header {
-  position: unset;
-}
-
-section {
-  width: auto;
-  float: left;
-}
-
-footer {
-  position: unset;
-  float: left;
-  width: 100%
-}
