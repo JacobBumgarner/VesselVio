@@ -2,7 +2,7 @@
 
  [Editor](https://github.com/JacobBumgarner/VesselVio/edit/gh-pages/index.md) 
 
-<iframe width="760" height="315" src="https://www.youtube.com/embed/S-Z8IUzS5uo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="500" height="500" src="https://www.youtube.com/embed/S-Z8IUzS5uo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### Markdown
 
