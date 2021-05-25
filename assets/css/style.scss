@@ -3,6 +3,18 @@
 
 @import "{{ site.theme }}";
 
-.inner {
-  max-width: 100%;
+.wrapper {
+  width: 100%;
+}
+
+header {
+  width: 10%;
+}
+
+footer {
+  width: 10%;
+}
+
+section {
+  width: 80%;
 }
