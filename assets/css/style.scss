@@ -1,8 +1,4 @@
 ---
 ---
 
-@import "jekyll-theme-minimal";
-
-wrapper {
-    width: 300px;
-}
+@import "{{ site.theme }}";
