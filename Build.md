@@ -1,7 +1,7 @@
 ---
 layout: default
 title: "Build Instructions"
-permalink: /Build/
+rank: 3
 ---
 
 ## Microvasculature Analysis and Visualization
