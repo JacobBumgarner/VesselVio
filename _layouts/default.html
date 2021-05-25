@@ -51,16 +51,23 @@
           {% endif %}
         {% endfor %}
       </header>
+      
+      
       <section>
 
       {{ content }}
 
       </section>
+      
+      
+      <hr size="1" width="90%" color="gray">    
+      
+      
       <footer>
         {% if site.github.is_project_page %}
         <p>VesselVio is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
         {% endif %}
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+        <p><small>GitHub Pages Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
