@@ -11,7 +11,7 @@
 
 ## Analysis
 VesselVio works with any binarized and segmented vasculature dataset to provide large-scale and individual-segment qualitative features. We have tested analysis on datasets acquired with light-sheet microscopy, micro-computed tomography, and magnetic resonance angiography. Examples of dataset analyses can be found in our recent [pre-print publication](). 
-![Analysis.pdf| ](https://github.com/JacobBumgarner/VesselVio/files/6564836/App.Images.dragged.pdf)
+![Analysis.pdf](https://github.com/JacobBumgarner/VesselVio/files/6564836/App.Images.dragged.pdf)
 
 ## Visualization
 Visualization of analyzed datasets can also be completed to manually inspect the results with the original and mesh-surface smoothed datasets.
@@ -26,19 +26,5 @@ This application is entirely open-source and free to download under [GNU GPLv3](
 
 
 ```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+Download Instructions...
 ```
