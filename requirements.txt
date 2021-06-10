@@ -14,8 +14,6 @@ meshio==4.4.3
 networkx==2.5.1
 numba==0.53.1
 numpy==1.20.3
-opencv-contrib-python==4.5.2.52
-opencv-python==4.5.2.52
 openpyxl==3.0.7
 Pillow==8.2.0
 pyinstaller==4.3
