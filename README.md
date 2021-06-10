@@ -12,6 +12,8 @@ Various whole-network and individual segment features are extracted from dataset
   <img align="center" height="300" alt="Data2" src="https://user-images.githubusercontent.com/70919881/121596339-4ff87280-ca0d-11eb-94e9-818d6928f070.png" />
 </p>
 
+Briefly, binarized vascular datasets are skeletonized, and undirected graphs are created from the skeleton centerlines. Centerlines are smoothed, spurious branch points are filtered, and end-point and isolated segments of defined lengths are filtered from the datasets. Following this, various results are extracted from the undirected graph.
+
 
 ## Visualization
 VesselVio was constructed using [PyVista](https://github.com/pyvista/pyvista), a high-level VTK package, to allow users to interactively visualize their of vascular datasets. This can be great for the generation of figure images or result inspections.
