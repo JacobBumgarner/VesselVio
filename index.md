@@ -2,7 +2,7 @@
 
 ## Microvasculature Analysis and Visualization
 
- [Editor](https://github.com/JacobBumgarner/VesselVio/edit/gh-pages/) 
+ [Editor](https://github.com/JacobBumgarner/VesselVio/edit/gh-pages) 
 
 <iframe width="500" height="500" src="https://www.youtube.com/embed/S-Z8IUzS5uo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>&nbsp;
 
