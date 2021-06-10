@@ -12,7 +12,7 @@ If you're using a PC, follow the [Windows Build Instructions](#-windows-build-in
 
 
 ## MacOS Build Instructions
-First you'll need to install python 3.8.8. This can be [messy](https://xkcd.com/1987/) if you've got python installed elsewhere or if you don't have an environment manager.
+First you'll need to install python 3.8.8. This can be <a href="https://xkcd.com/1987/" target="_blank">messy</a> if you've got python installed elsewhere or if you don't have an environment manager.
 
 We typically use an environment manager: pyenv. We build it using Homebrew. If you've already got a python environment setup, skip to step 3.
 
