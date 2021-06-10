@@ -151,6 +151,7 @@ python VVTerminal.py
 
 6. If you want to build a local stand-alone VesselVio application, follow these instructions.
    - Copy the pyinstaller .exe from your .pyenv folder created in step 2 into your VesselVio directory
+     - .pyenv>pyenv-win>versions>3.8.8>Scripts>pyinstaller.exe
    - Navigate to the VesselVio folder
    - Activate python 3.8.8 using pyenv
    - Execute the following command in your terminal.
