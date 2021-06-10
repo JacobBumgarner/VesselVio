@@ -25,5 +25,5 @@ Visualization of analyzed datasets can also be completed to manually inspect the
 Currently, VesselVio is available for download as a standalone application for computers running MacOS 10.15.17+ and Windows 10. If you would rather run the VesselVio from the command-line, instructions for python virtual environment builds on MacOS and Windows are found on the left side-bar.
 
 
-This application is entirely open-source and free to download under [GNU GPLv3](https://github.com/JacobBumgarner/VesselVio/blob/main/LICENSE). Reseachers hoping to modify or use individual components of the application's software can find the sourcecode on the [GitHub VesselVio page](https://github.com/JacobBumgarner/VesselVio">GitHub/VesselVio).
+This application is entirely open-source and free to download under [GNU GPLv3](https://github.com/JacobBumgarner/VesselVio/blob/main/LICENSE). Reseachers hoping to modify or use individual components of the application's software can find the sourcecode on the [GitHub VesselVio page](https://github.com/JacobBumgarner/VesselVio).
 
