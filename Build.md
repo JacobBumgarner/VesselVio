@@ -8,9 +8,9 @@ Coming soon...
 
 If you are unable to run the packaged VesselVio app, or if the packaged app versions are newer than your computer's OS version, this page is for you. Below are instructions detailing how to install the needed files to run VesselVio from the terminal or to build your own version of a stand-alone VesselVio application.
 
-If you're using a Mac, follow the [MacOS Build Instructions](## MacOS Build Instructions) guide.
+If you're using a Mac, follow the [MacOS Build Instructions](##-macos-build-instructions) guide.
 
-If you're using a PC, follow the [Windows Build Instructions](## Windows Build Instructions) guide.
+If you're using a PC, follow the [Windows Build Instructions](##-windows-build-instructions) guide.
 
 
 ## MacOS Build Instructions
