@@ -70,7 +70,7 @@ class mainWindow(QMainWindow):
         
         
         # Run our tiny file to prep our numba jit compilers.
-        # bep.process_file('./Library/tiny.nii')
+        bep.process_file('./Library/tiny.nii')
         
         # Present File
         self.show()
