@@ -16,6 +16,8 @@ from numba import njit
 def save_graph(g, points, filename, results_dir):
     # Get the dir and name for our graph.
     filename = path.splitext(path.basename(filename))[0]
+    if path.exists(results_dir) == False:
+        mkdir(results_dir)
     results_dir = path.join(results_dir, 'Graphs')
     if path.exists(results_dir) == False:
         mkdir(results_dir)
