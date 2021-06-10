@@ -1,15 +1,16 @@
 
-
 ## Microvasculature Analysis and Visualization
 
  [Editor](https://github.com/JacobBumgarner/VesselVio/tree/gh-pages) 
 
-<iframe width="500" height="500" src="https://www.youtube.com/embed/S-Z8IUzS5uo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>&nbsp;
+<p align="center">
+     <img height=25% alt="Brain" src="https://user-images.githubusercontent.com/70919881/121599523-28a3a480-ca11-11eb-8340-c29350998f02.mp4">
+</p>
 
 
 
 ## Analysis
-VesselVio works with any binarized and segmented vasculature dataset to provide large-scale and individual-segment qualitative features. We have tested analysis on datasets acquired with light-sheet microscopy, micro-computed tomography, and magnetic resonance angiography. Examples of dataset analyses can be found in our recent [pre-print publication](). 
+VesselVio works with any binarized and segmented vasculature dataset to provide large-scale and individual-segment qualitative features. We have tested analysis on datasets acquired with light-sheet microscopy, micro-computed tomography, and magnetic resonance angiography. Examples of dataset analyses can be found in our recent [pre-print publication](https://www.researchsquare.com/article/rs-608609/private/preview). 
 ![Analysis.pdf](https://github.com/JacobBumgarner/VesselVio/files/6564836/App.Images.dragged.pdf)
 
 ## Visualization
