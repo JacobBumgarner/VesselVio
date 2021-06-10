@@ -602,7 +602,6 @@ def write_results(results, results_folder, seg_results=None):
         added = 0
         for i in range(num_results):
             num_segs = len(seg_results[i][0])
-            print (num_segs)
             starting_column = ws.max_column
             if starting_column != 1:
                 starting_column += 1
