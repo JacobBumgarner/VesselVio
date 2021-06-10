@@ -43,7 +43,7 @@ class Page2(QSplitter):
         leftscroll.setWidgetResizable(True)
         leftscroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         leftscroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        leftscroll.setFixedWidth(240)
+        leftscroll.setFixedWidth(220)
         self.leftmenulayout = QVBoxLayout(leftmenu)
         self.leftmenulayout.setContentsMargins(0,20,0,20)
         
@@ -76,7 +76,7 @@ class Page2(QSplitter):
         self.loaded_vis.setReadOnly(True)
         self.loaded_vis.setAlignment(Qt.AlignCenter)
         load_layout.addWidget(self.loaded_file_header, alignment=Qt.AlignCenter)
-        load_layout.addWidget(self.loaded_vis)
+        load_layout.addWidget(self.loaded_vis, alignment=Qt.AlignCenter)
         
         # # Visualize
         visualize_button = QPushButton("Visualize")
@@ -161,11 +161,13 @@ class Page2(QSplitter):
         # Background color
         background_button = QPushButton("Background Color")
         background_button.clicked.connect(self.background_dialog)
+        background_button.setFixedWidth(180)
                                         
         # Capture Screenshot
         screen_cap = QPushButton("Take Screenshot")
         screen_cap.clicked.connect(self.screenshot)
         screen_cap.setToolTip("Saves screenshot of current view into results directory.")
+        screen_cap.setFixedWidth(180)
         
         vis_optionslayout.addWidget(self.axes_button)
         vis_optionslayout.addWidget(self.show_legend)
@@ -173,8 +175,8 @@ class Page2(QSplitter):
         vis_optionslayout.addWidget(self.legend_options)
         vis_optionslayout.addWidget(self.bounds_box)
         vis_optionslayout.addWidget(self.grid_coords)
-        vis_optionslayout.addWidget(background_button)
-        vis_optionslayout.addWidget(screen_cap)
+        vis_optionslayout.addWidget(background_button, alignment=Qt.AlignCenter)
+        vis_optionslayout.addWidget(screen_cap, alignment=Qt.AlignCenter)
         
         ### Tube view groupbox ###
         group_font = QFont()
@@ -212,6 +214,7 @@ class Page2(QSplitter):
         self.network_opacity.setRange(0,100)
         self.network_opacity.setSingleStep(10)
         self.network_opacity.valueChanged.connect(self.update_opacity)
+        self.network_opacity.setFixedWidth(65)
         net_opac_layout.addWidget(opacity_label)
         net_opac_layout.addWidget(self.network_opacity)
         net_opac_layout.addStretch(0)      
@@ -226,6 +229,7 @@ class Page2(QSplitter):
         nbcolorcolumnlayout = QVBoxLayout(self.nbcolorcolumn)
         nbcolorcolumnlayout.setContentsMargins(0,0,0,0)
         self.nb_color_button = QPushButton("Select Color")
+        self.nb_color_button.setFixedWidth(120)
         self.nb_color_button.clicked.connect(self.mesh_color)
         nbcolorbox = QHBoxLayout()
         nbcolorbox.setContentsMargins(0,0,0,0)
@@ -252,6 +256,7 @@ class Page2(QSplitter):
         necolorcolumnlayout.setContentsMargins(0,0,0,0)
         self.ne_color_button = QPushButton("Select Color")
         self.ne_color_button.clicked.connect(self.mesh_color)
+        self.ne_color_button.setFixedWidth(120)
         necolorbox = QHBoxLayout()
         necolorbox.setContentsMargins(0,0,0,0)
         self.netecolor = QWidget()
@@ -278,10 +283,12 @@ class Page2(QSplitter):
         
         
         self.network_scalar = QComboBox()
+        self.network_scalar.setFixedWidth(120)
         self.network_scalar.setFont(option_font)
         self.load_scalar_options(self.network_scalar)
         self.network_scalar.currentIndexChanged.connect(self.update_scalars)
         self.network_scalar_theme = QComboBox()
+        self.network_scalar_theme.setFixedWidth(120)
         self.network_scalar_theme.setFont(option_font)
         self.load_themes(self.network_scalar_theme)
         self.network_scalar_theme.currentIndexChanged.connect(self.update_cmap)
@@ -299,6 +306,7 @@ class Page2(QSplitter):
         self.network_single_colors.toggled.connect(self.toggle_network_color)
         self.network_colorbutton = QPushButton("Select Color")
         self.network_colorbutton.clicked.connect(self.mesh_color)
+        self.network_colorbutton.setFixedWidth(120)
         
         self.ncb = QWidget()
         ncblayout = QVBoxLayout(self.ncb)
@@ -312,8 +320,7 @@ class Page2(QSplitter):
         network_colorbox.addWidget(color_header[2])
         network_colorbox.addWidget(self.network_color)
         network_colorbox.addStretch(0)
-        
-        ncblayout.addWidget(self.network_colorbutton)
+        ncblayout.addWidget(self.network_colorbutton, alignment=Qt.AlignCenter)
         ncblayout.addLayout(network_colorbox)
         self.ncb.setVisible(False)
         
@@ -363,6 +370,7 @@ class Page2(QSplitter):
         self.scaled_opacity.setRange(0,100)
         self.scaled_opacity.setSingleStep(10)
         self.scaled_opacity.valueChanged.connect(self.update_opacity)
+        self.scaled_opacity.setFixedWidth(65)
         scal_opac_layout.addWidget(opacity_label1)
         scal_opac_layout.addWidget(self.scaled_opacity)
         scal_opac_layout.addStretch(0)      
@@ -378,6 +386,7 @@ class Page2(QSplitter):
         sbcolorcolumnlayout.setContentsMargins(0,0,0,0)
         self.sb_color_button = QPushButton("Select Color")
         self.sb_color_button.clicked.connect(self.mesh_color)
+        self.sb_color_button.setFixedWidth(120)
         sbcolorbox = QHBoxLayout()
         sbcolorbox.setContentsMargins(0,0,0,0)
         self.sbcolor = QWidget()
@@ -403,6 +412,7 @@ class Page2(QSplitter):
         secolorcolumnlayout.setContentsMargins(0,0,0,0)
         self.se_color_button = QPushButton("Select Color")
         self.se_color_button.clicked.connect(self.mesh_color)
+        self.se_color_button.setFixedWidth(120)
         secolorbox = QHBoxLayout()
         secolorbox.setContentsMargins(0,0,0,0)
         self.secolor = QWidget()
@@ -428,6 +438,7 @@ class Page2(QSplitter):
         self.scaled_scalar_colors.toggled.connect(self.toggle_scaled_color)
         
         self.scaled_scalar = QComboBox()
+        self.scaled_scalar.setFixedWidth(120)
         self.scaled_scalar.setFont(option_font)
         self.load_scalar_options(self.scaled_scalar)
         self.scaled_scalar.setCurrentIndex(1)
@@ -436,6 +447,7 @@ class Page2(QSplitter):
         self.scaled_scalar_theme.setFont(option_font)
         self.load_themes(self.scaled_scalar_theme)
         self.scaled_scalar_theme.currentIndexChanged.connect(self.update_cmap)
+        self.scaled_scalar_theme.setFixedWidth(120)
         
         self.ssb = QWidget()
         self.ssb_layout = QVBoxLayout(self.ssb)
@@ -450,6 +462,7 @@ class Page2(QSplitter):
         self.scaled_single_colors.toggled.connect(self.toggle_scaled_color)
         self.scaled_colorbutton = QPushButton("Select Color")
         self.scaled_colorbutton.clicked.connect(self.mesh_color)
+        self.scaled_colorbutton.setFixedWidth(120)
         
         self.scb = QWidget()
         scblayout = QVBoxLayout(self.scb)
@@ -464,7 +477,7 @@ class Page2(QSplitter):
         scaled_colorbox.addWidget(self.scaled_color)
         scaled_colorbox.addStretch(0)
         
-        scblayout.addWidget(self.scaled_colorbutton)
+        scblayout.addWidget(self.scaled_colorbutton, alignment=Qt.AlignCenter)
         scblayout.addLayout(scaled_colorbox)
         self.scb.setVisible(False)
         
@@ -524,6 +537,7 @@ class Page2(QSplitter):
         self.sm_opacity.setSuffix(" %")
         self.sm_opacity.setRange(0,100)
         self.sm_opacity.setSingleStep(10)
+        self.sm_opacity.setFixedWidth(65)
         sm_opaclayout.addWidget(opacity_label3)
         sm_opaclayout.addWidget(self.sm_opacity)
         sm_opaclayout.addStretch(0)
@@ -536,6 +550,7 @@ class Page2(QSplitter):
         
         self.smoothed_colorbutton = QPushButton("Select Color")
         self.smoothed_colorbutton.clicked.connect(self.mesh_color)
+        self.smoothed_colorbutton.setFixedWidth(120)
         
         sm_colorbox = QHBoxLayout()
         eliminate_spacing(sm_colorbox)
@@ -574,6 +589,7 @@ class Page2(QSplitter):
         self.o_opacity.setSuffix(" %")
         self.o_opacity.setRange(0,100)
         self.o_opacity.setSingleStep(10)
+        self.o_opacity.setFixedWidth(65)
         o_opaclayout.addWidget(opacity_label2)
         o_opaclayout.addWidget(self.o_opacity)
         o_opaclayout.addStretch(0)
@@ -586,6 +602,7 @@ class Page2(QSplitter):
         
         self.original_colorbutton = QPushButton("Select Color")
         self.original_colorbutton.clicked.connect(self.mesh_color)
+        self.original_colorbutton.setFixedWidth(120)
         
         o_colorbox = QHBoxLayout()
         eliminate_spacing(o_colorbox)
