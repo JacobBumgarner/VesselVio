@@ -156,4 +156,6 @@ python VVTerminal.py
    - Execute the following command in your terminal.
 ```markdown
 pyinstaller --add-data=Library;Library --additional-hooks-dir=Hooks --hidden-import=matplotlib VesselVio.py --windowed
+```
 
+You should now be able to successfuly use VesselVio on your PC either from the terminal or as a local stand-alone application!
