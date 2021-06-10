@@ -27,7 +27,3 @@ Currently, VesselVio is available for download as a standalone application for c
 
 This application is entirely open-source and free to download under [GNU GPLv3](https://github.com/JacobBumgarner/VesselVio/blob/main/LICENSE). Reseachers hoping to modify or use individual components of the application's software can find the sourcecode on the [GitHub VesselVio page](https://github.com/JacobBumgarner/VesselVio">GitHub/VesselVio).
 
-
-```markdown
-Download Instructions...
-```
