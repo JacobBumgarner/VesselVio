@@ -128,7 +128,7 @@ class AnalysisThread(QThread):
             # Check to see if graph save was requested.
             self.analysis_stage.emit(["Saving Graph...", i])
             if self.save_graph_files:
-                gproc.save_graph(graph, points, filename)
+                gproc.save_graph(graph, points, filename, self.results_folder)
             
             # Send completion announcement.
             seconds = '%.2f' % (time.perf_counter() - t1)
