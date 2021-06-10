@@ -116,11 +116,8 @@ max_radius = 150
 
 ## Testing.
 if __name__ == "__main__":
-    file1 = 'Segmented/bign.nii' 
-    file2 = 'Segmented/tiny.nii'
-    file3 = 'Segmented/TS Hb.nii'
-    file4 = '/Users/jacobbumgarner/Desktop/02_IC.tif'
-    file5 = '/Volumes/Bumgarner/IC_Segmented/04_IC.nii'
+    file1 = 'FILE PATH HERE'
+    file2 = 'ABBREV. FILE IN WORKING DIR'
     
     title = '4_IC_clim20'
     resolution = 2.7
