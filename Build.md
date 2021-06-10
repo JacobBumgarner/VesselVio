@@ -6,9 +6,12 @@ rank: 3
 
 Coming soon...
 
-If you are unable to run the packaged VesselVio app, this page is for you. Below are instructions detailing how to install the needed files to run VesselVio from the terminal or to build your own version of a stand-alone VesselVio application.
+If you are unable to run the packaged VesselVio app, or if the packaged app versions are newer than your computer's OS version, this page is for you. Below are instructions detailing how to install the needed files to run VesselVio from the terminal or to build your own version of a stand-alone VesselVio application.
 
-If you're using a Mac, follow the [MacOS Build Instructions](## MacOS Build Instructions)
+If you're using a Mac, follow the [MacOS Build Instructions](## MacOS Build Instructions) guide.
+
+If you're using a PC, follow the [Windows Build Instructions](## Windows Build Instructions) guide.
+
 
 ## MacOS Build Instructions
 First you'll need to install python 3.8.8. This can be [messy](https://xkcd.com/1987/) if you've got python installed elsewhere or if you don't have an environment manager.
@@ -89,3 +92,6 @@ VesselVio.py
 ```
  
 You should now be able to use VesselVio for dataset analysis and visualization!
+
+
+## Windows Build Instructions
