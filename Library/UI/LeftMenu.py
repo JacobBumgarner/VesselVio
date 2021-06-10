@@ -88,8 +88,9 @@ class LeftMenu(QFrame):
         
     def infoclick(self):
         message = """<center><b><u>About VesselVio:</b></u></center><br>
+                    This program is compatible with 2D and 3D datasets that have been pre-binarized and segmented.<br><br> 
                     VesselVio was developed by Jacob Bumgarner in Randy Nelson's lab at West Virginia University.<br><br>
-                    This software is <a href='GIT'>open-source</a> under GNU GPLv3.<br><br>
+                    This software is <a href='https://github.com/JacobBumgarner/VesselVio'>open-source</a> under GNU GPLv3.<br><br>
                     Please contact Jacob with any suggestions or questions:<br>
                     <center> <a href='mailto:jrbumgarner@mix.wvu.edu'>jrbumgarner@mix.wvu.edu</a>"""
         msgBox = QMessageBox()
