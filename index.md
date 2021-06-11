@@ -3,11 +3,11 @@
 
  [Editor](https://github.com/JacobBumgarner/VesselVio/tree/gh-pages) 
 
-<div class="iframe-container">
- <p align="center">
-  <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?hd=1' frameborder='0' scrolling='no' allowfullscreen></iframe>
- </p>
-<div/>
+
+<p align="center">
+ <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?hd=1' frameborder='0' scrolling='no' allowfullscreen></iframe>
+</p>
+???
 
 
 ## Analysis
