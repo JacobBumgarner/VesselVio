@@ -4,9 +4,9 @@
  [Editor](https://github.com/JacobBumgarner/VesselVio/tree/gh-pages) 
 
 
-<div class="iframe-container">
+<div style="position:relative; padding-bottom:calc(70.80% + 40px)">
  <p align="center">
-  <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?controls=0&hd=1' frameborder='0' scrolling='no' allowfullscreen></iframe>
+  <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?controls=0&hd=1' frameborder='0' scrolling='no' allowfullscreen style="position:absolute; top:0;left:0;"></iframe>
  </p>
 </div>
 
