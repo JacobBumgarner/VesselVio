@@ -26,17 +26,12 @@ footer {
 
 .iframe-container {
   position: relative;
-  width: 20%;
-  height: 20%;
+  width: 100vh;
+  height: 75vh;
 }
 
 .iframe-container iframe {
   position: absolute;
   width: 100%;
   height: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border: 0;
 }
