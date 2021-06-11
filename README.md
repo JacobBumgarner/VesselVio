@@ -21,7 +21,7 @@ VesselVio was constructed using [PyVista](https://github.com/pyvista/pyvista), a
 <p align="center">
   <img width="40%" alt="Gif" src="https://user-images.githubusercontent.com/70919881/121599185-b337d400-ca10-11eb-8d66-1b1bb1e0040c.mp4" /> <img width="40%" alt="Brain" src="https://user-images.githubusercontent.com/70919881/121599523-28a3a480-ca11-11eb-8340-c29350998f02.mp4">
   
-  <img align="center" width="50%" alt="Untitled" src="https://i.imgur.com/wnxSylE.png" />
+  <img align="center" width="70%" alt="Untitled" src="https://i.imgur.com/wnxSylE.png" />
   
 </p>
 
