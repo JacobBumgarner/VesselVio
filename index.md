@@ -4,7 +4,7 @@
  [Editor](https://github.com/JacobBumgarner/VesselVio/tree/gh-pages) 
 
 <p align="center">
- <img width=500 alt="Brain" src="https://i.imgur.com/GAbE0Zr.mp4">
+ <img width=500 alt="Brain" src="https://gfycat.com/niftygracefulafricanrockpython">
 </p>
 
 
