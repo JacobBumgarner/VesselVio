@@ -7,11 +7,6 @@
   <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?controls=0&hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe> 
 </div>
 
-<div style="position:relative; padding-bottom:calc(70.80% + 40px)">
- <p align="center">
-  <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?controls=0&hd=1' frameborder='0' scrolling='no' allowfullscreen style="position:absolute; top:0;left:0;" width="100%" height="100%"></iframe> 
- </p>
-</div>
 
 ## Analysis
 VesselVio works with any binarized and segmented vasculature dataset to provide large-scale and individual-segment qualitative features. We have tested analysis on datasets acquired with light-sheet microscopy, micro-computed tomography, and magnetic resonance angiography. Examples of dataset analyses can be found in our recent [pre-print publication](https://www.researchsquare.com/article/rs-608609/private/preview). 
