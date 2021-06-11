@@ -3,10 +3,13 @@
 
  [Editor](https://github.com/JacobBumgarner/VesselVio/tree/gh-pages) 
 
+<div class="iframe-container">
+  <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?controls=0&hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe> 
+</div>
 
 <div style="position:relative; padding-bottom:calc(70.80% + 40px)">
  <p align="center">
-  <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?controls=0&hd=1' frameborder='0' scrolling='no' allowfullscreen style="position:absolute; top:0;left:0;" width="100%" height="100%"></iframe>
+  <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?controls=0&hd=1' frameborder='0' scrolling='no' allowfullscreen style="position:absolute; top:0;left:0;" width="100%" height="100%"></iframe> 
  </p>
 </div>
 
