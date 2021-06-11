@@ -5,7 +5,7 @@
 
 <div class="iframe-container">
  <p align="center">
-  <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?hd=1' frameborder='0' scrolling='no' allowfullscreen width='640'></iframe>
+  <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?hd=1' frameborder='0' scrolling='no' allowfullscreen></iframe>
  </p>
 <div/>
 
