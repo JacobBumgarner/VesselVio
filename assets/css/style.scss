@@ -28,11 +28,11 @@ footer {
   position: relative;
   margin-left: auto;
   margin-right: auto;
-  width: 30vw;
-  padding-bottom: 50vh;
-  height: 0;
   overflow: hidden;
-  max-width: 100%
+  padding-bottom: 20%;
+  min-width: 250px;
+  max-width: 40%;
+  min-height: 200px;
 }
 
 .iframe-container iframe {
