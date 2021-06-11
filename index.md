@@ -17,7 +17,7 @@ VesselVio works with any binarized and segmented vasculature dataset to provide 
 ## Visualization
 Visualization of analyzed datasets can also be completed to manually inspect the results with the original and mesh-surface smoothed datasets. 
 <p align="center">
- <img align="center" alt="Visualization Page" src="https://i.imgur.com/wnxSylE.png">
+ <img align="center" style="width: 70%; min-width: 280px;" alt="Visualization Page" src="https://i.imgur.com/wnxSylE.png">
 </p>
 
 ## Download
