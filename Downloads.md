@@ -18,3 +18,6 @@ The applications are unsigned at the moment, so you may have to approve the appl
 ## NOTICE
 
 - 06.13.21 There is a currently a minor bug with the Windows package. The shortcut to the executable file wasn't linked corrected. To run the program, go to VesselVio>Contents>VesselVio.exe. You can create a shortcut of this and run the program from there.
+
+
+Please [contact us](mailto:vesselvio@gmail.com) with any bug reports, download issues, or feature requests.
