@@ -25,7 +25,7 @@ VesselVio was constructed using [PyVista](https://github.com/pyvista/pyvista), a
   
 </p>
 
-The front-end application was constructed usin [PyQt5](https://github.com/PyQt5/PyQt).
+The front-end application was constructed using [PyQt5](https://github.com/PyQt5/PyQt).
 
 Any suggestions, improvements, or comments should be directed to Jacob Bumgarner.
 
