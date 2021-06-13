@@ -4,9 +4,10 @@ title: "Downloads"
 rank: 2
 ---
 
-## Download Links
-VesselVio is available for download use in research as a stand-alone application.
+## Info
+VesselVio is available for download use in research as a stand-alone application. If you use the application for any work in your publications, please cite our [pre-print publication](https://www.researchsquare.com/article/rs-608609/v1).
 
+## Download Links
 Currently the stand-alone VesselVio application is available for MacOS 10.15.7+ and Windows 10+.
 
   | VesselVio Version | MacOS 10.15.7+ |    Windows 10+ |
@@ -19,5 +20,8 @@ The applications are unsigned at the moment, so you may have to approve the appl
 
 - 06.13.21 There is a currently a minor bug with the Windows package. The shortcut to the executable file wasn't linked corrected. To run the program, go to VesselVio>Contents>VesselVio.exe. You can create a shortcut of this and run the program from there.
 
+&nbsp;
 
-Please [contact us](mailto:vesselvio@gmail.com) with any bug reports, download issues, or feature requests.
+If you'd rather run the application/single analyses from your IDE, you can find our source-code on [GitHub](https://github.com/JacobBumgarner/VesselVio).
+
+Please feel free [contact us](mailto:vesselvio@gmail.com) with any bug reports, download issues, or feature requests.
