@@ -2,9 +2,9 @@
 ## Vasculature Analysis and Visualization
 
 <div class="iframe-container">
-  <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?controls=0&hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe>&nbsp;
+  <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?controls=0&hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe>
 </div>
-&nbsp;  
+&nbsp;
 
 ## Analysis
 Analyzing the structure of vascular networks can improve our understanding of their roles in health and disease. By observing and quantifying discrete alterations in the features of these networks, we can potentially improve the identification and characterization of underlying pathological conditions. 
