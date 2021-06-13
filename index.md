@@ -1,5 +1,5 @@
 
-## Microvasculature Analysis and Visualization
+## Vasculature Analysis and Visualization
 
 <div class="iframe-container">
   <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?controls=0&hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe>
