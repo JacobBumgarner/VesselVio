@@ -1,7 +1,7 @@
 # VesselVio
 VesselVio is an open-source application and software package developed for the analysis and visualization of vasculature datasets. 
 
-The program is compatabile with both 2D and 3D datasets of any imaging origin, with the caveat that the vasculature has been pre-segmented prior to analysis.
+The program is compatible with both 2D and 3D datasets of any imaging origin, with the caveat that the vasculature has been pre-segmented prior to analysis.
 
 ## Analysis
 Various whole-network and individual segment features are extracted from datasets and exported into convenient xlsx files for subsequent analyses. Through the adoption of Numba just-in-time compilation and parallelization of array processing, our back-end python source-code provides rapid options for various feature extractions. Users can prune segments at pre-defined lengths and can export graphml files for custom network analyses.
@@ -16,7 +16,7 @@ Briefly, binarized vascular datasets are skeletonized, and undirected graphs are
 
 
 ## Visualization
-VesselVio was constructed using [PyVista](https://github.com/pyvista/pyvista), a high-level VTK package, to allow users to interactively visualize their of vascular datasets. This can be great for the generation of figure images or result inspections.
+VesselVio was constructed using [PyVista](https://github.com/pyvista/pyvista), a high-level VTK package, to allow users to interactively visualize their own vascular datasets. This can be great for the generation of figure images or result inspections.
 
 <p align="center">
   <img width="48%" alt="Gif" src="https://user-images.githubusercontent.com/70919881/121599185-b337d400-ca10-11eb-8d66-1b1bb1e0040c.mp4" /> <img width="48%" alt="Brain" src="https://user-images.githubusercontent.com/70919881/121599523-28a3a480-ca11-11eb-8340-c29350998f02.mp4">
@@ -25,7 +25,7 @@ VesselVio was constructed using [PyVista](https://github.com/pyvista/pyvista), a
   
 </p>
 
-The front-end application was constructed usin [PyQt5](https://github.com/PyQt5/PyQt).
+The front-end application was constructed using [PyQt5](https://github.com/PyQt5/PyQt).
 
 Any suggestions, improvements, or comments should be directed to Jacob Bumgarner.
 
