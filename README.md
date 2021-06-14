@@ -1,7 +1,7 @@
 # VesselVio
 VesselVio is an open-source application and software package developed for the analysis and visualization of vasculature datasets. 
 
-The program is compatible with both 2D and 3D datasets of any imaging origin, with the caveat that the vasculature has been pre-segmented prior to analysis.
+The program is compatible with both 2D and 3D datasets of any imaging origin, with the caveat that the vasculature has been pre-segmented and binarized prior to analysis. Compatible file types include .nii, .tif, .bmp, & .png. 
 
 ## Analysis
 Various whole-network and individual segment features are extracted from datasets and exported into convenient xlsx files for subsequent analyses. Through the adoption of Numba just-in-time compilation and parallelization of array processing, our back-end python source-code provides rapid options for various feature extractions. Users can prune segments at pre-defined lengths and can export graphml files for custom network analyses.
