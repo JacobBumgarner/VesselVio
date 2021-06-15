@@ -8,6 +8,7 @@ By executing this program in a terminal, the VesselVio app will be built and can
 import sys, platform
 from os import path, environ, getcwd, mkdir
 
+# At the moment I import everything from the jump. I was experiencing issues with pyinstaller when some of these were excluded from the main file.
 from PyQt5.QtGui import QFont, QPalette
 from PyQt5.QtCore import Qt, QSize, pyqtSlot
 from PyQt5.QtWidgets import (QApplication,
