@@ -82,7 +82,7 @@ class mainWindow(QMainWindow):
         # Run our tiny file to prep our numba jitc.
         bep.process_file('./Library/tiny.nii')
         
-        # Present File
+        # Present application
         self.show()
       
     def update_dirs(self):
