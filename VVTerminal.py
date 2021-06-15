@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+By executing this program in a terminal, the specified files can be analyzed or visualized.
+Most commonly, I used this program for testing and movie generation.
+The features for movie generation can be adjusted in the Volume_Visualization.py file. 
+Adjustments will be made to allow for movie feature alterations from this file.
+
 Created on Tue Mar  2 15:03:10 2021
 
 @author: jacobbumgarner
@@ -99,7 +104,7 @@ def process_file(file_path, Visualize, movie, title, resolution, gen_volume, gen
     del(volume)
 
 
-# Loading dock for testing individual files...
+# Loading dock for testing individual files.
 def loading_dock(file_path, short_name, Visualize, movie, title, resolution, gen_volume, gen_tubes, save_seg_results, save_labeled, save_graph, verbose, iteration):
     wd = getcwd()
     
@@ -110,6 +115,7 @@ def loading_dock(file_path, short_name, Visualize, movie, title, resolution, gen
     
     return
 
+
 prune_length = 0
 filter_size = 10
 max_radius = 150
@@ -119,8 +125,8 @@ if __name__ == "__main__":
     file1 = 'FILE PATH HERE'
     file2 = 'ABBREV. FILE IN WORKING DIR'
     
-    title = '4_IC_clim20'
-    resolution = 2.7
+    title = 'FILE_NAME.nii'
+    resolution = 1
     short_name = False
     Visualize = False
     movie = True
