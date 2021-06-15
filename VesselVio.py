@@ -67,6 +67,8 @@ class mainWindow(QMainWindow):
         self.maingrid.addWidget(left_menu)
         self.qStack.addWidget(self.page1)
         self.qStack.addWidget(self.page2)
+        
+        ## TODO
         page3 = self.initPage3()
         self.maingrid.addWidget(self.qStack)
         
@@ -77,7 +79,7 @@ class mainWindow(QMainWindow):
         left_menu.qList.setCurrentRow(0)        
         
         
-        # Run our tiny file to prep our numba jit compilers.
+        # Run our tiny file to prep our numba jitc.
         bep.process_file('./Library/tiny.nii')
         
         # Present File
