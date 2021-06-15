@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+By executing this program in a terminal, the VesselVio app will be built and can be used to analyze and visualize files.
+
+@author: jacobbumgarner
+"""
+
 import sys, platform
 from os import path, environ, getcwd, mkdir
 
