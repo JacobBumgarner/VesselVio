@@ -23,7 +23,7 @@ The videos below were created using VesselVio's command-line script.
 Numerous network and segment features are calculated by PyVista. This includes network area/volume, network length, branch points, end points, and vessel segment partitioning. Individual segment features include the radius, length, tortuosity, volume, and surface area. These features are conveniently averaged and binned by segment size for ease of analysis.
 
 <p align="center">
-  <img width="48%" alt="Gif" src="https://user-images.githubusercontent.com/70919881/121599185-b337d400-ca10-11eb-8d66-1b1bb1e0040c.mp4" /> <img width="48%" alt="Brain" src="https://user-images.githubusercontent.com/70919881/121599523-28a3a480-ca11-11eb-8340-c29350998f02.mp4">
+  <img align="center" width="48%" alt="Distributions" src="https://i.imgur.com/zUV4ydP.png" /> <img align="center" width="48%" alt="Basic Results" src="https://i.imgur.com/vtU6obz.png" />
 </p>
 
 <p align="center">
