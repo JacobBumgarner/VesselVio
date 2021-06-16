@@ -1,7 +1,7 @@
 ---
 layout: default
 title: "Build Instructions"
-rank: 3
+rank: 4
 ---
 
 If you are unable to run the packaged VesselVio app, or if the packaged app versions are newer than your computer's OS version, this page is for you. Below are instructions detailing how to install the needed files to run VesselVio from the terminal or to build your own version of a stand-alone VesselVio application.
