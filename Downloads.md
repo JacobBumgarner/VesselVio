@@ -1,7 +1,7 @@
 ---
 layout: default
 title: "Downloads"
-rank: 2
+rank: 5
 ---
 
 ## Info
