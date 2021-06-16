@@ -1,7 +1,7 @@
 ---
 layout: default
 title: "Image Gallery"
-rank: 4
+rank: 2
 ---
 
 ## Visualization Output
