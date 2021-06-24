@@ -16,9 +16,9 @@ Currently the stand-alone VesselVio application is available for MacOS 10.15.7+ 
 
 The applications are unsigned at the moment, so you may have to approve the application in your system settings. We will work to sign the application with authentication certificates in the near future.
 
-## NOTICE
+# NOTICE
 
-- 06.13.21 There is a currently a minor bug with the Windows package. The shortcut to the executable file wasn't linked corrected. To run the program, go to VesselVio>Contents>VesselVio.exe. You can create a shortcut of this and run the program from there.
+- 06.13.21 There is a currently a minor bug with the Windows package. The shortcut to the executable file wasn't linked correctly. To run the program, go to VesselVio>Contents>VesselVio.exe. You can create a shortcut of this .exe file and run the program from there.
 
 &nbsp;
 
