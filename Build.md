@@ -14,16 +14,16 @@ If you're using a PC, follow the [Windows Build Instructions](#windows-build-ins
 ## MacOS Build Instructions
 First you'll need to install python 3.8.8. This can be <a href="https://xkcd.com/1987/" target="_blank">messy</a> if you've got python installed elsewhere or if you don't have an environment manager.
 
-We typically use an environment manager: pyenv. We build it using Homebrew. If you've already got a python environment setup, skip to step 3.
+We use pyenv installed with Homebrew, a popular python environment manager. If you've already got a python environment setup, skip to step 3.
 
 1. Install [Homebrew](https://brew.sh) as instructed by the developers.
 
 2. Install [pyenv](https://github.com/pyenv/pyenv) and [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) as instructed by the developers or by pasting the following code into a terminal window:
 ```markdown
-install pyenv
-install pyenv-virtualenv
+brew install pyenv
+brew install pyenv-virtualenv
 ```
-   - Configure your shell's environment for pyenv (here we use Zsh). Enter the following commands into your terminal to modify the .zprofile
+   - Configure your shell's environment for pyenv (we use Zsh). Enter the following commands into your terminal to modify the .zprofile
 ```markdown
 echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
 eval "$(pyenv init -)"
@@ -66,7 +66,7 @@ cd desktop/VesselVio
 pip install -r requirements.txt
 ```
 
-5. If you want to run the application from your terminal, navigate to the directory location where the VesselVio source-code is located. The source-code can be downloaded from our [GitHub page](https://github.com/JacobBumgarner/VesselVio). Make sure VV has been activated before trying to execute any files!
+5. If you want to run the application from your terminal, navigate to the directory location where the VesselVio source-code is located. The source-code can be downloaded from our [GitHub page](https://github.com/JacobBumgarner/VesselVio). Make sure VV has been activated before trying to execute any files!  We use [Visual Studio Code](https://code.visualstudio.com) which takes care of all of these steps automatically upon configuration.
    - Navigate to the VesselVio directory (example below) and activate the VV environment
 ```markdown
 cd desktop/VesselVio
