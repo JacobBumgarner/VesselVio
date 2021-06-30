@@ -14,11 +14,12 @@ Currently the stand-alone VesselVio application is available for MacOS 10.15.7+ 
   |:-------------:|:---------------:|:---------------:|
   | 1.0           | [Download](https://sourceforge.net/projects/vesselvio/files/1.0%20Downloads/VesselVio.app.zip/download) | [Download](https://sourceforge.net/projects/vesselvio/files/1.0%20Downloads/VesselVio.zip/download)  |
 
-The applications are unsigned at the moment, so you may have to approve the application in your system settings. We will work to sign the application with authentication certificates in the near future.
 
 # NOTICE
 
 - If using Windows, make sure to unzip the package before running. If the shortcut isn't working, you can create a new shortcut by going to VesselVio>Contents>VesselVio.exe. Please [contact us](mailto:vesselvio@gmail.com) with any questions or issues.
+
+- The software packages are unsigned at the moment. This means that dependeing on your system settings, you'll likely have to approve the application for run. We will work to sign the application with authentication certificates in the near future.
 
 &nbsp;
 
