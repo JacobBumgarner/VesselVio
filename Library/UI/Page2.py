@@ -68,10 +68,10 @@ class Page2(QSplitter):
         
         # Add our default file
         # A visualization
-        self.visualized_file = path.join(wd, 'Library/tiny.nii')
+        self.visualized_file = path.join(wd, 'Library/Cube.nii')
         self.queued_file = self.visualized_file
         
-        self.loaded_vis = QLineEdit("tiny.nii")
+        self.loaded_vis = QLineEdit("Cube.nii")
         self.loaded_vis.setFixedWidth(150)
         self.loaded_vis.setReadOnly(True)
         self.loaded_vis.setAlignment(Qt.AlignCenter)
