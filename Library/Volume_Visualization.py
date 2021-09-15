@@ -79,7 +79,7 @@ def py_plot(graph, resolution, verbose=False):
             # Prepare our scalars
             segment_length *= resolution
             radius = avg_radius * resolution
-            tortuosity = tortuosity.astype('float32') # Need to type match this for later.
+            tortuosity = float(tortuosity) # Need to type match this for later.
             spline['Length'] = [segment_length]
             spline['Radius'] = [radius]
             spline['Tortuosity'] = [tortuosity]
@@ -137,8 +137,7 @@ def py_plot(graph, resolution, verbose=False):
         # Make the scalars
         length = e['edge_length'] * resolution
         radius = avg_radius * resolution
-        a = np.array([1], dtype=np.float32)
-        tortuosity = a[0] #Can't mix types 
+        tortuosity = float(1)
         spline['Length'] = [length]
         spline['Radius'] = [radius]
         spline['Tortuosity'] = [tortuosity]
