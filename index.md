@@ -1,6 +1,6 @@
 
 ## Vasculature Analysis and Visualization
-
+VesselVio is an open-source application designed to allow researchers to analyze and visualize segmented and binarized vasculature datasets.
 <div class="iframe-container">
   <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe>
 </div>&nbsp;
@@ -8,13 +8,13 @@
 ## Analysis
 Analyzing the structure of vascular networks can improve our understanding of their roles in health and disease. By observing and quantifying discrete alterations in the features of these networks, we can potentially improve the identification and characterization of underlying pathological conditions. 
 
-VesselVio is compatible with any binarized and segmented vasculature dataset. Analysis of loaded datasets provides convenient xlsx exports with large-scale and individual-segment quantitative features. We have tested analysis on datasets acquired with light-sheet microscopy, micro-computed tomography, and magnetic resonance angiography. Examples of dataset analyses can be found in our recent [pre-print publication](https://www.researchsquare.com/article/rs-608609/v1). 
+VesselVio is compatible with any binarized and segmented vasculature dataset. Analysis of loaded datasets provides convenient xlsx exports with whole-network and individual-segment quantitative features. The program has been tested on datasets acquired with light-sheet microscopy, micro-computed tomography, and magnetic resonance angiography. Examples of dataset analyses can be found in our recent [pre-print publication](https://www.researchsquare.com/article/rs-608609/v1). 
 
 <p align="center">
  <img style="width: 50%; min-width: 300px;" alt="Analysis Page" src="https://i.imgur.com/szFAVii.png">
 </p>
 
-Numerous advancements in preclinical imaging technologies have lead to the generation of large-scale and micron-resolution vasculature datasets. These datasets include whole-brain, lymph node, and tumor vascualture. VesselVio bridges the gap between modern, advanced preclinical imaging technologies and open-source analysis programs.
+Numerous advancements in preclinical imaging technologies have lead to the generation of large-scale and micron-resolution vasculature datasets. These datasets include whole-brain, lymph node, and tumor vascualture. VesselVio bridges the gap between modern imaging and segmentation technologies and open-source analysis programs.
 
 ## Visualization
 VesselVio provides built-in visualization features to observe and inspect vasculature datasets for feature identifications and accuracy confirmations.
