@@ -1,5 +1,5 @@
 ---
 layout: default
-title: "Usage Instructions"
+title: "Tutorial"
 rank: 3
 ---
