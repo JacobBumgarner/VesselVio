@@ -1,12 +1,15 @@
 # VesselVio
-VesselVio is an open-source application and software package developed for the analysis and visualization of vasculature datasets. 
+VesselVio is an open-source application designed for the analysis and visualization of segmented vasculature datasets. 
 
-The program is compatible with both 2D and 3D datasets of any imaging origin, with the caveat that the vasculature has been pre-segmented and binarized prior to analysis. Compatible file types include .nii, .tif, .bmp, & .png. 
+There several options for using VesselVio. First, you can [download our app](https://jacobbumgarner.github.io/VesselVio/Downloads.html) for Windows and MacOS. Next, you can execute the app in your own IDE using the VesselVio.py script. Lastly, you can run individual file analyses/visualizations/movie generations by modifying and executing the VVT.py script.
 
-There are two options for running VesselVio. First, you run the app by executing the VesselVio.py file (or by downloading the [frozen application](https://jacobbumgarner.github.io/VesselVio/Downloads.html)). Or, you can run individual file analyses/visualizations/movie generations by modifying and executing the VVTerminal.py file.
+The program is compatible with both 2D and 3D datasets, with the caveat that the vasculature has been pre-segmented prior to analysis. Numerous open-source projects currently exist for this process<sup>[1](https://github.com/ChristophKirst/ClearMap2)[2](https://github.com/vessap/vessap)[3](https://github.com/giesekow/deepvesselnet)</sup>. Users can also analyze and visualize pre-constructed vascualture graphs from other programs.
+
+Finally, VesselVio is compatible with annotated datasets. Annotations can be loaded with original volumes as .nii files or as .png image series alongside custom or pre-loaded annotation trees from the Allen Brain Institute. Users can then select and process individual regions from these annotations as desired.
+
 
 ## Analysis
-Various whole-network and individual segment features are extracted from datasets and exported into convenient xlsx files for subsequent analyses. Through the adoption of Numba just-in-time compilation and parallelization of array processing, our back-end python source-code provides rapid options for various feature extractions. Users can prune segments at pre-defined lengths and can export graphml files for custom network analyses.
+Various reconstructs vascular networks to extract whole-network and individual segment features. Several examples of feature outputs can be seen below.
 
 <p align="center">
   <img align="center" height="200" alt="Untitled" src="https://user-images.githubusercontent.com/70919881/121594866-a369c100-ca0b-11eb-9e17-f59a55763a98.png" /><img align="center" height="300" alt="Data2" src="https://user-images.githubusercontent.com/70919881/121596339-4ff87280-ca0d-11eb-94e9-818d6928f070.png" />
@@ -14,11 +17,9 @@ Various whole-network and individual segment features are extracted from dataset
 <img align="center" width="50%" alt="Untitled" src="https://i.imgur.com/szFAVii.png" />
 </p>
 
-Briefly, binarized vascular datasets are skeletonized, and undirected graphs are created from the skeleton centerlines. Centerlines are smoothed, spurious branch points are filtered, and end-point and isolated segments of defined lengths are filtered from the datasets. Following this, various results are extracted from the undirected graph.
-
 
 ## Visualization
-VesselVio was constructed using [PyVista](https://github.com/pyvista/pyvista), an intuitive and high-level VTK package, to allow users to interactively visualize their own vascular datasets. This can be great for the generation of figure images or result inspections.
+The visualization component of VesselVio was constructed using [PyVista](https://github.com/pyvista/pyvista), an intuitive and high-level VTK package. Thanks to PyVista, users can easily visualize and examine their vasculature datasets with numerous options intended for accompanying figure images.
 
 <p align="center">
   <img width="48%" alt="Gif" src="https://user-images.githubusercontent.com/70919881/121599185-b337d400-ca10-11eb-8d66-1b1bb1e0040c.mp4" /> <img width="48%" alt="Brain" src="https://user-images.githubusercontent.com/70919881/121599523-28a3a480-ca11-11eb-8340-c29350998f02.mp4">
@@ -27,12 +28,12 @@ VesselVio was constructed using [PyVista](https://github.com/pyvista/pyvista), a
   
 </p>
 
-The front-end application was constructed using [PyQt5](https://github.com/PyQt5/PyQt).
+##
 
-Any suggestions, improvements, or comments should be directed to Jacob Bumgarner.
+The application's front-end was designed using [PyQt5](https://github.com/PyQt5/PyQt).
 
-If you use VesselVio in your research, please cite our [pre-print publication](https://www.researchsquare.com/article/rs-608609/v1).
+Any suggestions, improvements, or comments should be directed to [Jacob Bumgarner](jrbumgarner@mix.wvu.edu).
 
-https://www.researchsquare.com/article/rs-608609/v1
+<b>If you use VesselVio in your research, please cite our [pre-print publication](https://www.researchsquare.com/article/rs-608609/v1).
 
 
