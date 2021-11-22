@@ -14,7 +14,7 @@ Various reconstructs vascular networks to extract whole-network and individual s
 <p align="center">
   <img align="center" height="200" alt="Untitled" src="https://user-images.githubusercontent.com/70919881/121594866-a369c100-ca0b-11eb-9e17-f59a55763a98.png" /><img align="center" height="300" alt="Data2" src="https://user-images.githubusercontent.com/70919881/121596339-4ff87280-ca0d-11eb-94e9-818d6928f070.png" />
   
-<img align="center" width="50%" alt="Untitled" src="https://i.imgur.com/szFAVii.png" />
+
 </p>
 
 
@@ -24,14 +24,15 @@ The visualization component of VesselVio was constructed using [PyVista](https:/
 <p align="center">
   <img width="48%" alt="Gif" src="https://user-images.githubusercontent.com/70919881/121599185-b337d400-ca10-11eb-8d66-1b1bb1e0040c.mp4" /> <img width="48%" alt="Brain" src="https://user-images.githubusercontent.com/70919881/121599523-28a3a480-ca11-11eb-8340-c29350998f02.mp4">
   
-  <img align="center" width="70%" alt="Untitled" src="https://i.imgur.com/wnxSylE.png" />
-  
 </p>
 
-##
+## App Design
+
 
 The application's front-end was designed using [PyQt5](https://github.com/PyQt5/PyQt).
+<img align="center" width="50%" alt="Untitled" src="https://i.imgur.com/szFAVii.png" /><img align="center" width="70%" alt="Untitled" src="https://i.imgur.com/wnxSylE.png" />
 
+##
 Any suggestions, improvements, or comments should be directed to [Jacob Bumgarner](jrbumgarner@mix.wvu.edu).
 
 <b>If you use VesselVio in your research, please cite our [pre-print publication](https://www.researchsquare.com/article/rs-608609/v1).
