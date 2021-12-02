@@ -23,15 +23,11 @@ We use pyenv installed with Homebrew, a popular python environment manager. If y
 brew install pyenv
 brew install pyenv-virtualenv
 ```
-   - Configure your shell's environment for pyenv (we use Zsh). Enter the following commands into your terminal to modify the .zprofile
+   - Configure your shell's environment for pyenv and virtualenv (we use Zsh, see [here](https://github.com/pyenv/pyenv#homebrew-on-macos) if you use Bash or Fish). Enter the following commands into your terminal to modify the .zprofile and .zshrc
 ```markdown
 echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-```
-   - Next adjust the .zshrc
-```markdown
 echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.zshrc
 ```
    - Restart your terminal.
    - Ensure pyenv is set up by typing `pyenv` into a new terminal window. You should see a list of commands.
