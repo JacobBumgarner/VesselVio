@@ -1,12 +1,4 @@
 
-"""
-Author: Christoph Kirst <christoph.kirst.ck@gmail.com>
-License: GPLv3 - GNU General Pulic License v3 (see LICENSE)
-Copyright: Copyright © 2021 by Jacob Bumgarner
-Source: http://www.github.com/JacobBumgarner/VesselVio
-Website: https://vesselvio.com
-"""
-
 
 
 
