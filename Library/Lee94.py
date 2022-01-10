@@ -302,10 +302,7 @@ def binarize(volume):
     return (volume > 0).astype(np.uint8)
 
 def load_volume():
-    file = '/Users/jacobbumgarner/Desktop/VV_Build/Segmented/big.nii'
-    file = '/Users/jacobbumgarner/Desktop/A/1.nii'
-    file = '/Users/jacobbumgarner/Desktop/IC/01_IC.nii'
-    file = '/Users/jacobbumgarner/Desktop/v.nii'
+    file = 'test.nii'
     proxy = nibabel.load(file)
     volume = np.asarray(proxy.dataobj)
     # volume = binarize(volume)
@@ -324,18 +321,13 @@ if __name__ == "__main__":
     # volume = load_test(5)
     volume = load_volume()
     skeleton = np.ascontiguousarray(volume.copy())
-    print ("Me")
     t = pf()
     skeleton = skeletonize(skeleton, verbose=True)
     print (pf() - t)
-    print (skeleton.sum())
-    # WriteImage(GetImageFromArray(skeleton*255), '/Users/jacobbumgarner/Desktop/v.nii')
-    
-    print ("IAC")
+
     volume = load_volume()
     t = pf()
     skeleton = skeletonize_3d(volume)
     print (pf() - t)
-    print (skeleton.sum())
-    # WriteImage(GetImageFromArray(skeleton*255), '/Users/jacobbumgarner/Desktop/vIAC.nii')
+
     
