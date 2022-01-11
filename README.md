@@ -43,3 +43,4 @@ Any suggestions, improvements, or comments should be directed to [Jacob Bumgarne
 <b>If you use VesselVio in your research, please cite our [pre-print publication](https://www.researchsquare.com/article/rs-608609/v1).
 
 
+If you are looking for help with segmenting your vasculature, there are numerous packages available for this process<sup>[1](https://github.com/ChristophKirst/ClearMap2)[2](https://github.com/vessap/vessap)[3](https://github.com/giesekow/deepvesselnet)</sup>. The program is also capable of analyzing and visualizing  vasculature graphs that have been pre-constructed using other programs.
