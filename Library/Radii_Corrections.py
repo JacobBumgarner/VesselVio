@@ -78,8 +78,8 @@ def load_corrections(resolution=np.array([1,1,1]),
         if verbose:
             print ("Table generation complete.")
         return LUT
-            
-    if new_build:
+    
+    if new_build or not os.path.exists(rc_path):
         if verbose:
             print ("New build initiated.")
         LUT = build(resolution)
