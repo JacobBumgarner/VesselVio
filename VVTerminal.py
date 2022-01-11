@@ -1,15 +1,18 @@
+
 """
-By executing this program in a terminal, the specified files can be analyzed or visualized directly without a GUI interface.
-This script will likely only be useful for development or pipeline modification, as it is best for the analysis of individual files.
+The terminal-based access to the analysis pipeline. Headless, and doesn't come with the full functionality of the GUI. Best for testing or modifying the pipeline. Updates made here will need to be reflected on the QtThreading page.
+Copyright © 2021, Jacob Bumgarner
 """
+
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
 __copyright__ = 'Copyright © 2021 by Jacob Bumgarner'
-__webpage__   = 'https://jacobbumgarner.github.io/VesselVio_Web/'
-__download__  = 'https://jacobbumgarner.github.io/VesselVio_Web/Downloads'
+__webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
+__download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
 
 import os
+import re
 import time
 import igraph as ig
 
@@ -95,9 +98,9 @@ def process_graph(file_path, gen_options, graph_options, vis_options, verbose):
         
         
     
-# Process binarized volumes
-def process_volume(file_path, gen_options, ann_options, vis_options, iteration, verbose):
-    filename = ImProc.get_filename(file_path)
+# Process raw segmented volumes
+def process_volume(volume_file, gen_options, ann_options, vis_options, iteration, verbose):
+    filename = ImProc.get_filename(volume_file)
     if verbose:
         tic = time.perf_counter()
         print ("Processing dataset:", filename)
@@ -124,7 +127,7 @@ def process_volume(file_path, gen_options, ann_options, vis_options, iteration, 
         
         ## Image and volume processing.
         # region
-        volume, image_shape = ImProc.load_volume(file_path, verbose=verbose)
+        volume, image_shape = ImProc.load_volume(volume_file, verbose=verbose)
 
         if not ImProc.volume_check(volume, loading=True, verbose=verbose):
             if verbose:
@@ -135,6 +138,12 @@ def process_volume(file_path, gen_options, ann_options, vis_options, iteration, 
         if ROI_name:
             ROI_id = i % 255
             if ROI_id == 0:
+                if not helpers.check_storage(volume_file):
+                    file_size = helpers.get_file_size(volume_file, GB=True)
+                    if verbose:
+                        print (f"Not enough disk space! Need at least {file_size:.1f}GB of free space for the volume annotation.")
+                    return
+                
                 # We have to relabel every 255 elements because the volume.dtype == uint8.
                 ROI_sub_array = ROI_array[i:i+255]
                 ROI_volumes, minima, maxima = AnnProc.volume_labeling_input(volume, ann_options.annotation_file, 
@@ -224,7 +233,7 @@ def process_volume(file_path, gen_options, ann_options, vis_options, iteration, 
         if not vis_options.visualize or not vis_options.load_smoothed and not vis_options.load_original:
             volume = None
         else:
-            volume, _ = ImProc.load_volume(file_path)
+            volume, _ = ImProc.load_volume(volume_file)
             volume = ImProc.load_numba_compatible(volume)
             # Don't bound for visualization, as points will be true, not relative
             volume = VolProc.pad_volume(volume) 
@@ -251,12 +260,12 @@ if __name__ == "__main__":
     delimiter = ';' # If the file is a csv, what is the delimiter?
     vertex_representation = 'Branches' # 'Centerlines' or 'Branches' See documentation
       
-    attribute_key = IC.AttributeKey(X='X', Y='Y', Z='Z',
+    attribute_key = IC.AttributeKey(X='pos_x', Y='pos_x', Z='pos_x',
                                     vertex_radius='radius',
-                                    edge_radius='radius_avg', length='length',
-                                    volume='volume', surface_area='surface_area',
-                                    tortuosity='tortuosity',
-                                    edge_source='Source ID', edge_target='Target ID', edge_hex='hex')
+                                    edge_radius='avgRadiusAvg', length='length',
+                                    volume='volume', surface_area='',
+                                    tortuosity='curveness',
+                                    edge_source='node1id', edge_target='node2id', edge_hex='')
   
   
     centerline_smoothing = True # Smooth centerlines in vertex-based graphs?
@@ -272,7 +281,9 @@ if __name__ == "__main__":
     ###################### 
     # region    
     # Filepath to the annotation. RGB series folder OR .nii Allen brain atlas file
-    annotation_file = 'example_annotation.nii'
+    annotation_file = '/Users/jacobbumgarner/Desktop/BalbC_No1/RGB/Annotation Folder/A3'
+    annotation_file = '/Users/jacobbumgarner/Desktop/CD1-E_no1_iso3um_stitched_atlas_registration_result.nii'
+    annotation_file = '/Users/jacobbumgarner/Desktop/BalbC_No1/Sagittal 50/BalbC1_Annotation-50.nii'
 
     atlas = 'Library/Annotation Trees/p56 Mouse Brain.json'
     annotation_type = 'ID' # 'RGB' or 'ID'
@@ -288,9 +299,9 @@ if __name__ == "__main__":
     ### Visualization Options ###
     #############################
     # region    
-    visualize = True # Visualize the dataset? 
+    visualize = False # Visualize the dataset? 
     simplified_visualization = False # Faster but less detailed visualization.
-    # Network
+    # Network 
     load_network = False
     # Scaled
     load_scaled = True
@@ -306,8 +317,8 @@ if __name__ == "__main__":
     load_smoothed_volume = False
     # Movie options
     create_movie = False # Generate orbital movie?
-    movie_title = 'Movie_Title'
-    viewup = [1,0,0]
+    movie_title = 'Synth Demo4'
+    viewup = [-0.56, -0.44, 0.69]
     
     vis_options = IC.VisualizationOptions(visualize, simplified_visualization, 
                                           load_scaled, load_network, 
@@ -329,8 +340,8 @@ if __name__ == "__main__":
      
     # Results/graph export
     save_segment_results = True # Save individual segment features to csv file
-    results_folder = 'SAVE PATH HERE'
-    save_graph = True # Save reduced graph export?
+    results_folder = '/Users/jacobbumgarner/Desktop/VesselVio'
+    save_graph = False # Save reduced graph export?
     verbose = True 
     
     gen_options = IC.AnalysisOptions(results_folder, resolution, prune_length, 
@@ -345,25 +356,31 @@ if __name__ == "__main__":
     no_anno = IC.AnnotationOptions(None, None, 'None', None)
     process_volume(compiler_file, gen_options, no_anno, vis_options, 0, verbose)
     
-    ######################
+    ###################### 
     ### Run files here ###
     ######################
-    file1 = 'example.nii'
+    file1 = '/Users/jacobbumgarner/Desktop/VV_Build/Segmented/7.tif'
+    file2 = '/Users/jacobbumgarner/Desktop/100V.nii'
+    file3 = '/Users/jacobbumgarner/Desktop/BalbC_No1/RGB/RGB-3.nii'
+    file4 = '/Users/jacobbumgarner/Desktop/A/1.nii'
+    file5 = '/Users/jacobbumgarner/Desktop/BalbC1_Sagittal-2.nii'
+    file6 = '/Users/jacobbumgarner/Desktop/BalbC_No1/Sagittal 50/BalbC1_Sagittal-50.nii'
     
     iteration = 0
     
     # Use "no_anno" in place of "anno_options" if there are no annotations
-    process_volume(file0, gen_options, no_anno, vis_options, iteration, verbose)
+    process_volume(file1, gen_options, no_anno, vis_options, iteration, verbose)
      
     
     ### Graph files
     # Follow the format below to load csv-based graphs.
-    vertices = 'example_nodes.csv'
-    edges = 'example_edges.csv'
+    vertices = '/Users/jacobbumgarner/Desktop/synthetic_graph_1/1_b_3_0/1_b_3_0_nodes_processed.csv'
+    edges = '/Users/jacobbumgarner/Desktop/synthetic_graph_1/1_b_3_0/1_b_3_0_edges_processed.csv'
     graph0 = {'Vertices': vertices, 'Edges':edges}
     
     # iGraph compatible format
     graph1 = 'example.graphml'
 
     # process_graph(graph0, gen_options, graph_options, vis_options, verbose)    
+
 
