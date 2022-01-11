@@ -82,9 +82,13 @@ python VVTerminal.py
 pyinstaller \
 --add-data=./Library:Library \
 --additional-hooks-dir=./Hooks \
---hidden-import=matplotlib \
+--icon Icons/icon.icns
 --windowed \
 VesselVio.py
+```
+- Then, for the first build of the app, you'll have to open it via the terminal. If the `dist` folder is in the current directory, run:
+```markdown
+open dist/VesselVio.app
 ```
  
 You should now be able to use VesselVio for dataset analysis and visualization!
@@ -159,7 +163,7 @@ python VVTerminal.py
    - Activate python 3.8.8
    - Execute the following command in your terminal:
 ```markdown
-pyinstaller --add-data=Library;Library --additional-hooks-dir=Hooks --hidden-import=matplotlib VesselVio.py --windowed
+pyinstaller --add-data=Library;Library --additional-hooks-dir=Hooks --icon Icons\icon.ico VesselVio.py --windowed
 ```
 
 You should now be able to successfuly use VesselVio on your PC either from the terminal or as a local stand-alone application!
