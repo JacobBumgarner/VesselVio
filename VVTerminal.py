@@ -1,6 +1,8 @@
 
 """
-The terminal-based access to the analysis pipeline. Headless, and doesn't come with the full functionality of the GUI. Best for testing or modifying the pipeline. Updates made here will need to be reflected on the QtThreading page.
+The terminal-based entry point to the analysis pipeline. 
+Headless, and doesn't come with the full functionality of the GUI. Best for testing or modifying the pipeline. 
+Updates made here will need to be manually reflected on the QtThreading page.
 Copyright © 2021, Jacob Bumgarner
 """
 
@@ -260,12 +262,12 @@ if __name__ == "__main__":
     delimiter = ';' # If the file is a csv, what is the delimiter?
     vertex_representation = 'Branches' # 'Centerlines' or 'Branches' See documentation
       
-    attribute_key = IC.AttributeKey(X='pos_x', Y='pos_x', Z='pos_x',
+    attribute_key = IC.AttributeKey(X='X', Y='Y', Z='Z',
                                     vertex_radius='radius',
-                                    edge_radius='avgRadiusAvg', length='length',
-                                    volume='volume', surface_area='',
-                                    tortuosity='curveness',
-                                    edge_source='node1id', edge_target='node2id', edge_hex='')
+                                    edge_radius='radius_avg', length='length',
+                                    volume='volume', surface_area='surface_area',
+                                    tortuosity='tortuosity',
+                                    edge_source='Source ID', edge_target='Target ID', edge_hex='hex')
   
   
     centerline_smoothing = True # Smooth centerlines in vertex-based graphs?
@@ -281,9 +283,7 @@ if __name__ == "__main__":
     ###################### 
     # region    
     # Filepath to the annotation. RGB series folder OR .nii Allen brain atlas file
-    annotation_file = '/Users/jacobbumgarner/Desktop/BalbC_No1/RGB/Annotation Folder/A3'
-    annotation_file = '/Users/jacobbumgarner/Desktop/CD1-E_no1_iso3um_stitched_atlas_registration_result.nii'
-    annotation_file = '/Users/jacobbumgarner/Desktop/BalbC_No1/Sagittal 50/BalbC1_Annotation-50.nii'
+    annotation_file = 'annotation_volume.nii'
 
     atlas = 'Library/Annotation Trees/p56 Mouse Brain.json'
     annotation_type = 'ID' # 'RGB' or 'ID'
@@ -317,8 +317,8 @@ if __name__ == "__main__":
     load_smoothed_volume = False
     # Movie options
     create_movie = False # Generate orbital movie?
-    movie_title = 'Synth Demo4'
-    viewup = [-0.56, -0.44, 0.69]
+    movie_title = 'Volume Orbit'
+    viewup = [1,0,0]
     
     vis_options = IC.VisualizationOptions(visualize, simplified_visualization, 
                                           load_scaled, load_network, 
@@ -340,7 +340,7 @@ if __name__ == "__main__":
      
     # Results/graph export
     save_segment_results = True # Save individual segment features to csv file
-    results_folder = '/Users/jacobbumgarner/Desktop/VesselVio'
+    results_folder = 'RESULTS/PATH/HERE'
     save_graph = False # Save reduced graph export?
     verbose = True 
     
@@ -359,23 +359,19 @@ if __name__ == "__main__":
     ###################### 
     ### Run files here ###
     ######################
-    file1 = '/Users/jacobbumgarner/Desktop/VV_Build/Segmented/7.tif'
-    file2 = '/Users/jacobbumgarner/Desktop/100V.nii'
-    file3 = '/Users/jacobbumgarner/Desktop/BalbC_No1/RGB/RGB-3.nii'
-    file4 = '/Users/jacobbumgarner/Desktop/A/1.nii'
-    file5 = '/Users/jacobbumgarner/Desktop/BalbC1_Sagittal-2.nii'
-    file6 = '/Users/jacobbumgarner/Desktop/BalbC_No1/Sagittal 50/BalbC1_Sagittal-50.nii'
+    file0 = 'volume0.nii'
+    file1 = 'volume1.nii'
     
     iteration = 0
     
     # Use "no_anno" in place of "anno_options" if there are no annotations
-    process_volume(file1, gen_options, no_anno, vis_options, iteration, verbose)
+    process_volume(file0, gen_options, no_anno, vis_options, iteration, verbose)
      
     
     ### Graph files
     # Follow the format below to load csv-based graphs.
-    vertices = '/Users/jacobbumgarner/Desktop/synthetic_graph_1/1_b_3_0/1_b_3_0_nodes_processed.csv'
-    edges = '/Users/jacobbumgarner/Desktop/synthetic_graph_1/1_b_3_0/1_b_3_0_edges_processed.csv'
+    vertices = 'vertices.csv'
+    edges = 'edges.csv'
     graph0 = {'Vertices': vertices, 'Edges':edges}
     
     # iGraph compatible format
