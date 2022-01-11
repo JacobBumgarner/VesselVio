@@ -1,9 +1,13 @@
 # VesselVio
 VesselVio is an open-source application designed for the analysis and visualization of segmented vasculature datasets. 
 
-There several options for using VesselVio. First, you can [download our app](https://jacobbumgarner.github.io/VesselVio/Downloads.html) for Windows and MacOS. Next, you can execute the app in your own IDE using the VesselVio.py script. Lastly, you can run individual file analyses/visualizations/movie generations by modifying and executing the VVT.py script.
+There several options for using VesselVio:
 
-The program is compatible with both 2D and 3D vasculature datasets that have been pre-segmented. If you are looking for help with segmenting your vasculature, there are numerous packages available for this process<sup>[1](https://github.com/ChristophKirst/ClearMap2)[2](https://github.com/vessap/vessap)[3](https://github.com/giesekow/deepvesselnet)</sup>. The program is also capable of analyzing and visualizing  vasculature graphs that have been pre-constructed using other programs.
+- [Download our app](https://jacobbumgarner.github.io/VesselVio/Downloads.html) for Windows and MacOS.
+- Run the app in your own IDE by executing the VesselVio.py file
+- Modify the analysis pipeline and add custom analyses using the VVTerminal.py file
+
+The program is compatible with both 2D and 3D vasculature datasets that have been pre-segmented (binarized). 
 
 Finally, VesselVio is compatible with annotated datasets. Annotations can be loaded with original volumes as .nii files or as .png RGB image series alongside custom or pre-loaded annotation trees from the Allen Brain Institute. Users can then select and process individual regions from these annotations as desired. If you're looking for help with annotating mouse brain datasets, check out [QuickNII](https://www.nitrc.org/projects/quicknii).
 
