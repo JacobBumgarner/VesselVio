@@ -465,26 +465,17 @@ if __name__ == "__main__":
     print ("Regions:", len(annotation_data.keys()))
 
     
-    # volume = ImProc.load_nii_volume('/Users/jacobbumgarner/Desktop/CD1-E_no1_iso3um_stitched_segmentation.nii')
-    # annotation = "/Users/jacobbumgarner/Desktop/CD1-E_no1_iso3um_stitched_atlas_registration_result.nii"
+    # volume = ImProc.load_nii_volume('volume.nii')
+    # annotation = "annotation_volume.nii"
     # id_array = prep_id_array(annotation_data)
     # volume, ROI_volumes, mins, maxes = id_segmentation_input(volume, annotation, id_array, verbose=True)
 
 
-    volume = ImProc.load_nii_volume('/Users/jacobbumgarner/Desktop/BalbC_No1/RGB/A testing.nii')
-    annotation_folder = "/Users/jacobbumgarner/Desktop/BalbC_No1/RGB/Annotation Folder/Annotation"
+    volume = ImProc.load_nii_volume('volume.nii')
+    annotation_folder = "RGB Annotation Folder"
     RGB_array = prep_RGB_array(annotation_data)
     volume, ROI_volumes, mins, maxes = RGB_labeling_input(volume, annotation_folder, RGB_array, verbose=True)
     
-    
-    # t = pf()
-    # volume = segment_and_bound(volume, mins[0], maxes[0], 1)
-    # print (pf() - t)
-    print ("Saving")
-    t = pf()
-    nibabel.save(nibabel.Nifti1Image(np.asarray(volume).transpose(), np.eye(4)),
-                 '/Users/jacobbumgarner/Desktop/v.nii')
-    print (pf() - t)
     
         
 else:
