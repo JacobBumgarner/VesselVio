@@ -36,8 +36,8 @@ class updateAlert(QDialog):
         URL = "https://jacobbumgarner.github.io/VesselVio_Web/Downloads"
         
         message = QLabel(f"""<center>An updated version of VesselVio is available to download!<br><br>
-                         <b>Your version:</b> {local_version}<br><br>
-                         <b>Current version:</b> {current_version}<br>
+                         <b>Your version:</b> {local_version}<br>
+                         <b>Current version:</b> {current_version}<br><br>
                          You can download the update by clicking <u><a href={URL}>here</u></a>.<br>""")
         message.setOpenExternalLinks(True)
         
