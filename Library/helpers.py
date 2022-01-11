@@ -92,7 +92,7 @@ def load_results_dir():
     #     results_dir = f.read()
 
     # Checks to see if our results pathway is present or if our results cache is empty.
-    if not results_dir:
+    if not os.path.exists(results_dir):
         desktop = get_dir('Desktop')
         results_dir = os.path.join(desktop, 'VesselVio')
         results_dir = std_path(results_dir)
@@ -673,9 +673,4 @@ def get_resolution(resolution):
         X /= 2
         Y /= 2
     return X, Y
-
-
-
-
-
 
