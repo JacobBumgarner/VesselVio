@@ -1,13 +1,14 @@
+
 """
-This is the GUI entry point for VesselVio. By executing VesselVio.py, the app will be built and can be used locally.
+The main entry point to build the GUI of the application.
+Copyright © 2021, Jacob Bumgarner
 """
 
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
 __copyright__ = 'Copyright © 2021 by Jacob Bumgarner'
-__webpage__   = 'https://jacobbumgarner.github.io/VesselVio_Web/'
-__download__  = 'https://jacobbumgarner.github.io/VesselVio_Web/Downloads'
-
+__webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
+__download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
 
 import sys
