@@ -87,7 +87,6 @@ def load_movie_dir():
 
 def load_results_dir():
     results_dir = get_results_cache()
-    print (results_dir)
     # # Define our results path
     # with open(results_cache, 'r') as f:
     #     results_dir = f.read()
