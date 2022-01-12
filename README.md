@@ -9,7 +9,7 @@ There several options for using VesselVio:
 
 The program is compatible with both 2D and 3D vasculature datasets that have been pre-segmented (binarized). 
 
-Finally, VesselVio is compatible with annotated datasets. Annotations can be loaded with original volumes as .nii files or as .png RGB image series alongside custom or pre-loaded annotation trees from the Allen Brain Institute. Users can then select and process individual regions from these annotations as desired. If you're looking for help with annotating mouse brain datasets, check out [QuickNII](https://www.nitrc.org/projects/quicknii).
+VesselVio is also compatible with annotated datasets. Annotations can be loaded with original volumes as .nii files or as .png RGB image series alongside custom or pre-loaded annotation trees from the Allen Brain Institute. Users can then select and process individual regions from these annotations as desired. If you're looking for help with annotating mouse brain datasets, check out [QuickNII](https://www.nitrc.org/projects/quicknii).
 
 
 <img align="center" width="50%" alt="Untitled" src="https://user-images.githubusercontent.com/70919881/149036341-2b1515ba-94f4-4c89-b774-10e70e5e65c1.png" /><img align="center" width="50%" alt="Untitled" src="https://user-images.githubusercontent.com/70919881/149036342-f8aecef3-84fe-4fe7-8e2e-4eac6d543795.png" />
