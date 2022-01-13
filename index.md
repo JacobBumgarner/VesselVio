@@ -5,8 +5,8 @@ VesselVio is an open-source application designed to allow researchers to analyze
   <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe>
 </div>&nbsp;
 
-## Standalone Application or Terminal Builds
-To close learning-curves imposed by terminal-based analyses, we built a stand-alone app that can be downloaded for Windows and MacOS. The user-interface allows for users to easily load datasets for analysis and visualization with specific parameters. The application can also be run from the terminal by following our [Build Instructions](https://jacobbumgarner.github.io/VesselVio/Build.html). 
+## Using VesselVio
+In an attempt to tackel large learning-curves imposed by terminal-based analysis software, we sought to build an open-source and stand-alone application for [Windows and MacOS](https://jacobbumgarner.github.io/VesselVio/Downloads.html). The app's user-interface allows for users to easily load datasets for analysis and visualization with specific parameters. The application can also be run from the terminal by following our step-by-step [Build Instructions](https://jacobbumgarner.github.io/VesselVio/Build.html). 
 
 <p align="center">
  <img style="width: 48%; min-width: 300px;" alt="Analysis Page" src="https://user-images.githubusercontent.com/70919881/149365168-5822c405-bbdd-455a-a07a-f01c1afb05b8.png">
@@ -16,7 +16,7 @@ To close learning-curves imposed by terminal-based analyses, we built a stand-al
 ## Instructions 
 Tutorials on how to use VesselVio to analyze your vasculature datasets can be found on the [Tutorial Page](https://jacobbumgarner.github.io/VesselVio/Instructions.html). It's important to remember that the application was built for the analysis of segmented datasets. If you're looking for resources to segment your datasets, you can check out [ClearMap](https://christophkirst.github.io/ClearMap2Documentation/html/home.html), [VesSAP](https://github.com/vessap/vessap), or [DeepVesselNet](https://github.com/giesekow/deepvesselnet) as a few starting resources. Of course, there are many more. 
 
-If you're looking for help with annotating your whole-brain vasculature datasets, we'd recommend you check out [QuickNII](https://www.nitrc.org/projects/quicknii/). 
+If you're looking for help with annotating your whole-brain vasculature datasets, we'd recommend that you check out [QuickNII](https://www.nitrc.org/projects/quicknii/). 
 
 ## Download
 Currently, VesselVio is available for download as a standalone application for computers running MacOS 11.6+ and Windows 10. 
