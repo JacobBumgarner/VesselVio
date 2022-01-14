@@ -2,12 +2,11 @@
 """
 A numba-based implementation of the Lee et. al 1994 medial axis thinning algorithm.
 https://www.sci.utah.edu/devbuilds/biomesh3d/FEMesher/references/lee94-3dskeleton.pdf
-Copyright © 2021, Jacob Bumgarner
 """
 
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
-__copyright__ = 'Copyright © 2021 by Jacob Bumgarner'
+__copyright__ = 'Copyright 2022 by Jacob Bumgarner'
 __webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
 __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
@@ -333,7 +332,6 @@ if __name__ == "__main__":
     volume = load_test(2)
     skeleton = skeletonize(volume)
     
-    # volume = load_test(5)
     volume = load_volume()
     skeleton = np.ascontiguousarray(volume.copy())
     print ("Numba")

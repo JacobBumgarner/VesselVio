@@ -1,12 +1,11 @@
 
 """
 The PyQt5 code used to create the visualization page for the program.
-Copyright © 2021, Jacob Bumgarner
 """
 
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
-__copyright__ = 'Copyright © 2021 by Jacob Bumgarner'
+__copyright__ = 'Copyright 2022 by Jacob Bumgarner'
 __webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
 __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
@@ -823,7 +822,10 @@ class TopWidget(QWidget):
         return
     
     def delete_movie_dialogue(self):
-        del(self.movieDialogue)
+        try:
+            del(self.movieDialogue)
+        except AttributeError:
+            pass
         self.toggle_splitter(lock=False)
         return
     
@@ -862,7 +864,7 @@ class ScreenshotDialogue(QDialog):
         self.filePathWidget = QtO.new_widget()
         filePathLayout = QtO.new_layout(self.filePathWidget, no_spacing=True)
         titleLabel = QLabel("Save path:")
-        self.pathEdit = QtO.new_line_edit(self.filename, 175, locked=True)
+        self.pathEdit = QtO.new_line_edit(self.filename, width=200, locked=True)
         changePathButton = QtO.new_button('Change...', self.get_save_path)
         QtO.add_widgets(filePathLayout, [titleLabel, 5, self.pathEdit, 5, changePathButton])
         
@@ -904,13 +906,14 @@ class ScreenshotDialogue(QDialog):
         return
     
     def take_screenshot(self):
+        helpers.prep_media_dir(self.filename) # Make sure the parent directory actually exists before saving the image.
         self.plotter.screenshot(self.filename) 
         self.accept()
         return
     
     def check_name(self, filename, results_dir, depth):
-        base = filename + '_0%03d' % depth + '.png'
-        filepath = os.path.join(results_dir, base)
+        basename = filename + '_0%03d' % depth + '.png'
+        filepath = helpers.prep_media_path(results_dir, basename)
         if os.path.exists(filepath):
             return self.check_name(filename, results_dir, depth+1)
         else:
@@ -1070,6 +1073,9 @@ class MovieDialogue(QDialog):
             self.path_warning()
             return
         
+        # Make sure the save path exists
+        helpers.prep_media_dir(self.pathEdit.text())
+        
         # Get the at-frame path
         if self.movieType.currentText() == 'Orbit':
             self.path = helpers.update_orbit_frames(self.path, self.movieFrames.value())
@@ -1102,7 +1108,6 @@ class MovieDialogue(QDialog):
         self.pathEdit.setStyleSheet("border: 1px solid red;")
         self.pathEdit.setText("Select save path")
         return
-    
     
     # Window management
     def resize(self):
@@ -1863,7 +1868,7 @@ class TubeOptions(QWidget):
     
     def update_end_annotation(self):
         self.toggle_randomization_lock()
-        if not self.branchAnnotationColor.isChecked():
+        if not self.endAnnotationColor.isChecked():
             return
         annotation = f'{self.endAnnotationType.currentText()}_RGB'
         self.meshes.update_end_scalars(annotation)
@@ -1962,7 +1967,7 @@ class TubeOptions(QWidget):
         self.scaledTubes.setDisabled(self.meshes.scaled == None)
         self.vesselAnnotationColor.setVisible(annotation != 'None')
         self.branchAnnotationColor.setVisible(annotation != 'None')
-        self.branchAnnotationColor.setVisible(annotation != 'None')
+        self.endAnnotationColor.setVisible(annotation != 'None')
 
         QtO.signal_block(True, [self.vesselFeatureColor, self.branchSingleColor, self.endSingleColor])
         self.vesselFeatureColor.setChecked(True)

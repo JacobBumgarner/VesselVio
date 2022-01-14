@@ -5,12 +5,11 @@ https://www.sciencedirect.com/science/article/pii/S1077316999904987
 This code was HEAVILY inspired and sourced from Christoph Kirst's TubeMap skeletonization code: 
 https://github.com/ChristophKirst/ClearMap2
 Ultimately, VesselVio does not implement the PK12 algorithm.
-Copyright © 2021, Jacob Bumgarner
 """
 
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
-__copyright__ = 'Copyright © 2021 by Jacob Bumgarner'
+__copyright__ = 'Copyright 2022 by Jacob Bumgarner'
 __webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
 __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 

@@ -1,12 +1,11 @@
 
 """
 Volume (np.ndarray) processing page: skeletonization input, radius calculations, volume bounding, etc.
-Copyright © 2021, Jacob Bumgarner
 """
 
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
-__copyright__ = 'Copyright © 2021 by Jacob Bumgarner'
+__copyright__ = 'Copyright 2022 by Jacob Bumgarner'
 __webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
 __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
@@ -128,6 +127,11 @@ def label_volume(volume):
 # Filters labeled volumes from the volume.
 @njit(parallel=True, cache=True)
 def filter_segments(labeled, keep_ids):
+    """Remove specific ids from a labeled np.3darray
+        labeled: a 3D np.array or np.memmap that is labeled with specific ids
+        remove_ids: a 1D np.array of values that will be removed from the volume
+        returns the labeled volume with all elements of the remove_ids converted to zero
+    """
     keep_ids = set(keep_ids)
     for z in prange(labeled.shape[0]):
         for y in range(labeled.shape[1]):

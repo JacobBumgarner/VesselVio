@@ -1,12 +1,11 @@
 
 """
 The QThread page used to run all of the analysis and visualization pipelines in the background of the GUI.
-Copyright © 2021, Jacob Bumgarner
 """
 
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
-__copyright__ = 'Copyright © 2021 by Jacob Bumgarner'
+__copyright__ = 'Copyright 2022 by Jacob Bumgarner'
 __webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
 __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
@@ -21,6 +20,8 @@ import igraph as ig
 # from imageio import get_writer
 from time import sleep
 from time import perf_counter as pf
+import nibabel
+
 
 from Library import Image_Processing as ImProc
 from Library import Graph_IO as GIO
@@ -687,7 +688,6 @@ class MovieThread(QThread):
 ### JIT Init ###
 ################
 # Run a tiny volume through the pipeline to prep any of the functions that need it
-import nibabel
 def prepare_compilers():
     resolution = np.array([1.0, 1.0, 1.0])
     file = os.path.join(helpers.get_cwd(), 'Library', 'Volumes', 'JIT_volume.nii')

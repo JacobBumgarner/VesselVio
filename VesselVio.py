@@ -1,17 +1,17 @@
 
 """
 The main entry point to build the GUI of the application.
-Copyright © 2021, Jacob Bumgarner
 """
 
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
-__copyright__ = 'Copyright © 2021 by Jacob Bumgarner'
+__copyright__ = 'Copyright 2022 by Jacob Bumgarner'
 __webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
 __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
-
 import sys
+import os
+os.environ["QT_MAC_WANTS_LAYER"] = '1'
 
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import (QApplication, QStackedWidget,
@@ -31,7 +31,6 @@ from Library.UI import UpdateAlert
 from Library import QtThreading as QtTh
 from Library import Image_Processing as ImProc
 
-
 ######
 version = "V 1.1.0"
 ######
@@ -41,7 +40,7 @@ version = "V 1.1.0"
 class mainWindow(QMainWindow):
     def __init__(self):
         super().__init__()        
-        ## Setup the main window.
+        # Setup the main window.
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
         self.statusBar.setVisible(False)
@@ -57,9 +56,9 @@ class mainWindow(QMainWindow):
         self.centralLayout = QtO.new_layout(self.centralWidget, no_spacing=True)
         
         # Setup the individual pages of the application.
-        self.qStack = QStackedWidget()
-
         self.leftMenu = lm.LeftMenu(version)
+        
+        self.qStack = QStackedWidget() # Stacked widget for the pages
         
         self.page1 = p1.AnalysisPage()
         self.page2 = p2.VisualizationPage(self.statusBar, self.plotter, self)
@@ -75,6 +74,7 @@ class mainWindow(QMainWindow):
         
         # Add pages to the app
         QtO.add_widgets(self.centralLayout, [self.leftMenu, self.pageStack])
+        # QtO.add_widgets(self.centralLayout, [self.leftMenu])
         
         # Make sure we delete the labeled_cache_volume if it exists
         ImProc.clear_labeled_cache()

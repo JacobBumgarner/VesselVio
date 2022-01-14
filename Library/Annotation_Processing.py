@@ -1,12 +1,11 @@
 
 """
 Annotation volume processing backend. Used for ID (int or float) or RGB based annotations.
-Copyright © 2021, Jacob Bumgarner
 """
 
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
-__copyright__ = 'Copyright © 2021 by Jacob Bumgarner'
+__copyright__ = 'Copyright 2022 by Jacob Bumgarner'
 __webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
 __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
@@ -461,21 +460,20 @@ if __name__ == "__main__":
     from Library import Image_Processing as ImProc
     
     
-    annotation_data = load_annotation_file("/Users/jacobbumgarner/Desktop/1 fiber tracts.json")
+    annotation_data = load_annotation_file("")
     print ("Regions:", len(annotation_data.keys()))
 
     
-    # volume = ImProc.load_nii_volume('volume.nii')
-    # annotation = "annotation_volume.nii"
+    # volume = ImProc.load_nii_volume('')
+    # annotation = ""
     # id_array = prep_id_array(annotation_data)
     # volume, ROI_volumes, mins, maxes = id_segmentation_input(volume, annotation, id_array, verbose=True)
 
 
-    volume = ImProc.load_nii_volume('volume.nii')
-    annotation_folder = "RGB Annotation Folder"
+    volume = ImProc.load_nii_volume('')
+    annotation_folder = ""
     RGB_array = prep_RGB_array(annotation_data)
     volume, ROI_volumes, mins, maxes = RGB_labeling_input(volume, annotation_folder, RGB_array, verbose=True)
-    
     
         
 else:

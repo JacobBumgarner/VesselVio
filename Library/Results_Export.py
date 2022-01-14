@@ -1,12 +1,11 @@
 
 """
 Results caching and export.
-Copyright © 2021, Jacob Bumgarner
 """
 
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
-__copyright__ = 'Copyright © 2021 by Jacob Bumgarner'
+__copyright__ = 'Copyright 2022 by Jacob Bumgarner'
 __webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
 __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
@@ -102,14 +101,20 @@ def write_results(results_folder, image_dimensions=3, verbose=False):
 def write_seg_results(seg_results, results_folder, filename, ROI_Name):
     _, segment_results_header = load_headers()
     
+    # Make sure the folder exists
+    if not os.path.exists(results_folder):
+        os.mkdir(results_folder)
     segments_folder = os.path.join(results_folder, 'Segment Results')
-    if os.path.exists(segments_folder) == False:
+    if not os.path.exists(segments_folder):
         os.mkdir(segments_folder)
+        
+    # Add the ROI name if it exists
     if ROI_Name != 'None':
         file = os.path.join(segments_folder, filename + '_' + ROI_Name + '.csv')
     else:
         file = os.path.join(segments_folder, filename + '.csv')
         
+    # Save the info
     with open(file, 'w') as f:
         writer = csv.writer(f)
         writer.writerow(['Filename:', filename, 'ROI Name:', ROI_Name])

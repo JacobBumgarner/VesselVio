@@ -1,12 +1,11 @@
 
 """
 A catchall helpers page with small functions that are used throughout the program.
-Copyright © 2021, Jacob Bumgarner
 """
 
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
-__copyright__ = 'Copyright © 2021 by Jacob Bumgarner'
+__copyright__ = 'Copyright 2022 by Jacob Bumgarner'
 __webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
 __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
@@ -54,7 +53,7 @@ def get_dir(location):
         load_dir = os.path.join(os.path.expanduser('~'), location) 
     elif sys_os == "Windows":
         load_dir = os.path.join(os.path.join(os.environ['USERPROFILE']), location) 
-
+    load_dir = std_path(load_dir)
     return load_dir 
 
 def get_OS():
@@ -73,17 +72,34 @@ def load_screenshot_dir():
     results_dir = load_results_dir()
     screenshot_dir = os.path.join(results_dir, 'Screenshots')
     screenshot_dir = std_path(screenshot_dir)
-    if not os.path.exists(screenshot_dir):
-        os.mkdir(screenshot_dir)
+    # if not os.path.exists(screenshot_dir):
+    #     os.mkdir(screenshot_dir)
     return screenshot_dir
 
 def load_movie_dir():
     results_dir = load_results_dir()
-    movie_dir = os.path.join(results_dir, 'Movies')
-    movie_dir = std_path(movie_dir)
-    if not os.path.exists(movie_dir):
+    if os.path.exists(results_dir):
+        movie_dir = os.path.join(results_dir, 'Movies')
+        movie_dir = std_path(movie_dir)
         os.mkdir(movie_dir)
-    return movie_dir
+        return movie_dir
+    else:
+        return get_dir('Desktop')
+
+def prep_media_path(directory, name):
+    raw_name = os.path.join(directory, name)
+    filename = std_path(raw_name)
+    return filename
+
+def prep_media_dir(filename):
+    media_dir = os.path.dirname(filename)
+    if not os.path.exists(media_dir):
+        parent_dir = os.path.dirname(media_dir)
+        if not os.path.exists(parent_dir):
+            os.mkdir(parent_dir) # Make sure the parent folder exists
+        os.mkdir(media_dir) # Make sure the screenshots folder exists
+    return
+
 
 def load_results_dir():
     results_dir = get_results_cache()
@@ -93,16 +109,16 @@ def load_results_dir():
 
     # Checks to see if our results pathway is present or if our results cache is empty.
     if not os.path.exists(results_dir):
+        # If its empty, create a default folder. 
+        # It will be created later on during results export if it doesn't exist.
         desktop = get_dir('Desktop')
         results_dir = os.path.join(desktop, 'VesselVio')
         results_dir = std_path(results_dir)
-        if not os.path.isdir(results_dir):      
-            os.mkdir(results_dir)
         update_results_cache(results_dir)
         
     return results_dir
 
-def set_results_dir(parent):
+def set_results_dir():
     # Get selected results directory
     results_dir = QFileDialog.getExistingDirectory(QFileDialog(), "Select Results Folder", get_dir('Desktop'))
     results_dir = std_path(results_dir)
@@ -444,9 +460,9 @@ def randomize_mesh_colors(meshes, rainbow=False, shifted=False):
     return
 
 
-##############
-### Random ###
-##############
+#######################
+### Analysis Speeds ###
+#######################
 def get_time(tic_time):
     time = pf() - tic_time
     if time > 3600:
@@ -673,4 +689,9 @@ def get_resolution(resolution):
         X /= 2
         Y /= 2
     return X, Y
+
+
+
+
+
 

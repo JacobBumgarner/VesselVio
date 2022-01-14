@@ -1,12 +1,11 @@
 
 """
 The current route to check for app updates. In the future, it may be worth looking at pyupdater
-Copyright © 2021, Jacob Bumgarner
 """
 
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
-__copyright__ = 'Copyright © 2021 by Jacob Bumgarner'
+__copyright__ = 'Copyright 2022 by Jacob Bumgarner'
 __webpage__   = 'https://jacobbumgarner.github.io/VesselVio_Web/'
 __download__  = 'https://jacobbumgarner.github.io/VesselVio_Web/Downloads'
 
@@ -65,6 +64,7 @@ def version_check():
     prefs = helpers.load_prefs()
     if not internet_check() or not prefs['update_check']:
         return
+    
     version_url = "https://jacobbumgarner.github.io/VesselVio/Version"
     with urllib.request.urlopen(version_url) as response:
         html = response.read()
@@ -77,6 +77,6 @@ def version_check():
                 alert.exec_()
                 if alert.update_check.isChecked():
                     helpers.silence_update_alerts()
-                
+
     return
 

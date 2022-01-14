@@ -1,17 +1,16 @@
 
 """
 Preconstructed graph input and output
-Copyright © 2021, Jacob Bumgarner
 """
 
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
-__copyright__ = 'Copyright © 2021 by Jacob Bumgarner'
+__copyright__ = 'Copyright 2022 by Jacob Bumgarner'
 __webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
 __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
 
-from os import path, mkdir, remove
+import os
 import pandas
 
 import igraph as ig
@@ -250,12 +249,12 @@ def save_graph(g, filename, results_dir, main_thread=True, caching=False, verbos
         return g
     
     # Get the dir and name for our graph.
-    if path.exists(results_dir) == False:
-        mkdir(results_dir)
-    results_dir = path.join(results_dir, 'Graphs')
-    if path.exists(results_dir) == False:
-        mkdir(results_dir)
-    file = path.join(results_dir, filename + '.' + 'graphml')
+    if os.path.exists(results_dir) == False:
+        os.mkdir(results_dir)
+    results_dir = os.path.join(results_dir, 'Graphs')
+    if os.path.exists(results_dir) == False:
+        os.mkdir(results_dir)
+    file = os.path.join(results_dir, filename + '.' + 'graphml')
     
     # save the graph
     g.write(file)
@@ -264,27 +263,26 @@ def save_graph(g, filename, results_dir, main_thread=True, caching=False, verbos
 
 def save_cache(filename, results_dir):
     # Get the dir and name for our graph.
-    if path.exists(results_dir) == False:
-        mkdir(results_dir)
-    results_dir = path.join(results_dir, 'Graphs')
-    if path.exists(results_dir) == False:
-        mkdir(results_dir)
+    if os.path.exists(results_dir) == False:
+        os.mkdir(results_dir)
+    results_dir = os.path.join(results_dir, 'Graphs')
+    if os.path.exists(results_dir) == False:
+        os.mkdir(results_dir)
     
     # Get the cached result
     g = ig.read(helpers.get_graph_cache())
-    remove(helpers.get_graph_cache())
+    os.remove(helpers.get_graph_cache())
     
     # save the graph
-    file = path.join(results_dir, filename + '.' + 'graphml')
+    file = os.path.join(results_dir, filename + '.' + 'graphml')
     g.write(file)
     
     return
 
 def cache_graph(graph):
     cache_path = helpers.get_graph_cache()
-    if path.isfile(cache_path):
+    if os.path.isfile(cache_path):
         g = ig.read(cache_path)
-    
     else:
         g = ig.Graph()
         
