@@ -573,7 +573,7 @@ def feature_input(g, resolution, filename, image_dim=3, image_shape=None,
     # Create tortuosity and length bins 
     tortuosity_bins = [''] * 21
     length_bins = [''] * 21
-    SA_bins = [''] * 21
+    # SA_bins = [''] * 21
     
     # Find mean tortuosity & lengths of vessels in bins.
     for i in range(21):
@@ -581,9 +581,9 @@ def feature_input(g, resolution, filename, image_dim=3, image_shape=None,
         if len(locations) > 0:
             tortuosity_bins[i] = np.sum(tortuosities[locations]) / len(locations)
             length_bins[i] = np.sum(lengths[locations]) / len(locations)
-            SA_bins[i] = np.sum(surface_areas[locations]) / len(locations)
+            # SA_bins[i] = np.sum(surface_areas[locations]) / len(locations)
     
-    results += length_bins + tortuosity_bins + SA_bins
+    results += length_bins + tortuosity_bins # + SA_bins
     segment_results = None
     if save_seg_results:
         ids = np.arange(0, volumes_or_PAFs.shape[0])
