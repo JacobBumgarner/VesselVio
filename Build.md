@@ -16,9 +16,9 @@ First you'll need to install python 3.8.8. This can be <a href="https://xkcd.com
 
 We use pyenv installed with Homebrew, a popular python environment manager. If you've already got a python environment setup, skip to step 3.
 
-1. Install [Homebrew](https://brew.sh) as instructed by the developers.
+1. Install [Homebrew](https://brew.sh) as instructed by the developers (should be a simply copy and paste).
 
-2. Install [pyenv](https://github.com/pyenv/pyenv) and [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) as instructed by the developers or by pasting the following code into a terminal window:
+2. Install [pyenv](https://github.com/pyenv/pyenv) and [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) by pasting the following code into a terminal window:
 ```markdown
 brew install pyenv
 brew install pyenv-virtualenv
@@ -32,28 +32,32 @@ echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.zshrc
    - Restart your terminal.
    - Ensure pyenv is set up by typing `pyenv` into a new terminal window. You should see a list of commands.
 
-3. Now install the correct version of python (3.8.8) by pasting the following command*:
+3. Now install the correct version of python (3.8.8):
+   - If you only want to use VesselVio from your terminal, paste:
 ```markdown
 pyenv install 3.8.8
 ```
-   - Make sure pip is up to date by typing in:
-```markdown
-pip install -U pip
-```
-   - * If you want to build your own version of the app using pyinstaller, paste the following command:
+   - If you want to use VesselVio as a standalone application, paste: 
 ```markdown
 sudo env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.8.8
 ```
 
-4. Create a new virtual environment called 'VV':
+4. Make sure pip is up to date by typing in:
+```markdown
+pip install -U pip
+```
+
+5. Create a new virtual environment called 'VV':
 ```markdown
 pyenv virtualenv 3.8.8 VV
 ```
-5. Activate your virtual environment. If you're planning using VesselVio from the terminal, you'll need to activate the VV environment and navigate to the VesselVio directory each time before executing the VVTerminal.py or VesselVio.py files.
+
+6. Install the required packages.
+   - First, activate the virtual environment
 ```markdown
 pyenv activate VV
 ```
-   - Install all of the required python packages. First navigate to the VesselVio directory (example below):
+   - Then navigate to the VesselVio directory where the source code is located using `cd` (example below):
 ```markdown
 cd desktop/VesselVio
 ```
@@ -62,7 +66,7 @@ cd desktop/VesselVio
 pip install -r requirements.txt
 ```
 
-6. If you want to run the application from your terminal, navigate to the directory location where the VesselVio source-code is located. The source-code can be downloaded from our [GitHub page](https://github.com/JacobBumgarner/VesselVio). Make sure VV has been activated before trying to execute any files!  We use [Visual Studio Code](https://code.visualstudio.com) which takes care of all of these steps automatically upon configuration.
+7. If you want to run the application from your terminal, navigate to the directory location where the VesselVio source-code is located. The source-code can be downloaded from our [GitHub page](https://github.com/JacobBumgarner/VesselVio). Make sure VV has been activated before trying to execute any files!  We use [Visual Studio Code](https://code.visualstudio.com) which takes care of all of these steps automatically upon configuration.
    - Navigate to the VesselVio directory (example below) and activate the VV environment
 ```markdown
 cd desktop/VesselVio
@@ -77,7 +81,7 @@ python VesselVio.py
 python VVTerminal.py
 ```
 
-7. To build a local version of the application, paste the following code into your terminal:
+8. To build a local version of the application, paste the following code into your terminal:
 ```markdown
 pyinstaller \
 --add-data=./Library:Library \
@@ -112,7 +116,7 @@ git clone https://github.com/pyenv-win/pyenv-win.git "%USERPROFILE%\.pyenv"
 ```markdown
 pyenv --version
 ```
-   - If installation was successful, type the following into your terminal
+   - If the installation was successful, type the following into your terminal
 ```markdown
 pyenv rehash
 ```
@@ -122,7 +126,7 @@ pyenv rehash
 ```markdown
 pyenv install 3.8.8 
 ```
-   - Activate the 3.8.8 version. If this isn't the only version of python you have installed, you'll have to do this each time you restart your terminal and want to run VesselVio.
+   - Activate the 3.8.8 version. If you're using VesselVio from the terminal, you'll have to do this each time you restart your terminal and want to run VesselVio.
 ```markdown
 pyenv activate 3.8.8
 ```
@@ -146,10 +150,6 @@ pip install -r requirements.txt
    - If you want to run the application from the terminal, use the following code after activating python 3.8.8 and navigating to the source-code directory
 ```markdown
 python VesselVio.py
-```
-   - If you are planning on creating videos or customizing the source-code using an IDE, run the following code for terminal executions
-```markdown
-python VVTerminal.py
 ```
 
 6. If you want to build a local stand-alone VesselVio application, follow these instructions.
