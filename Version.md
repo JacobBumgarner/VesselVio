@@ -1,1 +1,1 @@
-app_version==1.1.0
+app_version==1.1.1
