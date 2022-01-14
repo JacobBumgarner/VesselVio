@@ -32,7 +32,7 @@ from Library import QtThreading as QtTh
 from Library import Image_Processing as ImProc
 
 ######
-version = "V 1.1.0"
+version = "V 1.1.1"
 ######
      
 
