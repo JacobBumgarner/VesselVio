@@ -32,24 +32,24 @@ echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.zshrc
    - Restart your terminal.
    - Ensure pyenv is set up by typing `pyenv` into a new terminal window. You should see a list of commands.
 
-3. Now install the correct version of python (3.8.8) by pasting the following command:
+3. Now install the correct version of python (3.8.8) by pasting the following command*:
 ```markdown
 pyenv install 3.8.8
 ```
-   - If you want to build your own version of the app using pyinstaller, paste the following command:
-```markdown
-sudo env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.8.8
-```
-   - Create a new virtual environment:
-```markdown
-pyenv virtualenv 3.8.8 VV
-```
-   - Update your pip version
+   - Make sure pip is up to date by typing in:
 ```markdown
 pip install -U pip
 ```
+   - * If you want to build your own version of the app using pyinstaller, paste the following command:
+```markdown
+sudo env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.8.8
+```
 
-4. Activate your virtual environment. If you're planning using VesselVio from the terminal, you'll need to activate the VV environment and navigate to the VesselVio directory each time before executing the VVTerminal.py or VesselVio.py files.
+4. Create a new virtual environment called 'VV':
+```markdown
+pyenv virtualenv 3.8.8 VV
+```
+5. Activate your virtual environment. If you're planning using VesselVio from the terminal, you'll need to activate the VV environment and navigate to the VesselVio directory each time before executing the VVTerminal.py or VesselVio.py files.
 ```markdown
 pyenv activate VV
 ```
@@ -62,7 +62,7 @@ cd desktop/VesselVio
 pip install -r requirements.txt
 ```
 
-5. If you want to run the application from your terminal, navigate to the directory location where the VesselVio source-code is located. The source-code can be downloaded from our [GitHub page](https://github.com/JacobBumgarner/VesselVio). Make sure VV has been activated before trying to execute any files!  We use [Visual Studio Code](https://code.visualstudio.com) which takes care of all of these steps automatically upon configuration.
+6. If you want to run the application from your terminal, navigate to the directory location where the VesselVio source-code is located. The source-code can be downloaded from our [GitHub page](https://github.com/JacobBumgarner/VesselVio). Make sure VV has been activated before trying to execute any files!  We use [Visual Studio Code](https://code.visualstudio.com) which takes care of all of these steps automatically upon configuration.
    - Navigate to the VesselVio directory (example below) and activate the VV environment
 ```markdown
 cd desktop/VesselVio
@@ -77,7 +77,7 @@ python VesselVio.py
 python VVTerminal.py
 ```
 
-6. If you want to build a local version of the application, paste the following code into your terminal:
+7. To build a local version of the application, paste the following code into your terminal:
 ```markdown
 pyinstaller \
 --add-data=./Library:Library \
@@ -86,12 +86,8 @@ pyinstaller \
 --windowed \
 VesselVio.py
 ```
-- Then, for the first build of the app, you'll have to open it via the terminal. If the `dist` folder is in the current directory, run:
-```markdown
-open dist/VesselVio.app
-```
- 
-You should now be able to use VesselVio for dataset analysis and visualization!
+The app will be located in the 'dist' folder in the folder that contains the original source-code.
+You should now be able to use the app!
 
 
 ## Windows Build Instructions
@@ -158,12 +154,12 @@ python VVTerminal.py
 
 6. If you want to build a local stand-alone VesselVio application, follow these instructions.
    - Copy the pyinstaller .exe from your .pyenv folder created in step 2 into your VesselVio directory
-     - Example file location: .pyenv>pyenv-win>versions>3.8.8>Scripts>pyinstaller.exe
+         - Example file location: `.pyenv>pyenv-win>versions>3.8.8>Scripts>pyinstaller.exe`
    - Navigate to the VesselVio directory
    - Activate python 3.8.8
    - Execute the following command in your terminal:
 ```markdown
-pyinstaller --add-data=Library;Library --additional-hooks-dir=Hooks --icon Icons\icon.ico VesselVio.py --windowed
+pyinstaller --add-data=Library;Library --additional-hooks-dir=Hooks --icon Icons\icon.ico --windowed VesselVio.py 
 ```
 
 You should now be able to successfuly use VesselVio on your PC either from the terminal or as a local stand-alone application!
