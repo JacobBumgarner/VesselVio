@@ -10,9 +10,9 @@ VesselVio is available for download use in research as a stand-alone application
 ## Download Links
 Currently the stand-alone VesselVio application is available for MacOS 10.15.7+ and Windows 10+.
 
-  | VesselVio Version | MacOS 10.15.7+ |    Windows 10+ |
+  | VesselVio Version |  Windows 10+ | MacOS 10.15.7+|
   |:-------------:|:---------------:|:---------------:|
-  | 1.1.1           | [Download](https://sourceforge.net/projects/vesselvio/files/1.1.1%20Downloads/VesselVio.app.zip/download) | [Download](https://sourceforge.net/projects/vesselvio/files/1.1.1%20Downloads/VesselVio%201.1.1.zip/download)  |
+  | 1.1.1           | [Download](https://sourceforge.net/projects/vesselvio/files/1.1.1%20Downloads/VesselVio%201.1.1.zip/download) | [Download](https://sourceforge.net/projects/vesselvio/files/1.1.1%20Downloads/VesselVio.app.zip/download)  |
 
 
 # NOTICE
