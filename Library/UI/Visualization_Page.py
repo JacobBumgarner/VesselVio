@@ -770,7 +770,7 @@ class TopWidget(QWidget):
         boxLayout = QtO.new_layout(self, 'V', margins=0)
         
         loadedLabel = QLabel("<b>Loaded file:")
-        self.loadedFile = QtO.new_line_edit('Cube.nii', 'Center', 180, True)
+        self.loadedFile = QtO.new_line_edit('Demo Volume.nii', 'Center', 180, True)
         
         self.loadingButton = QtO.new_button("Load Files", None)
         self.visualizeButton = QtO.new_button("Visualize", None)
