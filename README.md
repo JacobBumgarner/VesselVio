@@ -24,7 +24,7 @@ VesselVio is compatible with several different types of segmented vasculature da
 Various reconstructs vascular networks to extract whole-network and individual segment features. Several examples of feature outputs can be seen below.
 
 <p align="center">
-  <img align="center" width="50%" alt="Untitled" src="https://github.com/JacobBumgarner/VesselVio/files/7850412/Fig.3.pdf" />
+  <img align="center" width="50%" alt="Untitled" src="https://user-images.githubusercontent.com/70919881/149639453-71c22b0a-7a0c-4c3f-8af5-f38aaf4027df.png" />
 </p>
 
 ## Visualization
