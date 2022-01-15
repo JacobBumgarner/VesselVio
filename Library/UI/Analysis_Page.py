@@ -746,7 +746,7 @@ class LoadingWidget(QWidget):
     
     ## Results folder processing
     def set_results_folder(self):
-        folder = helpers.set_results_dir(self)
+        folder = helpers.set_results_dir()
         if folder:
             self.results_folder = folder
             self.resultPath.setText(folder)
