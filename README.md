@@ -30,8 +30,10 @@ Various reconstructs vascular networks to extract whole-network and individual s
 ## Visualization
 Visualization with VesselVio is made possible with [PyVista](https://github.com/pyvista/pyvista), an intuitive and high-level VTK package. Thanks to PyVista, users can easily visualize and examine their vasculature datasets with numerous options intended for accompanying figure images.
 
-<p align="center">
-  <video width="20%" alt="Inferior Colliculus" src="https://user-images.githubusercontent.com/70919881/121599185-b337d400-ca10-11eb-8d66-1b1bb1e0040c.mp4"></video> <video width="20%" alt="Brain" src="https://user-images.githubusercontent.com/70919881/121599523-28a3a480-ca11-11eb-8340-c29350998f02.mp4"></video>
+
+<p float="left">
+  <img src="https://user-images.githubusercontent.com/70919881/121599185-b337d400-ca10-11eb-8d66-1b1bb1e0040c.mp4" width="48%" />
+  <img src="https://user-images.githubusercontent.com/70919881/121599523-28a3a480-ca11-11eb-8340-c29350998f02.mp4" width="48%" />
 </p>
 
 ## App Design
