@@ -98,8 +98,8 @@ class VisualizationPage(QSplitter):
         visualizer = VisualizationDialog(self.files, self.graph_options, 
                                          self.plotter, self.actors, self.meshes)
         if visualizer.exec_():
-            self.statusBar.setVisible(True)
-            self.statusBar.showMessage("Loading meshes...")
+            # self.statusBar.setVisible(True)
+            # self.statusBar.showMessage("Loading meshes...")
             self.files.visualized_file = self.files.file1_name()
             self.meshes = visualizer.meshes
             self.loadingBox.update_rendered(self.files.visualized_file)
@@ -108,7 +108,7 @@ class VisualizationPage(QSplitter):
             self.tubeOptions.load_meshes(self.meshes, self.files.annotation_type)
             self.volumeOptions.load_meshes(self.meshes)
             self.update_meshes(visualizer.analysis_options.image_dimensions)
-            self.statusBar.setVisible(False)
+            # self.statusBar.setVisible(False)
             del(visualizer)
         else:
             if visualizer.visualizing:
