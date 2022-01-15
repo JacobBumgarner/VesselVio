@@ -81,7 +81,8 @@ def load_movie_dir():
     if os.path.exists(results_dir):
         movie_dir = os.path.join(results_dir, 'Movies')
         movie_dir = std_path(movie_dir)
-        os.mkdir(movie_dir)
+        if not os.path.exists(movie_dir):
+            os.mkdir(movie_dir)
         return movie_dir
     else:
         return get_dir('Desktop')
