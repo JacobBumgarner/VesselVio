@@ -66,7 +66,8 @@ class VisualizationPage(QSplitter):
         
         # self.splitterMoved.connect(self.redraw_widgets)
         ## Default loading file
-        default_file = os.path.join(helpers.get_cwd(), 'Library/Volumes/Cube.nii')
+        default_file = os.path.join(helpers.get_cwd(), 'Library', 'Volumes', 'Cube.nii')
+        default_file = helpers.std_path(default_file)
         self.files.file1 = str(default_file)
         ## Page layout setup
         pageLayout = QtO.new_layout(self, no_spacing=True)
