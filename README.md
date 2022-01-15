@@ -3,16 +3,22 @@ VesselVio is an open-source application designed for the analysis and visualizat
 
 There several options for using VesselVio:
 
-- [Download our app](https://jacobbumgarner.github.io/VesselVio/Downloads.html) for Windows and MacOS (most convenient option).
-- Run the app in your own IDE by executing the VesselVio.py file (fastest option)
+- [Download the app](https://jacobbumgarner.github.io/VesselVio/Downloads.html) for Windows and MacOS (most convenient option).
+- Build the app in your own IDE by executing or freezing the VesselVio.py file (fastest option)
 - Modify the analysis pipeline and add custom analyses using the VVTerminal.py file
 
-The program is compatible with both 2D and 3D vasculature datasets that have been pre-segmented (binarized). 
-
-VesselVio is also compatible with annotated datasets. Annotations can be loaded with original volumes as .nii files or as .png RGB image series alongside custom or pre-loaded annotation trees from the Allen Brain Institute. Users can then select and process individual regions from these annotations as desired. If you're looking for help with annotating mouse brain datasets, check out [QuickNII](https://www.nitrc.org/projects/quicknii).
-
-
 <img align="center" width="50%" alt="Untitled" src="https://user-images.githubusercontent.com/70919881/149036341-2b1515ba-94f4-4c89-b774-10e70e5e65c1.png" /><img align="center" width="50%" alt="Untitled" src="https://user-images.githubusercontent.com/70919881/149036342-f8aecef3-84fe-4fe7-8e2e-4eac6d543795.png" />
+
+VesselVio is compatible with several different types of segmented vasculature datasets, including:
+- Non-annotated volumes of any imaging source
+- Annotated volumes, including:
+  - Whole-brain vasculature datasets with Allen Brain Institute ID-based annotations
+  - Manually labelled datasets with a program such as [ITK-Snap](http://www.itksnap.org/pmwiki/pmwiki.php)
+  - RGB-based annotations, such as those created with [QuickNII](https://www.nitrc.org/projects/quicknii)
+- Pre-constructed graphs (both edge- and vertex- based graphs)
+- 2D and 3D datasets
+- Isotropic and Anisotropic datasets
+
 
 ## Analysis
 Various reconstructs vascular networks to extract whole-network and individual segment features. Several examples of feature outputs can be seen below.
