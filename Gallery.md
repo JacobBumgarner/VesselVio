@@ -9,7 +9,7 @@ rank: 2
 
 
 ### Videos
-The videos below were created using VesselVio's command-line script.
+The videos below were created using VesselVio's built-in rendering page.
 <div class="iframe-container">
   <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe>
 </div>&nbsp;
