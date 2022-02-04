@@ -20,16 +20,13 @@ The videos below were created using VesselVio's built-in rendering page.
 
 ## Analysis Output
 
-Numerous network and segment features are calculated by VesselVio. These features include network area/volume, network length, branch points, end points, and vessel segment partitioning. Individual segment features include the radius, length, tortuosity, volume, and surface area. These features are conveniently averaged and binned by segment size for ease of analysis.
+Numerous network and segment features are calculated by VesselVio. These features include network area/volume, network length, branch points, end points, and vessel segment partitioning. Individual segment features include radius, length, tortuosity, volume, and surface area. These features are conveniently averaged and binned by segment size for ease of analysis.
 
 <p align="center">
-  <img align="center" width="48%" alt="Distributions" src="https://i.imgur.com/zUV4ydP.png" /> <img align="center" width="48%" alt="Basic Results" src="https://i.imgur.com/vtU6obz.png" />
+  <img align="center" width="70%" alt="Whole Brain Analysis" src="https://user-images.githubusercontent.com/70919881/152599562-0c294c5e-7d7e-4c12-a44b-fb4f645ec5d2.jpg" />
 </p>
 
-<p align="center">
-   <img width="70%" alt="HRF Results" src="https://i.imgur.com/vvfSomh.jpg"/>
-</p>
-                         
+              
                          
 ## App Images
 Analysis Page - MacOS
