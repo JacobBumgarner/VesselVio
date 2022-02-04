@@ -11,11 +11,11 @@ rank: 2
 ### Videos
 The videos below were created using VesselVio's built-in rendering page.
 <div class="iframe-container">
-  <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe>
+  <iframe src='https://gfycat.com/flawlesspaltryhornbill?hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe>
 </div>&nbsp;
 
 <div class="iframe-container">
-  <iframe src='https://gfycat.com/ifr/MarriedAppropriateDragonfly?hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe>
+  <iframe src='https://gfycat.com/unconsciousunhappydesertpupfish?hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe>
 </div>&nbsp;
 
 ## Analysis Output
@@ -24,13 +24,9 @@ Numerous network and segment features are calculated by VesselVio. These feature
 
 <p align="center">
   <img align="center" width="70%" alt="Whole Brain Analysis" src="https://user-images.githubusercontent.com/70919881/152599562-0c294c5e-7d7e-4c12-a44b-fb4f645ec5d2.jpg" />
-</p>
-
-              
+</p>   
                          
-## App Images
-Analysis Page and Visualization Pages - MacOS
-Visualization Page - MacOS
+## App Images - MacOS
 <p align="center">
  <img style="width: 48%; min-width: 300px;" alt="Analysis Page" src="https://user-images.githubusercontent.com/70919881/152601190-3be4feef-87cc-43aa-9379-6f75a94af32d.png"> <img style="width: 48%; min-width: 300px;" alt="Visualization Page" src="https://user-images.githubusercontent.com/70919881/152601220-eddbce1d-250e-4d0d-a1d1-d45cdf0d41ab.png">
 </p>
