@@ -1,4 +1,6 @@
 # VesselVio
+[![DOI](https://zenodo.org/badge/365252628.svg)](https://zenodo.org/badge/latestdoi/365252628)
+
 VesselVio is an open-source application designed for the analysis and visualization of segmented vasculature datasets. 
 
 There several options for using VesselVio:
