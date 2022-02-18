@@ -158,8 +158,8 @@ def prep_id_array(ROI_dict):
 
     ### REMOVE BEFORE FLIGHT ###
     ### REMOVE BEFORE FLIGHT ###
-    for ROI in ROIs:
-        ROI += [r * -1 for r in ROI]
+    #for ROI in ROIs:
+    #    ROI += [r * -1 for r in ROI]
     ### REMOVE BEFORE FLIGHT ###
     ### REMOVE BEFORE FLIGHT ###
     
