@@ -12,6 +12,7 @@ If you're using a PC, follow the [Windows Build Instructions](#windows-build-ins
 
 If you're using a Mac, follow the [MacOS Build Instructions](#macos-build-instructions) guide.
 
+---
 ## Windows Command Prompt Instructions
 First, you'll need to install python 3.8.8. This can be <a href="https://xkcd.com/1987/" target="_blank">messy</a> if you've got python installed elsewhere or if you don't have an environment manager.
 
