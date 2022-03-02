@@ -15,13 +15,13 @@ If you're using a Mac, follow the [MacOS Build Instructions](#macos-build-instru
 
 ---
 ## Windows Command Prompt Instructions
-First, you'll need to install python 3.8.8. This can be <a href="https://xkcd.com/1987/" target="_blank">messy</a> if you've got python installed elsewhere or if you don't have an environment manager.
+First, you'll need to install python 3.8.8. This can be <a href="https://xkcd.com/1987/" target="_blank" ref="noopener noreferrer">messy</a> if you've got python installed elsewhere or if you don't have an environment manager.
 
 To avoid this mess, we use the popular python environment manager: pyenv. If you've already got a python environment setup, skip to step 4.
 
-1. Install <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git" target="_blank" rel="noopener noreferrer">Git</a> as directed by the developers.  . . . 
+1. Install <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git" target="_blank" rel="noopener noreferrer">Git</a> as directed by the developers.
 
-2. Install [pyenv-winows](https://github.com/pyenv-win/pyenv-win) as directed by the developers or by following the instructions below.
+2. Install <a target="_blank" rel="noopener noreferrer" href="https://github.com/pyenv-win/pyenv-win">pyenv-winows</a> as directed by the developers or by following the instructions below.
    - Paste the following command into your command prompt
 ```markdown
 git clone https://github.com/pyenv-win/pyenv-win.git "%USERPROFILE%\.pyenv"
@@ -56,7 +56,7 @@ pyenv activate 3.8.8
 pip install -U pip
 ```
 
-4. Download the VesselVio source code from our [GitHub page](https://github.com/JacobBumgarner/VesselVio).
+4. Download the VesselVio source code from our <a target="_blank" rel="noopener noreferrer" href="https://github.com/JacobBumgarner/VesselVio">GitHub page</a>.
    - On the GitHub page, click the green Code dropdown button, then Download ZIP. 
    - Unzip the package, and place it somewhere accessible to you (e.g., your desktop).
 
@@ -101,19 +101,19 @@ You should now be able to successfuly use VesselVio on your PC either from the c
 
 ---
 ## MacOS Terminal Instructions
-First, you'll need to install python 3.8.8. This can be <a href="https://xkcd.com/1987/" target="_blank">messy</a> if you've got python installed elsewhere or if you don't have an environment manager.
+First, you'll need to install python 3.8.8. This can be <a href="https://xkcd.com/1987/" target="_blank" ref="noopener noreferrer">messy</a> if you've got python installed elsewhere or if you don't have an environment manager.
 
 To avoid this mess, we use the popular python environment manager: pyenv. If you've already got a python environment setup, skip to step 5.
 
-1. Install [Homebrew](https://brew.sh) as instructed by the developers (a simple copy and paste).
+1. Install <a target="_blank" ref="noopener noreferrer" href="https://brew.sh">Homebrew</a> as instructed by the developers (a simple copy and paste).
 
-2. Install [pyenv](https://github.com/pyenv/pyenv) and [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv).
+2. Install <a target="_blank" ref="noopener noreferrer" href="https://github.com/pyenv/pyenv">pyenv</a> and <a target="_blank" ref="noopener noreferrer" href="https://github.com/pyenv/pyenv-virtualenv">pyenv-virtualenv</a>.
    - First, install the packages by pasting the following commands into your terminal.
 ```markdown
 brew install pyenv
 brew install pyenv-virtualenv
 ```
-   - The , configure your shell's environment for pyenv and virtualenv (we use Zsh, see [here](https://github.com/pyenv/pyenv#homebrew-on-macos) if you use Bash or Fish). To do this, paste the following commands into your terminal to modify the .zprofile and .zshrc
+   - The , configure your shell's environment for pyenv and virtualenv (we use Zsh, see <a target="_blank" ref="noopener noreferrer" href"https://github.com/pyenv/pyenv#homebrew-on-macos">here</a> if you use Bash or Fish). To do this, paste the following commands into your terminal to modify the .zprofile and .zshrc
 ```markdown
 echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
 echo 'eval "$(pyenv init -)"' >> ~/.zshrc
@@ -142,7 +142,7 @@ pyenv virtualenv 3.8.8 VV
 pyenv activate VV
 ```
 
-5. Download the VesselVio source code from our [GitHub page](https://github.com/JacobBumgarner/VesselVio).
+5. Download the VesselVio source code from our <a target="_blank" rel="noopener noreferrer" href="https://github.com/JacobBumgarner/VesselVio">GitHub page</a>.
    - On the GitHub page, click the green Code dropdown button, then Download ZIP.  
    - Unzip the package, and place it somewhere accessible to you (e.g., your desktop).
 
