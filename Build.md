@@ -155,7 +155,7 @@ pyenv activate VV
 pip install -r requirements.txt
 ```
 
-7. You should now be able to execute the VesselVio.py file to run the application!.
+7. You should now be able to execute the VesselVio.py file to run the application!
    - First make sure you've activated your python environment (example below)
 ```markdown
 pyenv activate VV
