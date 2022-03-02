@@ -96,7 +96,7 @@ pyinstaller --add-data=Library;Library --additional-hooks-dir=Hooks --icon Icons
 
 You should now be able to successfuly use VesselVio on your PC either from the command prompt or as a local standalone application!
 
-
+---
 ## MacOS Terminal Instructions
 First, you'll need to install python 3.8.8. This can be <a href="https://xkcd.com/1987/" target="_blank">messy</a> if you've got python installed elsewhere or if you don't have an environment manager.
 
