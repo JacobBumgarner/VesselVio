@@ -19,7 +19,7 @@ First, you'll need to install python 3.8.8. This can be <a href="https://xkcd.co
 
 To avoid this mess, we use the popular python environment manager: pyenv. If you've already got a python environment setup, skip to step 4.
 
-1. Install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) as directed by the developers.
+1. Install <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git" target="_blank" rel="noopener noreferrer">Git</a> as directed by the developers.  . . . 
 
 2. Install [pyenv-winows](https://github.com/pyenv-win/pyenv-win) as directed by the developers or by following the instructions below.
    - Paste the following command into your command prompt
