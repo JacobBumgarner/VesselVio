@@ -4,7 +4,7 @@ title: "Build Instructions"
 rank: 4
 ---
 
-If you are unable to run the bundled VesselVio app, this page is for you. Below you'll find detailed instructions explaining how to download the necessary files and then run the application from your terminal.
+If you are unable to run the bundled VesselVio app or just want to run the app locally, this page is for you. Below you'll find detailed instructions explaining how to download the necessary files and then run the application from your command prompt/terminal.
 
 We've tried to make this process as simple as possible! By the end, you should be able to run the app with a single line of code. Please [contact us](mailto:vesselvio@gmail.com) if you need help or have questions.
 
@@ -34,7 +34,7 @@ git clone https://github.com/pyenv-win/pyenv-win.git "%USERPROFILE%\.pyenv"
 ```markdown
 pyenv --version
 ```
-   - If the installation was successful, paste the following into the command prompt to finish the installation.
+   - Following successful installation, paste the following into the command prompt to complete the installation.
 ```markdown
 pyenv rehash
 ```
@@ -53,8 +53,8 @@ pyenv activate 3.8.8
 pip install -U pip
 ```
 
-4. Download the VesselVio sourcecode from our [GitHub page](https://github.com/JacobBumgarner/VesselVio).
-   - Click the Code dropdown, then Download ZIP). 
+4. Download the VesselVio source code from our [GitHub page](https://github.com/JacobBumgarner/VesselVio).
+   - On the GitHub page, click the green Code dropdown button, then Download ZIP. 
    - Unzip the package, and place it somewhere accessible to you (e.g., your desktop).
 
 5. Navigate to the vesselVio file directory to install the required python packages.
@@ -138,7 +138,7 @@ pyenv activate VV
 ```
 
 5. Download the VesselVio source code from our [GitHub page](https://github.com/JacobBumgarner/VesselVio).
-   - Click the Code dropdown, then Download ZIP). 
+   - On the GitHub page, click the green Code dropdown button, then Download ZIP.  
    - Unzip the package, and place it somewhere accessible to you (e.g., your desktop).
 
 6. Then navigate to the VesselVio file directory to install the required python packages.
