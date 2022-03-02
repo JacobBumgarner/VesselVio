@@ -17,7 +17,7 @@ If you're using a Mac, follow the [MacOS Build Instructions](#macos-build-instru
 ## Windows Command Prompt Instructions
 First, you'll need to install python 3.8.8. This can be <a href="https://xkcd.com/1987/" target="_blank">messy</a> if you've got python installed elsewhere or if you don't have an environment manager.
 
-We use the popular python environment manager: pyenv. If you've already got a python environment setup, skip to step 4.
+To avoid this mess, we use the popular python environment manager: pyenv. If you've already got a python environment setup, skip to step 4.
 
 1. Install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) as directed by the developers.
 
@@ -103,7 +103,7 @@ You should now be able to successfuly use VesselVio on your PC either from the c
 ## MacOS Terminal Instructions
 First, you'll need to install python 3.8.8. This can be <a href="https://xkcd.com/1987/" target="_blank">messy</a> if you've got python installed elsewhere or if you don't have an environment manager.
 
-We use the popular python environment manager: pyenv. If you've already got a python environment setup, skip to step 5.
+To avoid this mess, we use the popular python environment manager: pyenv. If you've already got a python environment setup, skip to step 5.
 
 1. Install [Homebrew](https://brew.sh) as instructed by the developers (a simple copy and paste).
 
