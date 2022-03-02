@@ -7,7 +7,7 @@ rank: 4
 ## Overview
 If you are unable to run the bundled VesselVio app or prefer to create the app locally, this page is for you. Below you'll find detailed instructions explaining how to download the necessary files and then run the application from your command prompt/terminal.
 
-We've tried to make this process as simple as possible! By the end, you should be able to run the app with a single line of code. Please [contact us](mailto:vesselvio@gmail.com) if you need help or have questions.
+We've tried to make this process as streamlined as possible! By the end, you should be able to run the app with a single line of code. Please [contact us](mailto:vesselvio@gmail.com) if you need help or have questions.
 
 If you're using a PC, follow the [Windows Build Instructions](#windows-build-instructions) guide.
 
