@@ -82,13 +82,13 @@ cd desktop\VesselVio
 python VesselVio.py
 ```
 
-### Windows App Bundling
+#### Windows App Bundling
 If you want to build a local standalone VesselVio application, follow these instructions.
    - Copy the pyinstaller .exe from your .pyenv folder created in step 2 into your VesselVio directory
          - Example file location: `.pyenv>pyenv-win>versions>3.8.8>Scripts>pyinstaller.exe`
    - Navigate to the VesselVio directory
    - Activate python 3.8.8
-   - Execute the following command in your terminal:
+   - Execute the following command in your command prompt:
 ```markdown
 pyinstaller --add-data=Library;Library --additional-hooks-dir=Hooks --icon Icons\icon.ico --windowed VesselVio.py 
 ```
@@ -169,7 +169,7 @@ cd desktop/VesselVio
 python VesselVio.py
 ```
 
-### MacOS App Bundling
+#### MacOS App Bundling
 To build a local version of the application, you'll first have to reinstall python 3.8.8 with an updated framework configuration.
 ```markdown
 sudo env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.8.8
