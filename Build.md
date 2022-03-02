@@ -26,7 +26,7 @@ We use the popular python environment manager: pyenv. If you've already got a py
 ```markdown
 git clone https://github.com/pyenv-win/pyenv-win.git "%USERPROFILE%\.pyenv"
 ```
-   - Paste the following commands into a powershell.
+   - Paste the following commands one-by-one into a powershell.
 ``` markdown
 [System.Environment]::SetEnvironmentVariable('PYENV',$env:USERPROFILE + "\.pyenv\pyenv-win\","User")
 [System.Environment]::SetEnvironmentVariable('PYENV_HOME',$env:USERPROFILE + "\.pyenv\pyenv-win\","User")
@@ -42,15 +42,16 @@ pyenv rehash
 ```
    - Restart your terminal
 
-3. Install python 3.8.8 by pasting the command below into your command prompt.
+3. Install python version 3.8.8.
+   - First, paste the following command into your command prompt.
 ```markdown
 pyenv install 3.8.8 
 ```
-   - Activate python version 3.8.8.
+   - Then, activate python version 3.8.8 using the following command.
 ```markdown
 pyenv activate 3.8.8
 ```
-   - Update your pip installer.
+   - Lastly, update your pip installer the command below.
 ```markdown
 pip install -U pip
 ```
@@ -60,18 +61,18 @@ pip install -U pip
    - Unzip the package, and place it somewhere accessible to you (e.g., your desktop).
 
 5. Navigate to the vesselVio file directory to install the required python packages.
-   - For example, if the directory is located on your desktop, navigate to it by typing the following into your terminal:
+   - For example, if the directory is located on your desktop, navigate to it by typing the following into your command prompt:
 ```markdown
 cd desktop\VesselVio
 ```
-   - Make sure python 3.8.8 is activated (step 3.2)
+   - Make sure python 3.8.8 is activated (step 3.1)
    - Install the necessary VesselVio dependency packages
 ```markdown
 pip install -r requirements.txt
 ```
 
 6. You should now be able to execute the VesselVio.py file to run the application!
-   - First make sure you've activated your python environment in the command prompt.
+   - First make sure you've activated python 3.8.8 in your command prompt.
 ```markdown
 python activate 3.8.8
 ```
@@ -106,21 +107,22 @@ We use the popular python environment manager: pyenv. If you've already got a py
 
 1. Install [Homebrew](https://brew.sh) as instructed by the developers (a simple copy and paste).
 
-2. Install [pyenv](https://github.com/pyenv/pyenv) and [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) by pasting the following code into a terminal window:
+2. Install [pyenv](https://github.com/pyenv/pyenv) and [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv).
+   - First, install the packages by pasting the following commands into your terminal.
 ```markdown
 brew install pyenv
 brew install pyenv-virtualenv
 ```
-   - Configure your shell's environment for pyenv and virtualenv (we use Zsh, see [here](https://github.com/pyenv/pyenv#homebrew-on-macos) if you use Bash or Fish). Paste the following commands into your terminal to modify the .zprofile and .zshrc
+   - The , configure your shell's environment for pyenv and virtualenv (we use Zsh, see [here](https://github.com/pyenv/pyenv#homebrew-on-macos) if you use Bash or Fish). To do this, paste the following commands into your terminal to modify the .zprofile and .zshrc
 ```markdown
 echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
 echo 'eval "$(pyenv init -)"' >> ~/.zshrc
 echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.zshrc
 ```
    - Restart your terminal.
-   - Ensure pyenv is set up by typing `pyenv` into a new terminal window. If it was successful, you should see a list of commands.
+   - Lastly, ensure pyenv is set up by typing `pyenv` into a new terminal window. If set up correctly, you should see a list of commands.
 
-3. Install the correct version of python (version 3.8.8):
+3. Install the python version 3.8.8.
    - Paste the following into the terminal
 ```markdown
 pyenv install 3.8.8
@@ -131,6 +133,7 @@ pip install -U pip
 ```
 
 4. Create a new virtual environment called 'VV' (or whatever name you prefer), and activate this environment.
+   - Create the environment by pasting the following command into your terminal. Replace 'VV' if you prefer a different name.
 ```markdown
 pyenv virtualenv 3.8.8 VV
 ```
@@ -152,7 +155,7 @@ cd desktop/VesselVio
 ```markdown
 pyenv activate VV
 ```
-   - Install the necessary VesselVio dependency packages
+   - Install the necessary VesselVio dependency packages using the following command.
 ```markdown
 pip install -r requirements.txt
 ```
