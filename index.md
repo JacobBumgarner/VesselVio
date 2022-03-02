@@ -1,13 +1,13 @@
 
 ## Vasculature Dataset Analysis and Visualization
-VesselVio is an open-source application designed to allow researchers to analyze and visualize segmented and binarized vasculature datasets. It is also compatible with annotated datasets and pre-constructed graphs made in other programs.
+VesselVio is an open-source application designed to allow researchers to analyze and visualize segmented vasculature datasets. The application is also compatible with annotated datasets and pre-constructed graphs made in other programs.
 <div class="iframe-container">
 <!--   <iframe src='https://gfycat.com/ifr/LastingCourteousEchidna?hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe> -->
   <iframe src='https://gfycat.com/ifr/NiftyGracefulAfricanrockpython?hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe>
 </div>&nbsp;
 
 ## Using VesselVio
-In an attempt to tackel large learning-curves imposed by terminal-based analysis software, we built an open-source and stand-alone application for [Windows and MacOS](https://jacobbumgarner.github.io/VesselVio/Downloads.html). The application interface allows for users to easily load datasets for analysis and visualization with specific parameters. If you're having trouble with the downloads, you can also build the application from your terminal by following our step-by-step [installation and build instructions](https://jacobbumgarner.github.io/VesselVio/Build.html). 
+To tackle large learning-curves imposed by traditional terminal-based analysis software, we built an open-source and standalone application for [Windows and MacOS](https://jacobbumgarner.github.io/VesselVio/Downloads.html). The application interface allows for users to easily load datasets for analysis and visualization with specific parameters. Alternatively, you can also build the application from your terminal with a single line of code after following our step-by-step [installation and build instructions](https://jacobbumgarner.github.io/VesselVio/Build.html). 
 
 <p align="center">
  <img style="width: 48%; min-width: 300px;" alt="Analysis Page" src="https://user-images.githubusercontent.com/70919881/149365168-5822c405-bbdd-455a-a07a-f01c1afb05b8.png">
@@ -24,3 +24,4 @@ Currently, VesselVio is available for download as a standalone application for c
 
 This application is entirely open-source and free to download under the [GNU GPLv3 license](https://github.com/JacobBumgarner/VesselVio/blob/main/LICENSE). Reseachers hoping to modify or use individual components of the pipelines can find the source code on the [GitHub VesselVio page](https://github.com/JacobBumgarner/VesselVio).
 
+Of course, if you use VesselVio in your research, don't forget to cite our publication in <i>Cell Reports Methods</i>.
