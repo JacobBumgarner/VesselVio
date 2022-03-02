@@ -21,7 +21,7 @@ To avoid this mess, we use the popular python environment manager: pyenv. If you
 
 1. Install <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git" target="_blank" rel="noopener noreferrer">Git</a> as directed by the developers.
 
-2. Install <a target="_blank" rel="noopener noreferrer" href="https://github.com/pyenv-win/pyenv-win">pyenv-winows</a> as directed by the developers or by following the instructions below.
+2. Install <a target="_blank" rel="noopener noreferrer" href="https://github.com/pyenv-win/pyenv-win">pyenv-windows</a> as directed by the developers or by following the instructions below.
    - Paste the following command into your command prompt
 ```markdown
 git clone https://github.com/pyenv-win/pyenv-win.git "%USERPROFILE%\.pyenv"
