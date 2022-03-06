@@ -9,14 +9,17 @@ rank: 2
 
 
 ### Videos
-The videos below were created using VesselVio's built-in rendering page.
+The videos below were created using VesselVio's built-in visualization page.
+
 <div class="iframe-container">
   <iframe src='https://gfycat.com/ifr/flawlesspaltryhornbill?hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe>
 </div>&nbsp;
+The first video above shows the vasculature found in a lymph node from a mouse. The vessels are first colored by their radius and then by their tortuosity.
 
 <div class="iframe-container">
   <iframe src='https://gfycat.com/ifr/unconsciousunhappydesertpupfish?hd=1' frameborder='0' scrolling='no' allowfullscreen width="100%" height="100%"></iframe>
 </div>&nbsp;
+The second video above shows how VesselVio can be used. Visualized is a tiny cube of vasculature from the cortex of a mouse.
 
 ## Analysis Output
 
