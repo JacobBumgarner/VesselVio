@@ -14,7 +14,7 @@ If you're using a PC, follow the [Windows Build Instructions](#windows-build-ins
 If you're using a Mac, follow the [MacOS Build Instructions](#macos-build-instructions) guide.
 
 ---
-## Windows Command Prompt Instructions
+## Windows Build Instructions
 First, you'll need to install python 3.8.8. This can be <a href="https://xkcd.com/1987/" target="_blank" ref="noopener noreferrer">messy</a> if you've got python installed elsewhere or if you don't have an environment manager.
 
 To avoid this mess, we use the popular python environment manager: pyenv. If you've already got a python environment setup, skip to step 4.
@@ -100,7 +100,7 @@ pyinstaller --add-data=Library;Library --additional-hooks-dir=Hooks --icon Icons
 You should now be able to successfuly use VesselVio on your PC either from the command prompt or as a local standalone application!
 
 ---
-## MacOS Terminal Instructions
+## MacOS Build Instructions
 First, you'll need to install python 3.8.8. This can be <a href="https://xkcd.com/1987/" target="_blank" ref="noopener noreferrer">messy</a> if you've got python installed elsewhere or if you don't have an environment manager.
 
 To avoid this mess, we use the popular python environment manager: pyenv. If you've already got a python environment setup, skip to step 5.
