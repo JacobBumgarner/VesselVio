@@ -7,7 +7,7 @@ VesselVio is an open-source application designed to allow researchers to analyze
 </div>&nbsp;
 
 ## Using VesselVio
-To tackle large learning-curves imposed by traditional terminal-based analysis software, we built an open-source and standalone application for [Windows and MacOS](https://jacobbumgarner.github.io/VesselVio/Downloads.html). The application interface allows for users to easily load datasets for analysis and visualization with specific parameters. Alternatively, you can also build the application from your terminal with a single line of code after following our step-by-step [installation and build instructions](https://jacobbumgarner.github.io/VesselVio/Build.html). 
+To tackle large learning-curves imposed by traditional terminal-based analysis software, we built an open-source and standalone application that can be downloaded on [Windows and MacOS](https://jacobbumgarner.github.io/VesselVio/Downloads.html). The application interface allows for users to easily load datasets for analysis and visualization with specific parameters. Alternatively, you can also run the application from your terminal with a single line of code after following our step-by-step [installation and build instructions](https://jacobbumgarner.github.io/VesselVio/Build.html). 
 
 <p align="center">
  <img style="width: 48%; min-width: 300px;" alt="Analysis Page" src="https://user-images.githubusercontent.com/70919881/149365168-5822c405-bbdd-455a-a07a-f01c1afb05b8.png">
@@ -15,7 +15,7 @@ To tackle large learning-curves imposed by traditional terminal-based analysis s
 </p>
 
 ## Instructions 
-Tutorials on how to use VesselVio to analyze your vasculature datasets can be found on the [Tutorial Page](https://jacobbumgarner.github.io/VesselVio/Instructions.html). It's important to remember that the application was built for the analysis of segmented vasculature datasets. If you're looking for resources to segment your datasets, you can check out [ClearMap](https://christophkirst.github.io/ClearMap2Documentation/html/home.html), [VesSAP](https://github.com/vessap/vessap), or [DeepVesselNet](https://github.com/giesekow/deepvesselnet). Of course, there are many more options available. 
+Tutorials on how to use VesselVio to analyze your vasculature datasets can be found on the [Tutorial Page (Coming soon!)](https://jacobbumgarner.github.io/VesselVio/Instructions.html). It's important to remember that the application was built for the analysis of <i>segmented</i> vasculature datasets. If you're looking for resources to segment your datasets, you can check out [ClearMap](https://christophkirst.github.io/ClearMap2Documentation/html/home.html), [VesSAP](https://github.com/vessap/vessap), or [DeepVesselNet](https://github.com/giesekow/deepvesselnet). Of course, there are many more options available. 
 
 If you're looking for help with annotating your whole-brain vasculature datasets, we'd recommend that you check out [QuickNII](https://www.nitrc.org/projects/quicknii/) as a starting point. 
 
