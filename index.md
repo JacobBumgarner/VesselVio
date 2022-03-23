@@ -26,4 +26,4 @@ Currently, VesselVio is available for download as a standalone application for c
 
 This application is entirely open-source and free to download under the [GNU GPLv3 license](https://github.com/JacobBumgarner/VesselVio/blob/main/LICENSE). Reseachers hoping to modify or use individual components of the pipelines can find the source code on the [GitHub VesselVio page](https://github.com/JacobBumgarner/VesselVio).
 
-Of course, if you use VesselVio in your research, don't forget to cite our publication in <i>Cell Reports Methods</i>.
+Of course, if you use VesselVio in your research, don't forget to cite our publication in <i>[Cell Reports Methods](https://www.cell.com/cell-reports-methods/fulltext/S2667-2375(22)00044-3)</i>.
