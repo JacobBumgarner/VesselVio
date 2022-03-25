@@ -20,7 +20,7 @@ Please feel free to [email me](mailto:vesselvio@gmail.com) or [create an issue](
 
 # NOTICE
 
-- If using Windows, make sure to unzip the package before running. If the shortcut isn't working, you can create a new shortcut by going to VesselVio>Contents>VesselVio.exe. Please [contact us](mailto:vesselvio@gmail.com) with any questions or issues.
+- If using Windows, make sure to unzip the package before running. If the shortcut isn't working, you can create a new shortcut by going to VesselVio>Contents>VesselVio.exe.
 
 - The software packages are unsigned at the moment. This means that depending on your system settings, you'll likely have to approve the application for run. We will work to sign the application with authentication certificates in the near future.
 
