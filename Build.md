@@ -36,10 +36,6 @@ git clone https://github.com/pyenv-win/pyenv-win.git "%USERPROFILE%\.pyenv"
 ```markdown
 pyenv --version
 ```
-   - Following successful installation, paste the following into the command prompt to complete the installation.
-```markdown
-pyenv rehash
-```
    - Restart your terminal
 
 3. Install python version 3.8.8.
@@ -47,9 +43,13 @@ pyenv rehash
 ```markdown
 pyenv install 3.8.8 
 ```
+   - Following successful installation, paste the following into the command prompt to complete the installation, and restart the prompt.
+```markdown
+pyenv rehash
+```
    - Then, activate python version 3.8.8 using the following command.
 ```markdown
-pyenv activate 3.8.8
+pyenv local 3.8.8
 ```
    - Lastly, update your pip installer the command below.
 ```markdown
