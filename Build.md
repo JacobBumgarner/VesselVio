@@ -74,7 +74,7 @@ pip install -r requirements.txt
 6. You should now be able to execute the VesselVio.py file to run the application!
    - First make sure you've activated python 3.8.8 in your command prompt.
 ```markdown
-python activate 3.8.8
+python local 3.8.8
 ```
    - Then make sure you've navigated to the VesselVio source code folder (example below).
 ```markdown
