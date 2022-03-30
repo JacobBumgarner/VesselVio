@@ -16,10 +16,11 @@ import json
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QApplication, QWidget, QMainWindow,  QTreeWidget, QTreeWidgetItem, QHeaderView, QLineEdit, QCompleter, QLabel, QTableWidget, QTableWidgetItem, QListWidget, QListWidgetItem, QDialog, QGroupBox, QFileDialog, QPushButton, QMessageBox, QAbstractItemView)
 
-from library import helpers
-from library import annotation_processing as AnProc
-from library.ui import qt_objects as QtO
-from library.ui import stylesheets as Styles
+from Library import Annotation_Processing as AnProc
+from Library.helpers import get_cwd, get_dir
+from Library.UI import QtObjects as QtO
+from Library.UI import stylesheets as Styles
+from Library import helpers
 
 
 class mainWindow(QMainWindow):
@@ -45,9 +46,7 @@ class AnnotationPage(QWidget):
         
         
         ## Default annotation file setup
-        self.tree_file = helpers.std_path(os.path.join(helpers.get_cwd(),
-                                            'library', 'annotation_trees',
-                                             'p56 Mouse Brain.json'))
+        self.tree_file = os.path.join(get_cwd(), 'Library/Annotation Trees/p56 Mouse Brain.json')
 
         
         pageLayout = QtO.new_layout(self, 'H',spacing=0,
@@ -227,7 +226,7 @@ class AnnotationPage(QWidget):
                     'colors':colors,
                     'ids':ids}
             
-            file_name = helpers.get_save_file("Save File As...", helpers.get_dir('Desktop'), 'json')
+            file_name = helpers.get_save_file("Save File As...", get_dir('Desktop'), 'json')
 
             if file_name:
                 with open(file_name, "w") as f:
@@ -522,12 +521,13 @@ class LoadTreeFile(QDialog):
 
     def load_default(self):
         selection = self.defaultList.currentItem().text()
-        self.file_name = os.path.join(helpers.get_cwd(), f"library/annotation_trees/{selection}.json")
+        self.file_name = os.path.join(get_cwd(), f"Library/Annotation Trees/{selection}.json")
         self.accept()
         return
     
     def load_json_file(self):
-        loaded_file = helpers.load_JSON(helpers.get_dir('Desktop'))
+        loaded_file = helpers.load_JSON(get_dir('Desktop'))
+        # loaded_file = QFileDialog.getOpenFileName(self, "Select JSON Tree File", load_dir, filter)
         if loaded_file:
             self.file_name = loaded_file
             self.accept()

@@ -13,17 +13,14 @@ __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 import sys, os
 import json
 
-from PyQt5.QtWidgets import (QApplication, QWidget, QMainWindow, QHeaderView, 
-                             QLabel, QTableWidget, QTableWidgetItem, QDialog, 
-                             QFileDialog, QTabWidget, QLayout, QMessageBox, 
-                             QAbstractItemView)
+from PyQt5.QtWidgets import (QApplication, QWidget, QMainWindow, QHeaderView, QLabel, QTableWidget, QTableWidgetItem, QDialog, QFileDialog, QTabWidget, QLayout, QMessageBox, QAbstractItemView)
 
-from library import helpers
-from library import input_classes as IC
-from library import qt_threading as QtTh
-from library.ui import qt_objects as QtO
-from library.annotation_processing import RGB_check
-from library.ui.annotation_page import RGB_Warning
+from Library import Input_Classes as IC
+import Library.helpers as helpers
+from Library.UI import QtObjects as QtO
+from Library import QtThreading as QtTh
+from Library.Annotation_Processing import RGB_check
+from Library.UI.Annotation_Page import RGB_Warning
 
 
 class mainWindow(QMainWindow):

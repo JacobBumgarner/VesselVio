@@ -29,7 +29,7 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtGui import QPalette
 from PyQt5.QtCore import Qt
 
-from library import input_classes as IC
+from Library import Input_Classes as IC
 
 ##########################
 ### File Path Handling ###
@@ -72,6 +72,8 @@ def load_screenshot_dir():
     results_dir = load_results_dir()
     screenshot_dir = os.path.join(results_dir, 'Screenshots')
     screenshot_dir = std_path(screenshot_dir)
+    # if not os.path.exists(screenshot_dir):
+    #     os.mkdir(screenshot_dir)
     return screenshot_dir
 
 def load_movie_dir():
@@ -99,9 +101,13 @@ def prep_media_dir(filename):
         os.mkdir(media_dir) # Make sure the screenshots folder exists
     return
 
+
 def load_results_dir():
     results_dir = get_results_cache()
-    
+    # # Define our results path
+    # with open(results_cache, 'r') as f:
+    #     results_dir = f.read()
+
     # Checks to see if our results pathway is present or if our results cache is empty.
     if not os.path.exists(results_dir):
         # If its empty, create a default folder. 
@@ -182,17 +188,18 @@ def load_JSON(dir):
         loaded_file = std_path(loaded_file)
     return loaded_file
 
-## cache path loading
+
+## Cache path loading
 def load_prefs():
     wd = get_cwd()    
-    pref_cache = os.path.join(wd, 'library', 'cache', 'preferences.json')
+    pref_cache = os.path.join(wd, 'Library', 'Cache', 'preferences.json')
     with open(pref_cache) as p:
         prefs = json.load(p)
     return prefs
 
 def save_prefs(prefs):
     wd = get_cwd()
-    pref_cache = os.path.join(wd, 'library', 'cache', 'preferences.json')
+    pref_cache = os.path.join(wd, 'Library', 'Cache', 'preferences.json')
     with open(pref_cache, 'w') as p:
         json.dump(prefs, p)
     return
@@ -210,13 +217,13 @@ def get_results_cache():
 
 def get_graph_cache():
     wd = get_cwd()    
-    graph_cache = os.path.join(wd, 'library', 'cache', 'cached_graph.graphml')
+    graph_cache = os.path.join(wd, 'Library', 'Cache', 'cached_graph.graphml')
     graph_cache = std_path(graph_cache)
     return graph_cache
 
 def get_volume_cache():
     wd = get_cwd()
-    volume_cache = os.path.join(wd, 'library', 'cache', 'labeled_volume.npy')
+    volume_cache = os.path.join(wd, 'Library', 'Cache', 'labeled_volume.npy')
     volume_cache = std_path(volume_cache)
     return volume_cache
 
@@ -225,25 +232,6 @@ def silence_update_alerts():
     prefs['update_check'] = False
     save_prefs(prefs)
     return
-
-
-#####################
-### Icon Handling ###
-#####################
-def load_icon():
-    """Locates the path to the application icon based on the current OS
-    
-    returns icon_path"""
-    wd = get_cwd()
-    
-    # Load the correct icon file, dependent on OS.
-    # Assumes we're only running this on Windows or Mac...
-    if get_OS() == 'Windows':
-        icon_path = std_path(os.path.join(wd, 'library', 'icons', 'icon.ico'))
-    else:
-        icon_path = std_path(os.path.join(wd, 'library', 'icons', 'icon.icns'))
-    
-    return icon_path
 
 
 ########################

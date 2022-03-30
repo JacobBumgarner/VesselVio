@@ -16,8 +16,8 @@ import pandas
 import igraph as ig
 import numpy as np
 
-from library import feature_extraction as FeatExt
-from library import helpers
+from Library import Feature_Extraction as FeatExt
+from Library import helpers
 
 
 ###########################
