@@ -17,9 +17,8 @@ from skimage.morphology import skeletonize_3d
 from time import perf_counter as pf
 from scipy.ndimage import label
 
-from Library import Radii_Corrections as RadCor
-# from Library import PK12
-from Library import Lee94
+from library import radii_corrections as RadCor
+from library import lee94
 
 #######################
 ### Volume Bounding ###
@@ -277,8 +276,7 @@ def skeletonize(volume, verbose=False):
         skeleton = skeletonize_3d(volume)
     else:
         skeleton = np.ascontiguousarray(volume.copy())
-        skeleton = Lee94.skeletonize(skeleton, verbose=verbose)
-        # skeleton = PK12_skeletonize(volume)
+        skeleton = lee94.skeletonize(skeleton, verbose=verbose)
         
     # Rearrange point array to (n,3) or (n,2).
     points = find_centerlines(skeleton)

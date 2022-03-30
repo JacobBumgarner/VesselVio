@@ -19,8 +19,8 @@ import numpy as np
 
 from time import perf_counter as pf
 
-from Library import helpers
-from Library import Volume_Processing as VolProc
+from library import helpers
+from library import volume_processing as VolProc
 
 #######################
 ### Tree Processing ###
@@ -70,7 +70,8 @@ def tree_processing(file=None, names=None, tree_info=None):
     # Load the default file if there isn't one
     if not file:
         wd = get_cwd()
-        file = helpers.std_path(os.path.join(wd, 'Library', 'Annotation Trees', 'p56 Mouse Brain.json')) 
+        file = helpers.std_path(os.path.join(wd, 'library', 'annotation_trees', 
+                                             'p56 Mouse Brain.json')) 
     
     # Set up the JSON_Options object to know how to read the JSON file
     if not tree_info:
@@ -158,8 +159,8 @@ def prep_id_array(ROI_dict):
 
     ### REMOVE BEFORE FLIGHT ###
     ### REMOVE BEFORE FLIGHT ###
-    #for ROI in ROIs:
-    #    ROI += [r * -1 for r in ROI]
+    # for ROI in ROIs:
+    #     ROI += [r * -1 for r in ROI]
     ### REMOVE BEFORE FLIGHT ###
     ### REMOVE BEFORE FLIGHT ###
     
@@ -413,8 +414,8 @@ def id_labeling_input(volume, annotation_file, id_array, verbose=False):
     annotation_memmap = ImProc.load_nii_volume(annotation_file)
     
     # # Make sure volume and annotation are of same shape.
-    # if not ImProc.id_dim_check(annotation_memmap, volume.shape, verbose=verbose):
-        # return None, None, None, None
+    if not ImProc.id_dim_check(annotation_memmap, volume.shape, verbose=verbose):
+        return None, None, None, None
     
     # Check to see that the dtype is appropriate for numba
     numba_seg = ImProc.dtype_check(annotation_memmap)
@@ -457,19 +458,19 @@ if __name__ == "__main__":
     # If labeling from __main__, this file needs to be copied to 
     # Parent dir of /Library folder, i.e., with the VesselVio.py file.
     from os import getcwd as get_cwd
-    from Library import Image_Processing as ImProc
+    from library import image_processing as ImProc
     
     
     annotation_data = load_annotation_file("")
     print ("Regions:", len(annotation_data.keys()))
 
-    
+    ### NII Testing
     # volume = ImProc.load_nii_volume('')
     # annotation = ""
     # id_array = prep_id_array(annotation_data)
     # volume, ROI_volumes, mins, maxes = id_segmentation_input(volume, annotation, id_array, verbose=True)
 
-
+    ### RGB Testing
     volume = ImProc.load_nii_volume('')
     annotation_folder = ""
     RGB_array = prep_RGB_array(annotation_data)
@@ -477,5 +478,5 @@ if __name__ == "__main__":
     
         
 else:
-    from Library.helpers import get_cwd
-    from Library import Image_Processing as ImProc
+    from library.helpers import get_cwd
+    from library import image_processing as ImProc

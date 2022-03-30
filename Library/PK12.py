@@ -202,7 +202,7 @@ def load_LUT():
         wd = sys._MEIPASS 
     except AttributeError:
         wd = os.getcwd()
-    file = os.path.join(wd, 'Library/Volumes/PK12.npy')
+    file = os.path.join(wd, 'library/volumes/PK12.npy')
     if not os.path.exists(file):
         LUT = build_LUT()
         np.save(file, LUT)

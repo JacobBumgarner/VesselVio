@@ -24,7 +24,7 @@ import nibabel
 # Result Export
 from pyexcelerate import Workbook
 
-from Library import helpers
+from library import helpers
 
 ## Global min_resolution variable
 min_resolution = 1

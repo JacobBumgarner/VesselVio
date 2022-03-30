@@ -21,10 +21,10 @@ import matplotlib.pyplot as plt
 
 from multiprocessing import cpu_count
 
-from Library import Image_Processing as ImProc
-from Library import Volume_Processing as VolProc
-from Library import Input_Classes as IC
-from Library import helpers
+from library import image_processing as ImProc
+from library import volume_processing as VolProc
+from library import input_classes as IC
+from library import helpers
 
 
 ############################

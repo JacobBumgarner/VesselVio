@@ -17,8 +17,8 @@ from PyQt5.QtWidgets import (QWidget, QLabel, QPushButton, QFrame, QListWidget,
                              QListWidgetItem, QVBoxLayout, QDialog)
 
 
-from Library.UI import QtObjects as QtO
-from Library.UI import stylesheets
+from library.ui import qt_objects as QtO
+from library.ui import stylesheets
 
 
 class LeftMenu(QFrame):
