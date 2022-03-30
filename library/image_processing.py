@@ -3,6 +3,7 @@
 Image loading and processing.
 """
 
+
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
 __license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
 __copyright__ = 'Copyright 2022 by Jacob Bumgarner'
@@ -18,6 +19,7 @@ from time import perf_counter as pf
 # Image processing
 from pathlib import Path
 from SimpleITK import ReadImage, GetArrayFromImage, GetImageFromArray, WriteImage
+from skimage.io import imread
 import cv2
 import nibabel
 
