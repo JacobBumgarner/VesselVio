@@ -15,28 +15,27 @@ os.environ["QT_MAC_WANTS_LAYER"] = '1'
 
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import (QApplication, QStackedWidget,
-                            QMainWindow, QStatusBar)
-from PyQt5.QtGui import QIcon
+                            QMainWindow, QStatusBar, QMessageBox)
 from multiprocessing import freeze_support
 
 from pyvistaqt import QtInteractor
 import pyvista as pv
 
 # Import UIs
-from library.ui import qt_objects as QtO
-from library.ui import left_menu as lm
-from library.ui import analysis_page as p1
-from library.ui import visualization_page as p2
-from library.ui import annotation_page as p3
-from library.ui import update_alert
-from library import qt_threading as QtTh
-from library import image_processing as ImProc
-from library.helpers import load_icon
+from Library.UI import QtObjects as QtO
+from Library.UI import LeftMenu as lm
+from Library.UI import Analysis_Page as p1
+from Library.UI import Visualization_Page as p2
+from Library.UI import Annotation_Page as p3
+from Library.UI import UpdateAlert
+from Library import QtThreading as QtTh
+from Library import Image_Processing as ImProc
 
 ######
-__version__ = "V 1.1.2"
+version = "V 1.1.1"
 ######
      
+
 # Main window for the application.
 class mainWindow(QMainWindow):
     def __init__(self):
@@ -57,7 +56,7 @@ class mainWindow(QMainWindow):
         self.centralLayout = QtO.new_layout(self.centralWidget, no_spacing=True)
         
         # Setup the individual pages of the application.
-        self.leftMenu = lm.LeftMenu(__version__)
+        self.leftMenu = lm.LeftMenu(version)
         
         self.qStack = QStackedWidget() # Stacked widget for the pages
         
@@ -75,6 +74,7 @@ class mainWindow(QMainWindow):
         
         # Add pages to the app
         QtO.add_widgets(self.centralLayout, [self.leftMenu, self.pageStack])
+        # QtO.add_widgets(self.centralLayout, [self.leftMenu])
         
         # Make sure we delete the labeled_cache_volume if it exists
         ImProc.clear_labeled_cache()
@@ -83,11 +83,8 @@ class mainWindow(QMainWindow):
         QtTh.prepare_compilers()
         
         # Check for updates
-        update_alert.local_version = __version__[2:]
-        QTimer.singleShot(500, update_alert.version_check)
-        
-        # Present the application
-        self.show()
+        UpdateAlert.local_version = version[2:]
+        QTimer.singleShot(500, UpdateAlert.version_check)
         return
     
     # Close all associated widgets if the main thread is ended.s
@@ -103,6 +100,6 @@ class mainWindow(QMainWindow):
 if __name__ == '__main__':
     freeze_support()
     app = QApplication(sys.argv)  
-    app.setWindowIcon(QIcon(load_icon()))
     main_app = mainWindow()
+    main_app.show()
     sys.exit(app.exec_()) 

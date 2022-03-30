@@ -17,7 +17,7 @@ import csv
 from openpyxl import load_workbook
 from pyexcelerate import Workbook, Style, Font, Alignment
 
-from library import helpers
+from Library import helpers
 
 ###########################
 ### Results Header Text ###
@@ -157,7 +157,7 @@ def read_cache_results():
 
 def get_cache_path():
     wd = helpers.get_cwd()
-    results_cache = helpers.std_path(os.path.join(wd, 'library', 'cache', 'results_cache.csv'))
+    results_cache = helpers.std_path(os.path.join(wd, 'Library', 'Cache', 'results_cache.csv'))
     return results_cache
     
 # Delete cache file after successfully exporting the results

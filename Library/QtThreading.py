@@ -23,16 +23,16 @@ from time import perf_counter as pf
 import nibabel
 
 
-from library import image_processing as ImProc
-from library import graph_io as GIO
-from library import graph_processing as GProc
-from library import feature_extraction as FeatExt 
-from library import results_export as ResExp
-from library import volume_processing as VolProc
-from library import volume_visualization as VolVis
-from library import annotation_processing as AnnProc
-from library import input_classes as IC
-from library import helpers
+from Library import Image_Processing as ImProc
+from Library import Graph_IO as GIO
+from Library import Graph_Processing as GProc
+from Library import Feature_Extraction as FeatExt 
+from Library import Results_Export as ResExp
+from Library import Volume_Processing as VolProc
+from Library import Volume_Visualization as VolVis
+from Library import Annotation_Processing as AnnProc
+from Library import Input_Classes as IC
+from Library import helpers
 
 
 ################
@@ -690,7 +690,7 @@ class MovieThread(QThread):
 # Run a tiny volume through the pipeline to prep any of the functions that need it
 def prepare_compilers():
     resolution = np.array([1.0, 1.0, 1.0])
-    file = os.path.join(helpers.get_cwd(), 'library', 'volumes', 'JIT_volume.nii')
+    file = os.path.join(helpers.get_cwd(), 'Library', 'Volumes', 'JIT_volume.nii')
     file = helpers.std_path(file)
     volume, image_shape = ImProc.load_volume(file)
     volume, point_minima = VolProc.volume_prep(volume)
