@@ -16,8 +16,8 @@ import re
 
 from PyQt5.QtWidgets import QDialog, QLabel
 
-from Library.UI import QtObjects as QtO
-from Library import helpers
+from library import helpers
+from library.ui import qt_objects as QtO
 
 #####################
 ### Version Check ###
@@ -32,7 +32,7 @@ class updateAlert(QDialog):
         layout = QtO.new_layout(self, 'V')
         self.setWindowTitle("Version Update")
         
-        URL = "https://jacobbumgarner.github.io/VesselVio_Web/Downloads"
+        URL = "https://jacobbumgarner.github.io/VesselVio/Downloads"
         
         message = QLabel(f"""<center>An updated version of VesselVio is available to download!<br><br>
                          <b>Your version:</b> {local_version}<br>

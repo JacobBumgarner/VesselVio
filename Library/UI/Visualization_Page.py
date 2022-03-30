@@ -22,13 +22,13 @@ from PyQt5.Qt import pyqtSlot
 from PyQt5.QtCore import Qt, QTimer, QThread
 from PyQt5.QtWidgets import (QApplication, QWidget, QMainWindow, QLabel, QDialog, QFileDialog, QMessageBox, QSplitter, QGroupBox, QColorDialog, QFrame, QProgressBar, QDialogButtonBox, QStatusBar)
 
-from Library import Input_Classes as IC
-import Library.helpers as helpers
-from Library.UI import QtObjects as QtO
-from Library import QtThreading as QtTh
-from Library.UI.Analysis_Page import GraphOptions, AnalysisOptions
-from Library.Annotation_Processing import RGB_check
-from Library.UI.Annotation_Page import RGB_Warning
+from library import helpers
+from library import input_classes as IC
+from library import qt_threading as QtTh
+from library.ui import qt_objects as QtO
+from library.ui.analysis_page import GraphOptions, AnalysisOptions
+from library.ui.annotation_page import RGB_Warning
+from library.annotation_processing import RGB_check
 
 
 class mainWindow(QMainWindow):
@@ -66,7 +66,7 @@ class VisualizationPage(QSplitter):
         
         # self.splitterMoved.connect(self.redraw_widgets)
         ## Default loading file
-        default_file = os.path.join(helpers.get_cwd(), 'Library', 'Volumes', 'Demo Volume.nii')
+        default_file = os.path.join(helpers.get_cwd(), 'library', 'volumes', 'Demo Volume.nii')
         default_file = helpers.std_path(default_file)
         self.files.file1 = str(default_file)
         ## Page layout setup

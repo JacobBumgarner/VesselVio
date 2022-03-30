@@ -11,9 +11,13 @@ __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
 
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtWidgets import (QWidget, QPushButton, QSpinBox, QDoubleSpinBox, QHBoxLayout, QVBoxLayout, QToolButton, QLineEdit, QComboBox, QStyledItemDelegate, QCheckBox, QFormLayout, QFrame, QRadioButton, QButtonGroup, QScrollArea, QStackedWidget)
+from PyQt5.QtWidgets import (QWidget, QPushButton, QSpinBox, QDoubleSpinBox, 
+                             QHBoxLayout, QVBoxLayout, QToolButton, QLineEdit, 
+                             QComboBox, QStyledItemDelegate, QCheckBox, 
+                             QFormLayout, QFrame, QRadioButton, QButtonGroup, 
+                             QScrollArea, QStackedWidget)
 
-from Library import helpers 
+from library import helpers 
 
 ###############
 ### Widgets ###

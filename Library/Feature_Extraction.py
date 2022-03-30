@@ -21,9 +21,9 @@ from numba import njit
 
 from multiprocessing import cpu_count
 
-from Library import Graph_Processing as GProc
-from Library import Image_Processing as ImProc
-from Library import helpers
+from library import graph_processing as GProc
+from library import image_processing as ImProc
+from library import helpers
 
 
 #############################
@@ -127,9 +127,10 @@ def feature_extraction(g, point_list, resolution, image_dim=None, image_shape=No
     if not visualize:
         coords = None # No need to hang on to these if not visualizing or exporting the graph
         
-    features = FeatureSet(volume_or_PAF, surface_area, segment_length, tortuosity,
+    features = FeatureSet(volume_or_PAF, surface_area, segment_length, 
+                          tortuosity, 
                           r_avg, r_max, r_min, r_SD,
-                          vis_radii, coords, vis_radius)
+                          vis_radii, coords, vis_radius,)
     return features
 
 ## General Features
@@ -347,6 +348,7 @@ def record_results(g, features, edges, reduce_graph):
         radii_avg[i] = feature.radius_avg
         radii_max[i] = feature.radius_max
         radii_min[i] = feature.radius_min
+        radii_SD[i] = feature.radius_SD
         
         if reduce_graph:
             # Z,Y,X -> X,Y,Z for visualization

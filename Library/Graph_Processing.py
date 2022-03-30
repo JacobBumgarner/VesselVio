@@ -21,9 +21,9 @@ from itertools import repeat, chain
 from multiprocessing import cpu_count
 from math import floor
 
-from Library import Feature_Extraction as FeatExt
-from Library import Volume_Processing as VolProc
-from Library import helpers
+from library import feature_extraction as FeatExt
+from library import volume_processing as VolProc
+from library import helpers
 
 
 #######################
