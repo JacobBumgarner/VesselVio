@@ -233,7 +233,7 @@ def process_volume(volume_file, gen_options, ann_options, vis_options, iteration
             volume = None
         else:
             volume, _ = ImProc.load_volume(volume_file)
-            volume = ImProc.load_numba_compatible(volume)
+            volume = ImProc.prep_numba_compatability(volume)
             # Don't bound for visualization, as points will be true, not relative
             volume = VolProc.pad_volume(volume) 
             if volume.ndim == 2:

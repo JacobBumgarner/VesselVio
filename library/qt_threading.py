@@ -526,7 +526,7 @@ class VolumeVisualizationThread(QThread):
                 # Volume is already None, so won't be visualized if neither were selected
                 if any([self.vis_options.load_original,  self.vis_options.load_smoothed]):
                     volume, _ = ImProc.load_volume(volume_file)
-                    volume = ImProc.load_numba_compatible(volume)
+                    volume = ImProc.prep_numba_compatability(volume)
                     volume = VolProc.pad_volume(volume)
                     if volume.ndim == 2:
                         _, volume, _ = ImProc.reshape_2D(points, volume)               

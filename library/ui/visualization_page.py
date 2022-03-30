@@ -12,15 +12,17 @@ __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
 import sys, os
 import json
-from time import sleep
 import pyvista as pv
 from pyvistaqt import QtInteractor
 from imageio import get_writer
 import imageio_ffmpeg
 
 from PyQt5.Qt import pyqtSlot
-from PyQt5.QtCore import Qt, QTimer, QThread
-from PyQt5.QtWidgets import (QApplication, QWidget, QMainWindow, QLabel, QDialog, QFileDialog, QMessageBox, QSplitter, QGroupBox, QColorDialog, QFrame, QProgressBar, QDialogButtonBox, QStatusBar)
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtWidgets import (QApplication, QWidget, QMainWindow, QLabel, QDialog, 
+                             QMessageBox, QSplitter, QGroupBox, 
+                             QColorDialog, QFrame, QProgressBar, QDialogButtonBox, 
+                             QStatusBar)
 
 from library import helpers
 from library import input_classes as IC
@@ -51,7 +53,6 @@ class mainWindow(QMainWindow):
         layout.addWidget(annotationpage)
         
         self.show()
-        
 
 
 class VisualizationPage(QSplitter):
@@ -66,7 +67,8 @@ class VisualizationPage(QSplitter):
         
         # self.splitterMoved.connect(self.redraw_widgets)
         ## Default loading file
-        default_file = os.path.join(helpers.get_cwd(), 'library', 'volumes', 'Demo Volume.nii')
+        default_file = os.path.join(helpers.get_cwd(), 'library', 'volumes', 
+                                    'Cube.nii')
         default_file = helpers.std_path(default_file)
         self.files.file1 = str(default_file)
         ## Page layout setup
@@ -86,7 +88,8 @@ class VisualizationPage(QSplitter):
         self.volumeOptions = VolumeOptions(self.plotter, self.meshes, self.actors)
         
         line1 = QtO.new_line()
-        QtO.add_widgets(optionsLayout, [self.loadingBox, line1, self.generalOptions, 5, self.tubeOptions, 5, self.volumeOptions, 0])
+        QtO.add_widgets(optionsLayout, [self.loadingBox, line1, self.generalOptions, 
+                                        5, self.tubeOptions, 5, self.volumeOptions, 0])
         
         QtO.add_widgets(pageLayout, [self.optionsScroll, self.plotter])
 
@@ -103,8 +106,8 @@ class VisualizationPage(QSplitter):
             self.files.visualized_file = self.files.file1_name()
             self.meshes = visualizer.meshes
             self.loadingBox.update_rendered(self.files.visualized_file)
-            self.tubeOptions.remove_all_actors()
-            self.volumeOptions.remove_all_actors()
+            self.tubeOptions.remove_tube_actors()
+            self.volumeOptions.remove_volume_actors()
             self.tubeOptions.load_meshes(self.meshes, self.files.annotation_type)
             self.volumeOptions.load_meshes(self.meshes)
             self.update_meshes(visualizer.analysis_options.image_dimensions)
@@ -180,7 +183,6 @@ class VisualizationDialog(QDialog):
         
         self.setWindowTitle("Visualization")
         
-        
         ## Four rows
         ## Top row
         self.topWidget = QtO.new_widget()
@@ -239,7 +241,8 @@ class VisualizationDialog(QDialog):
         self.analysisOptions = AnalysisOptions(vis_page=True)
         
         # If a centerline graph was loaded, add centerline smoothing buttons
-        if self.files.dataset_type == 'Graph' and self.graph_options.graph_type == 'Centerlines':
+        if (self.files.dataset_type == 'Graph' 
+            and self.graph_options.graph_type == 'Centerlines'):
             self.centerlineLine = QtO.new_widget()
             clLayout = QtO.new_layout(self.centerlineLine, margins=0)
             self.centerlineSmoothing = QtO.new_checkbox("Centerline smoothing")
@@ -333,6 +336,7 @@ class VisualizationDialog(QDialog):
             if actor:
                 self.plotter.remove_actor(actor, reset_camera=False)
                 helpers.remove_legend(self.plotter, actor)
+                # self.plotter.remove_scalar_bar()
         self.actors.reset()
         self.meshes.reset()
         
@@ -345,7 +349,8 @@ class VisualizationDialog(QDialog):
         return
     
     def init_volume_visualization(self):
-        self.a_thread = QtTh.VolumeVisualizationThread(self.analysis_options, self.vis_options, self.files)
+        self.a_thread = QtTh.VolumeVisualizationThread(self.analysis_options, 
+                                                       self.vis_options, self.files)
         return
     
     def init_graph_visualization(self):
@@ -378,7 +383,6 @@ class VisualizationDialog(QDialog):
     def failed_visualization(self, status):
         self.visualizing = False
         self.a_thread.quit()
-        # self.reject()
         return
     
     def prepare_visualization_options(self):
@@ -394,7 +398,8 @@ class VisualizationDialog(QDialog):
                     
         self.vis_options = IC.VisualizationOptions(True, simplified, self.loadScaled.isChecked(),
                                                    self.loadNetwork.isChecked(),
-                                                   self.loadOriginal.isChecked(), self.loadSmoothed.isChecked(),
+                                                   self.loadOriginal.isChecked(), 
+                                                   self.loadSmoothed.isChecked(),
                                                    render_annotations=render_annotations,
                                                    rendering_quality=rendering_quality)
         return
@@ -461,7 +466,8 @@ class LoadingDialog(QDialog):
         self.datasetType = QtO.new_combo(['Volume', 'Graph'], connect=self.toggle_type)
         
         annHeader = QLabel("<b>Annotation Type:")
-        self.annotationType = QtO.new_combo(['None', 'ID', 'RGB'], connect=self.annotation_options)
+        self.annotationType = QtO.new_combo(['None', 'ID', 'RGB'], 
+                                            connect=self.annotation_options)
         self.annotationType.currentIndexChanged.connect(self.update_JSON)
         
         # Load annotation
@@ -564,11 +570,11 @@ class LoadingDialog(QDialog):
         accept.setDefault(True)
         accept.setAutoDefault(True)
         
-        
         QtO.add_widgets(buttonLayout, [0, cancel, accept])
         
         ## add
-        QtO.add_widgets(pageLayout, [pageHeader, topWidget, self.bottomWidget, 10, buttonLine])
+        QtO.add_widgets(pageLayout, [pageHeader, topWidget, self.bottomWidget, 
+                                     10, buttonLine])
         
         
         self.resize()
@@ -662,7 +668,6 @@ class LoadingDialog(QDialog):
         self.file2Edit.setText(self.files.file2_name())
         return
     
-    
     ## JSON file loading
     def annotation_options(self):
         # Clear the annotation if swapped to None            
@@ -722,7 +727,8 @@ class LoadingDialog(QDialog):
     ## Final option management
     def prepare_graph_options(self):
         graph_options = self.graphOptions.prepare_options()
-        if self.graphOptions.graphType.currentText() == 'Branches' and self.hexPresent.isChecked():
+        if (self.graphOptions.graphType.currentText() == 'Branches' 
+            and self.hexPresent.isChecked()):
             graph_options.a_key.edge_hex = self.edgeHexEdit.text()
         return graph_options
 
@@ -770,12 +776,14 @@ class TopWidget(QWidget):
         boxLayout = QtO.new_layout(self, 'V', margins=0)
         
         loadedLabel = QLabel("<b>Loaded file:")
-        self.loadedFile = QtO.new_line_edit('Demo Volume.nii', 'Center', 180, True)
+        self.loadedFile = QtO.new_line_edit('Demo Volume.nii', 'Center', 
+                                            180, True)
         
         self.loadingButton = QtO.new_button("Load Files", None)
         self.visualizeButton = QtO.new_button("Visualize", None)
 
-        self.screenshotButton = QtO.new_button("Save image...", self.screenshot, 120)
+        self.screenshotButton = QtO.new_button("Save image...", 
+                                               self.screenshot, 120)
         self.screenshotButton.setToolTip("Saves a screenshot of the current view into the results directory selected on the anlaysis page.")
     
         self.movieButton = QtO.new_button("Save movie...", self.movie, 120)
@@ -784,7 +792,8 @@ class TopWidget(QWidget):
 
         QtO.add_widgets(boxLayout, [loadedLabel, self.loadedFile, 5, 
                                     self.loadingButton, 
-                                    self.visualizeButton, self.screenshotButton, self.movieButton], 'Center')
+                                    self.visualizeButton, self.screenshotButton, 
+                                    self.movieButton], 'Center')
 
     ## Loading file dialog initialization
     def update_loaded(self, filename):
@@ -799,7 +808,9 @@ class TopWidget(QWidget):
     
     ## Screenshot capturing
     def screenshot(self):
-        screenshotDialogue = ScreenshotDialogue(self.plotter, self.visualized_file, self.mainWindow)
+        screenshotDialogue = ScreenshotDialogue(self.plotter, 
+                                                self.visualized_file, 
+                                                self.mainWindow)
         screenshotDialogue.accepted.connect(self.toggle_splitter)
         screenshotDialogue.rejected.connect(self.toggle_splitter)
         self.toggle_splitter(lock=True)
@@ -809,7 +820,8 @@ class TopWidget(QWidget):
     def movie(self):
         self.toggle_splitter(lock=True)
         movie_dir = helpers.load_movie_dir()
-        self.movieDialogue = MovieDialogue(self.plotter, movie_dir, self.mainWindow)
+        self.movieDialogue = MovieDialogue(self.plotter, movie_dir, 
+                                           self.mainWindow)
         self.movieDialogue.accepted.connect(self.render_movie)
         self.movieDialogue.rejected.connect(self.delete_movie_dialogue)
         self.movieDialogue.show()
@@ -817,7 +829,8 @@ class TopWidget(QWidget):
     
     def render_movie(self):        
         # Create the dialogue popup
-        self.renderDialog = RenderDialogue(self.plotter, self.movieDialogue.movie_settings)
+        self.renderDialog = RenderDialogue(self.plotter, 
+                                           self.movieDialogue.movie_settings)
         self.renderDialog.exec_()
         self.delete_movie_dialogue()
         return
@@ -849,7 +862,6 @@ class ScreenshotDialogue(QDialog):
         filename = self.check_name(visualized_file, self.screenshot_dir, 0)
         self.filename = filename
 
-
         # Page Layout
         pageLayout = QtO.new_layout(self, 'V', spacing=5)
         
@@ -857,9 +869,11 @@ class ScreenshotDialogue(QDialog):
         self.resolutionWidget = QtO.new_widget()
         resolutionLayout = QtO.new_layout(self.resolutionWidget, margins=0)
         resolutionLabel = QLabel("Resolution:")
-        self.imageResolution = QtO.new_combo(['Current', '720p','1080p','1440p','2160p'], 120)
+        self.imageResolution = QtO.new_combo(['Current', '720p','1080p',
+                                              '1440p','2160p'], 120)
         self.imageResolution.setCurrentIndex(2)
-        QtO.add_widgets(resolutionLayout, [0, resolutionLabel, self.imageResolution, 0])
+        QtO.add_widgets(resolutionLayout, [0, resolutionLabel, 
+                                           self.imageResolution, 0])
         
         ## File path line
         self.filePathWidget = QtO.new_widget()
@@ -867,7 +881,8 @@ class ScreenshotDialogue(QDialog):
         titleLabel = QLabel("Save path:")
         self.pathEdit = QtO.new_line_edit(self.filename, width=200, locked=True)
         changePathButton = QtO.new_button('Change...', self.get_save_path)
-        QtO.add_widgets(filePathLayout, [titleLabel, 5, self.pathEdit, 5, changePathButton])
+        QtO.add_widgets(filePathLayout, [titleLabel, 5, self.pathEdit, 
+                                         5, changePathButton])
         
         QtO.button_defaulting(changePathButton, False)
         
@@ -886,7 +901,8 @@ class ScreenshotDialogue(QDialog):
         self.captureMessage.hide()
         
         ## Add the widgets
-        QtO.add_widgets(pageLayout, [self.resolutionWidget, self.filePathWidget, self.buttons, self.captureMessage])
+        QtO.add_widgets(pageLayout, [self.resolutionWidget, self.filePathWidget, 
+                                     self.buttons, self.captureMessage])
         
         self.window().setFixedSize(self.window().sizeHint())
         self.setWindowFlags(self.windowFlags() ^ Qt.WindowStaysOnTopHint)        
@@ -907,7 +923,8 @@ class ScreenshotDialogue(QDialog):
         return
     
     def take_screenshot(self):
-        helpers.prep_media_dir(self.filename) # Make sure the parent directory actually exists before saving the image.
+        # Make sure the parent directory actually exists before saving the image
+        helpers.prep_media_dir(self.filename) 
         self.plotter.screenshot(self.filename) 
         self.accept()
         return
@@ -921,7 +938,8 @@ class ScreenshotDialogue(QDialog):
             return filepath
     
     def get_save_path(self):
-        filename = helpers.get_save_file('Save screenshot as...', self.screenshot_dir, 'png')
+        filename = helpers.get_save_file('Save screenshot as...', 
+                                         self.screenshot_dir, 'png')
         if filename:
             self.filename = filename
             self.pathEdit.setText(self.filename)
@@ -947,21 +965,25 @@ class MovieDialogue(QDialog):
         
         # Top left
         optionsColumn = QtO.new_widget(240)
-        optionsColumnLayout = QtO.new_layout(optionsColumn, orient='V', no_spacing=True)
+        optionsColumnLayout = QtO.new_layout(optionsColumn, orient='V', 
+                                             no_spacing=True)
         optionsHeader = QLabel("<b>Movie options")
         
         optionsBox = QGroupBox()
         optionsLayout = QtO.new_form_layout(optionsBox)
 
         typeLabel = QLabel("Movie Type:")
-        self.movieType = QtO.new_combo(['Orbit', 'Flythrough'], 120, connect=self.toggle_type)
+        self.movieType = QtO.new_combo(['Orbit', 'Flythrough'], 120, 
+                                       connect=self.toggle_type)
         self.movieType.currentIndexChanged.connect(self.visualize_path)
         
         formatLabel = QLabel("File Format:")
-        self.movieFormat = QtO.new_combo(['mp4', 'mov', 'wmv'], 120, connect=self.update_format)
+        self.movieFormat = QtO.new_combo(['mp4', 'mov', 'wmv'], 120, 
+                                         connect=self.update_format)
 
         resolutionLabel = QLabel("Resolution:")
-        self.movieResolution = QtO.new_combo(['720p','1080p','1440p','2160p', 'Current'], 120)
+        self.movieResolution = QtO.new_combo(['720p','1080p','1440p','2160p', 
+                                              'Current'], 120)
         
         fpsLabel = QLabel("Frame rate:")
         self.movieFPS = QtO.new_combo(['24', '30', '60'], 120)
@@ -977,7 +999,6 @@ class MovieDialogue(QDialog):
                                            [frameLabel, self.movieFrames]])
         
         QtO.add_widgets(optionsColumnLayout, [optionsHeader, optionsBox])
-        
         
         # Top right
         pathColumn = QtO.new_widget(260)
@@ -998,13 +1019,13 @@ class MovieDialogue(QDialog):
         self.updateOrientation.setVisible(False)
         
         QtO.add_form_rows(pathLayout, [[pathHeader, self.updatePath],
-                                       [self.orientationHeader, self.updateOrientation]])
+                                       [self.orientationHeader, 
+                                        self.updateOrientation]])
         QtO.add_widgets(boxLayout, [0, pathLayout, 0])
         
         QtO.add_widgets(pathColumnLayout, [pathColumnHeader, pathBox])
         
         QtO.add_widgets(topRowLayout, [optionsColumn, pathColumn])
-        
         
         ## Bottom layout
         filePathWidget = QtO.new_widget()
@@ -1013,7 +1034,8 @@ class MovieDialogue(QDialog):
         self.pathEdit = QtO.new_line_edit("None", 150, locked=True)
         self.pathDefaultStyle = self.pathEdit.styleSheet()
         self.changePathButton = QtO.new_button('Change...', self.get_save_path)
-        QtO.add_widgets(filePathLayout, [titleLabel, 5, self.pathEdit, 5, self.changePathButton])
+        QtO.add_widgets(filePathLayout, [titleLabel, 5, self.pathEdit, 
+                                         5, self.changePathButton])
         
         buttons = QtO.new_layout(None)
         cancelButton = QtO.new_button("Cancel", self.closeEvent)
@@ -1022,7 +1044,6 @@ class MovieDialogue(QDialog):
         
         QtO.button_defaulting(cancelButton, False)
         QtO.button_defaulting(renderButton, True)
-        
         
         QtO.add_widgets(dialogueLayout, [topRow, filePathWidget, buttons])
         
@@ -1050,7 +1071,8 @@ class MovieDialogue(QDialog):
             if self.sender() in [self.updatePath, self.movieType]:
                 self.path = helpers.construct_flythrough_path(self.plotter, 120)
             elif self.sender() == self.updateOrientation:
-                self.path = helpers.update_flythrough_orientation(self.plotter, self.path, 120)
+                self.path = helpers.update_flythrough_orientation(self.plotter, 
+                                                                  self.path, 120)
 
         # Create camera actor
         self.pathActors = helpers.create_path_actors(self.plotter, self.path)
@@ -1059,7 +1081,8 @@ class MovieDialogue(QDialog):
     def remove_camera_actors(self):
         for actor in self.pathActors.iter_actors():
             if actor:
-                self.plotter.remove_actor(self.pathActors.iter_actors(), reset_camera=False)
+                self.plotter.remove_actor(self.pathActors.iter_actors(), 
+                                          reset_camera=False)
         self.pathActors.reset_actors()
         return
     
@@ -1079,10 +1102,15 @@ class MovieDialogue(QDialog):
         
         # Get the at-frame path
         if self.movieType.currentText() == 'Orbit':
-            self.path = helpers.update_orbit_frames(self.path, self.movieFrames.value())
+            self.path = helpers.update_orbit_frames(self.path, 
+                                                    self.movieFrames.value())
         elif self.movieType.currentText() == 'Flythrough':
-            self.path = helpers.update_flythrough_frames(self.path, self.movieFrames.value())
-        self.movie_settings = IC.MovieOptions(self.pathEdit.text(), self.movieResolution.currentText(), int(self.movieFPS.currentText()), self.movieFrames.value(), self.path)
+            self.path = helpers.update_flythrough_frames(self.path, 
+                                                         self.movieFrames.value())
+        self.movie_settings = IC.MovieOptions(self.pathEdit.text(), 
+                                              self.movieResolution.currentText(), 
+                                              int(self.movieFPS.currentText()), 
+                                              self.movieFrames.value(), self.path)
         
         self.remove_camera_actors()
         self.accept()
@@ -1159,13 +1187,15 @@ class RenderDialogue(QDialog):
             self.plotter.resize(X, Y)
             self.plotter.render()        
         
-        self.movieRenderer = QtTh.MovieThread(self.plotter, self.movie_options.camera_path)
+        self.movieRenderer = QtTh.MovieThread(self.plotter, 
+                                              self.movie_options.camera_path)
         self.movieRenderer.progress_update.connect(self.update_progress)
         self.movieRenderer.write_frame.connect(self.write_frame)
         self.movieRenderer.rendering_complete.connect(self.rendering_complete)
         
         # Set up the movie writer
-        self.plotter.mwriter = get_writer(self.movie_options.filepath, fps=self.movie_options.fps, quality=7)
+        self.plotter.mwriter = get_writer(self.movie_options.filepath, 
+                                          fps=self.movie_options.fps, quality=7)
         
         self.current_frame = 0
         self.movieRenderer.start()
@@ -1281,7 +1311,8 @@ class GeneralOptions(QWidget):
         self.legendOptions.lock(True)
         # self.showLegend.stateChanged.connect(self.legendOptions.lock)
         
-        changeBackground = QtO.new_button("Background color...", self.update_background_color, 160)
+        changeBackground = QtO.new_button("Background color...", 
+                                          self.update_background_color, 160)
                 
         ## Add options to box
         QtO.add_widgets(boxLayout, 
@@ -1303,7 +1334,7 @@ class GeneralOptions(QWidget):
             
     def toggle_bounds(self):
         if self.showBounds.isChecked():
-            self.plotter.add_bounding_box()
+            self.plotter.add_bounding_box(reset_camera=False)
         else:
             self.plotter.remove_bounding_box()
             
@@ -1361,7 +1392,8 @@ class TubeOptions(QWidget):
         self.scaledTubes = QtO.new_radio("Scaled Vessels", self.add_vessels)
         QtO.button_grouping([self.noTubes, self.networkTubes, self.scaledTubes])
         
-        QtO.add_widgets(tubeButtonLayout, [self.noTubes, self.networkTubes, self.scaledTubes])
+        QtO.add_widgets(tubeButtonLayout, [self.noTubes, self.networkTubes, 
+                                           self.scaledTubes])
         
         self.networkTubes.setDisabled(True)
         self.scaledTubes.setDisabled(True)
@@ -1377,21 +1409,30 @@ class TubeOptions(QWidget):
         self.vesselFeatureColor.toggled.connect(self.update_vessel_feature)
         
         self.vesselScalarBox = QtO.new_widget()
-        scalarBoxLayout = QtO.new_layout(self.vesselScalarBox, 'V',no_spacing=True)
-        self.vesselScalar = QtO.new_combo(['Radius', 'Length', 'Tortuosity', 'Volume', 'Surface Area'], 130, connect=self.update_vessel_feature)
-        self.cmap = QtO.new_combo(helpers.load_cmaps(), 130, connect=self.update_cmap)
+        scalarBoxLayout = QtO.new_layout(self.vesselScalarBox, 'V', 
+                                         no_spacing=True)
+        self.vesselScalar = QtO.new_combo(['Radius', 'Length', 'Tortuosity', 
+                                           'Volume', 'Surface Area'], 130,
+                                          connect=self.update_vessel_feature)
+        self.cmap = QtO.new_combo(helpers.load_cmaps(), 130, 
+                                  connect=self.update_cmap)
         
         rangeLabel = QLabel("<center>Unit range:")
         unitMinMaxLine = QtO.new_widget()
         minmaxLayout = QtO.new_layout(unitMinMaxLine, no_spacing=True)
-        self.unitMin = QtO.new_doublespin(0, 1000000, 0.1, decimals=2, connect=self.update_clim, )
+        self.unitMin = QtO.new_doublespin(0, 1000000, 0.1, decimals=2, 
+                                          connect=self.update_clim, )
         unitTo = QLabel("to")
-        self.unitMax = QtO.new_doublespin(0.01, 1000000, 1, decimals=2, connect=self.update_clim)
+        self.unitMax = QtO.new_doublespin(0.01, 1000000, 1, decimals=2, 
+                                          connect=self.update_clim)
         QtO.add_widgets(minmaxLayout, [self.unitMin, unitTo, self.unitMax])
         
         self.resetRange = QtO.new_button('Reset range', self.reset_clim)        
         
-        QtO.add_widgets(scalarBoxLayout, [QLabel("Feature:"), self.vesselScalar, 5, QLabel("Color map:"), self.cmap, 5, rangeLabel, 5, unitMinMaxLine, 5, [self.resetRange, 'Center']])        
+        QtO.add_widgets(scalarBoxLayout, [QLabel("Feature:"), self.vesselScalar, 
+                                          5, QLabel("Color map:"), self.cmap, 5, 
+                                          rangeLabel, 5, unitMinMaxLine, 5, 
+                                          [self.resetRange, 'Center']])        
         
         
         
@@ -1408,18 +1449,26 @@ class TubeOptions(QWidget):
         
         
         # Annotation colors
-        self.vesselAnnotationColor = QtO.new_radio("Annotation Colors", self.update_vessel_annotation)
+        self.vesselAnnotationColor = QtO.new_radio("Annotation Colors", 
+                                                   self.update_vessel_annotation)
         self.vesselAnnotationBox = QtO.new_widget()
-        vAnnotationLayout = QtO.new_layout(self.vesselAnnotationBox, 'V', no_spacing=True)
+        vAnnotationLayout = QtO.new_layout(self.vesselAnnotationBox, 'V', 
+                                           no_spacing=True)
         vAnnotationHeader = QLabel("Annotation color:")
-        self.vesselAnnotationType = QtO.new_combo(['Original', 'Rainbow', 'Shifted'], connect=self.update_vessel_annotation)
+        self.vesselAnnotationType = QtO.new_combo(['Original', 'Rainbow', 'Shifted'], 
+                                                  connect=self.update_vessel_annotation)
         QtO.add_widgets(vAnnotationLayout, [vAnnotationHeader, self.vesselAnnotationType])
         self.vesselAnnotationBox.hide()
         
-        QtO.button_grouping([self.vesselFeatureColor, self.vesselSingleColor, self.vesselAnnotationColor])
+        QtO.button_grouping([self.vesselFeatureColor, self.vesselSingleColor, 
+                             self.vesselAnnotationColor])
         
-        QtO.add_widgets(tubeOptionsLayout, [self.vesselFeatureColor, self.vesselScalarBox, self.vesselSingleColor, 
-                                        self.vesselColorBox, self.vesselAnnotationColor, self.vesselAnnotationBox])
+        QtO.add_widgets(tubeOptionsLayout, [self.vesselFeatureColor, 
+                                            self.vesselScalarBox, 
+                                            self.vesselSingleColor, 
+                                            self.vesselColorBox, 
+                                            self.vesselAnnotationColor, 
+                                            self.vesselAnnotationBox])
         
         self.tubeOptions.setContentLayout(tubeOptionsLayout)
         QtO.add_widgets(tubeGroupLayout, [tubeButtons, self.tubeOptions])
@@ -1450,11 +1499,13 @@ class TubeOptions(QWidget):
                                         4, self.updateBranchColor, 0])
         
         # annotation color
-        self.branchAnnotationColor = QtO.new_radio('Annotation Colors', self.update_branch_annotation)
+        self.branchAnnotationColor = QtO.new_radio('Annotation Colors', 
+                                                   self.update_branch_annotation)
         self.aBranchColorBox = QtO.new_widget()
         aBCBoxLayout = QtO.new_layout(self.aBranchColorBox, 'V', no_spacing=True)
         branchAnnotationHeader = QLabel("Annotation color:")
-        self.branchAnnotationType = QtO.new_combo(['Original', 'Rainbow', 'Shifted'], connect=self.update_branch_annotation)
+        self.branchAnnotationType = QtO.new_combo(['Original', 'Rainbow', 'Shifted'], 
+                                                  connect=self.update_branch_annotation)
         QtO.add_widgets(aBCBoxLayout, [branchAnnotationHeader, self.branchAnnotationType])
         self.aBranchColorBox.hide()
         
@@ -1488,11 +1539,13 @@ class TubeOptions(QWidget):
         
         
         # annotation color
-        self.endAnnotationColor = QtO.new_radio('Annotation Colors', self.update_end_annotation)
+        self.endAnnotationColor = QtO.new_radio('Annotation Colors', 
+                                                self.update_end_annotation)
         self.aEndColorBox = QtO.new_widget()
         aECBoxLayout = QtO.new_layout(self.aEndColorBox, 'V', no_spacing=True)
         endAnnotationHeader = QLabel("Annotation color:")
-        self.endAnnotationType = QtO.new_combo(['Original', 'Rainbow', 'Shifted'], connect=self.update_end_annotation)
+        self.endAnnotationType = QtO.new_combo(['Original', 'Rainbow', 'Shifted'], 
+                                               connect=self.update_end_annotation)
         QtO.add_widgets(aECBoxLayout, [endAnnotationHeader, self.endAnnotationType])
         self.aEndColorBox.hide()
         
@@ -1513,13 +1566,15 @@ class TubeOptions(QWidget):
         # endregion
         
         ## Randomizae annotation color
-        self.randomizeAnnotations = QtO.new_button("Randomize annotations...", self.randomize_annotation_color, 180)
+        self.randomizeAnnotations = QtO.new_button("Randomize annotations...", 
+                                                   self.randomize_annotation_color, 180)
         self.randomizeAnnotations.hide()
         
         ### Add all of the options to the box layout
         line0 = QtO.new_line()
         line1 = QtO.new_line()
-        QtO.add_widgets(boxLayout, [tubeGroup, 5, line0, beBox, line1, 5, [self.randomizeAnnotations, 'Center']])
+        QtO.add_widgets(boxLayout, [tubeGroup, 5, line0, beBox, line1, 5, 
+                                    [self.randomizeAnnotations, 'Center']])
         
         QtO.add_widgets(tubeLayout, [header, self.tubeBox])
         
@@ -1536,7 +1591,7 @@ class TubeOptions(QWidget):
     
     ## Mesh loading and removal
     # region    
-    def remove_all_actors(self):
+    def remove_tube_actors(self):
         self.showBranches.setChecked(False)
         self.showEnds.setChecked(False)
         for actor in self.actors.iter_vessels():
@@ -1587,8 +1642,14 @@ class TubeOptions(QWidget):
         
         # Add the actors
         scalars = helpers.get_scalar(self.vesselScalar)
-        self.actors.vessels = self.plotter.add_mesh(meshes[0], scalars=scalars, smooth_shading=True, show_scalar_bar=False, reset_camera=False)
-        self.actors.vessel_caps = self.plotter.add_mesh(meshes[1], scalars=scalars, smooth_shading=True, show_scalar_bar=False, reset_camera=False)
+        self.actors.vessels = self.plotter.add_mesh(meshes[0], scalars=scalars, 
+                                                    smooth_shading=True, 
+                                                    show_scalar_bar=False, 
+                                                    reset_camera=False)
+        self.actors.vessel_caps = self.plotter.add_mesh(meshes[1], scalars=scalars, 
+                                                        smooth_shading=True, 
+                                                        show_scalar_bar=False, 
+                                                        reset_camera=False)
         
         # Update the colors for the vessels 
         if self.vesselFeatureColor.isChecked():
@@ -1626,7 +1687,9 @@ class TubeOptions(QWidget):
             else:
                 mesh = self.meshes.network_branches if self.meshes.network else self.meshes.scaled_branches
 
-            self.actors.branches = self.plotter.add_mesh(mesh, show_scalar_bar=False, smooth_shading=True, reset_camera=False)
+            self.actors.branches = self.plotter.add_mesh(mesh, show_scalar_bar=False, 
+                                                         smooth_shading=True, 
+                                                         reset_camera=False)
             
             # Update the colors
             if self.branchSingleColor.isChecked():
@@ -1655,7 +1718,9 @@ class TubeOptions(QWidget):
             else: # If neither are checked, default to the network
                 mesh = self.meshes.network_ends if self.meshes.network else self.meshes.scaled_ends
                 
-            self.actors.ends = self.plotter.add_mesh(mesh, show_scalar_bar=False, smooth_shading=True, reset_camera=False)
+            self.actors.ends = self.plotter.add_mesh(mesh, show_scalar_bar=False, 
+                                                     smooth_shading=True, 
+                                                     reset_camera=False)
             
             # Update the colors
             if self.endSingleColor.isChecked():
@@ -1970,11 +2035,13 @@ class TubeOptions(QWidget):
         self.branchAnnotationColor.setVisible(annotation != 'None')
         self.endAnnotationColor.setVisible(annotation != 'None')
 
-        QtO.signal_block(True, [self.vesselFeatureColor, self.branchSingleColor, self.endSingleColor])
+        QtO.signal_block(True, [self.vesselFeatureColor, self.branchSingleColor, 
+                                self.endSingleColor])
         self.vesselFeatureColor.setChecked(True)
         self.branchSingleColor.setChecked(True)
         self.endSingleColor.setChecked(True)
-        QtO.signal_block(False, [self.vesselFeatureColor, self.branchSingleColor, self.endSingleColor])
+        QtO.signal_block(False, [self.vesselFeatureColor, self.branchSingleColor, 
+                                 self.endSingleColor])
 
 
 class VolumeOptions(QWidget):
@@ -1997,10 +2064,11 @@ class VolumeOptions(QWidget):
         volumeGroup.setStyleSheet("border: 0px;")
         volumeGroupLayout = QtO.new_layout(volumeGroup, 'V', spacing=2, margins=0)
         
-        self.noVolume = QtO.new_radio("None", self.remove_all_actors)
+        self.noVolume = QtO.new_radio("None", self.remove_volume_actors)
         self.originalVolume = QtO.new_radio("Original", self.add_volume)
         self.smoothedVolume = QtO.new_radio("Smoothed", self.add_volume)
-        QtO.add_widgets(volumeGroupLayout, [self.noVolume, self.originalVolume, self.smoothedVolume])
+        QtO.add_widgets(volumeGroupLayout, [self.noVolume, self.originalVolume, 
+                                            self.smoothedVolume])
         
         self.originalVolume.setDisabled(True)
         self.smoothedVolume.setDisabled(True)
@@ -2038,7 +2106,7 @@ class VolumeOptions(QWidget):
         return
 
     ## Actor addition and removal
-    def remove_all_actors(self, hide_box=True):
+    def remove_volume_actors(self, hide_box=True):
         if self.actors.volume:
             self.plotter.remove_actor(self.actors.volume, reset_camera=False)
         self.toggle_options()
@@ -2068,8 +2136,10 @@ class VolumeOptions(QWidget):
         self.volumeOptions.setVisible(True)
         
         # remove old meshes
-        self.remove_all_actors(hide_box=False)
-        self.actors.volume = self.plotter.add_mesh(mesh, show_scalar_bar=False, reset_camera=False, smooth_shading=smooth_shading)
+        self.remove_volume_actors(hide_box=False)
+        self.actors.volume = self.plotter.add_mesh(mesh, show_scalar_bar=False, 
+                                                   reset_camera=False, 
+                                                   smooth_shading=smooth_shading)
         self.toggle_options()
         self.update_opacity()
         self.update_volume_color()
@@ -2117,4 +2187,3 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     ex = mainWindow()
     sys.exit(app.exec_())
-    
