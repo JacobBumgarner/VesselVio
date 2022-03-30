@@ -19,7 +19,6 @@ from skimage.io import imread
 import cv2
 import nibabel
 
-
 from library import helpers
 
 ## Global min_resolution variable
