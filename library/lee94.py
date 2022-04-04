@@ -21,9 +21,10 @@ import nibabel
 ###########################
 ### Directional Filters ###
 ###########################
-# Directional nomenclature derived from Lee '94 Fig. 8
 @njit(cache=True)
 def init_filters():
+    """Directional nomenclature derived from Lee '94 Fig. 8
+    """
     North = [0,1,1]
     South = [2,1,1]
     East = [1,1,2]
@@ -36,26 +37,34 @@ def init_filters():
 ######################
 ### Euler Variance ###
 ######################
-# See Table 2, column 3 of Lee '94
 @njit(cache=True)
 def load_Euler_LUT():
-    Euler_table = [1, -1, -1, 1, -3, -1, -1, 1, -1, 1, 1, -1, 3, 1, 1, -1, -3, -1, 3, 1, 
-        1, -1, 3, 1, -1, 1, 1, -1, 3, 1, 1, -1, -3, 3, -1, 1, 1,3, -1, 1, 
-        -1, 1, 1, -1, 3, 1, 1, -1, 1, 3, 3, 1, 5, 3, 3, 1, -1, 1, 1, -1, 
-        3, 1, 1, -1, -7, -1, -1, 1, -3, -1, -1, 1, -1, 1, 1, -1, 3, 1, 1, -1, 
-        -3, -1, 3, 1, 1, -1, 3, 1, -1, 1, 1, -1, 3, 1, 1, -1, -3, 3, -1, 1, 
-        1, 3, -1, 1, -1, 1, 1, -1, 3, 1, 1, -1, 1, 3, 3, 1, 5, 3, 3, 1, 
-        -1, 1, 1, -1, 3, 1, 1, -1]
+    """See Table 2, column 3 of Lee '94
+    """
+    Euler_table = [1, -1, -1, 1, -3, -1, -1, 1, -1, 1, 1, -1, 3, 
+                   1, 1, -1, -3, -1, 3, 1, 1, -1, 3, 1, -1, 1, 1, 
+                   -1, 3, 1, 1, -1, -3, 3, -1, 1, 1,3, -1, 1, -1, 
+                   1, 1, -1, 3, 1, 1, -1, 1, 3, 3, 1, 5, 3, 3, 1, 
+                   -1, 1, 1, -1, 3, 1, 1, -1, -7, -1, -1, 1, -3, 
+                   -1, -1, 1, -1, 1, 1, -1, 3, 1, 1, -1, -3, -1, 
+                   3, 1, 1, -1, 3, 1, -1, 1, 1, -1, 3, 1, 1, -1, 
+                   -3, 3, -1, 1, 1, 3, -1, 1, -1, 1, 1, -1, 3, 1, 
+                   1, -1, 1, 3, 3, 1, 5, 3, 3, 1, -1, 1, 1, -1, 3, 
+                   1, 1, -1]
     LUT = np.zeros(256, np.int8)
     LUT[1::2] = Euler_table
     # LUT = np.array(Euler_table, dtype=np.int8)
     return LUT
 
-# For an explanation of octants/Euler characteristics, see Lee'94 and Lobrecht '80
-# The octants are rotations of the cube with the ordering described in 
-    # Lee '94 and Lobrecht '80, such that cube[1,1,1] is octant[1,1,1]
-    # IAC uses a different scheme. To avoid confusion, I've stuck with the paper's numbering order
+
 def load_Euler_octants():
+    """For an explanation of octants/Euler characteristics, 
+        see Lee'94 and Lobrecht '80
+    The octants are rotations of the cube with the ordering described in 
+        Lee '94 and Lobrecht '80, such that cube[1,1,1] (v) is octant[1,1,1].
+        IAC uses a different scheme. 
+        To avoid confusion, I've stuck with the paper's numbering order
+    """
     key = build_Euler_key()
     NEU = key[[8, 5, 16, 13, 7, 4, 15]]
     NWU = key[[2, 1, 11, 10, 5, 4, 13]]
@@ -69,27 +78,48 @@ def load_Euler_octants():
     return np.array([SWU, NWU, SEU, NEU, SWB, NWB, SEB, NEB])
 
 def build_Euler_key():
+    """Create a key that corresponds to the numerical indices shown in the 
+    cube in Lee '94
+    """
+    # Create the cube and orient it as shown in figure 1
     indices = np.arange(0,27)
     indices [14:] = indices[13:26]
     indices [13] = 0
     cube = indices.reshape([3,3,3])
     cube = np.rot90(cube, axes=(1,2))
     cube = np.rot90(cube, axes=(0,1))
-    flat = cube.flatten()
-    neighborhood = flat.copy()
-    index = 0
-    for i in range(9):
-        for k in range(3):
-            neighborhood[index] = flat[i+k*9]
-            index += 1
+    
+    ## Dev
+    ## Check to make sure that the flattened cube steps as expected
+    # flat = cube.flatten()
+    # neighborhood = flat.copy()
+    # index = 0
+    # for i in range(9):
+    #     for k in range(3):
+    #         neighborhood[index] = flat[i+k*9]
+    #         index += 1
+    
+    # Ravel the cube, arg sort based on the flattened indices to get the key
     flat = cube.ravel()
+    key = np.argsort(flat)
+    key = np.delete(key, 1)
+    return key
+    
+    # Could've just used np.argsort() lol
     ind = np.arange(0,27).tolist()
-    b = zip(flat, ind)
-    b = sorted(list(b), key=lambda x: x[0])
-    # Remove v to get N26(v) so that
-        # the indices match up with the octant elements (0-25)
-    del(b[1]) 
-    key = np.array([e[1] for e in b])    
+    indexed = zip(flat, ind)
+    
+    # Sort the indexed cube based on the flattened 0-26 indices. 
+        # This way, when we flatten the neighborhood for Euler analysis, 
+        # we can access the elements as described in the original ms, 
+        # rather than trying to re-index everyting ourselves (hello bugs...)
+    indexed = sorted(list(indexed), key=lambda x: x[0])
+    # Sample of indexed...
+        # (0, 0), (0, 13), (1, 9), (2, 18), (3, 1), (4, 10), (5, 19)
+        # 0 at 0th index, 1 at 9th index, 2 at 18th index, etc.
+    # Remove v (i.e., (0,13))from the cube to get N26(v) element locations
+    del(indexed[1]) 
+    key = np.array([e[1] for e in indexed])    
     return key
 
 E_octant = load_Euler_octants()
@@ -293,9 +323,11 @@ def skeletonize(volume, verbose=False):
         #         print (f"Cycle:{cycle}, Points remaining: {points.shape[0]}", end='\r')
         for i in range(6):
             # First identify all candidate border points
-            border_points, border_ids = is_simple_point(volume, points, orientations[i],
-                                                           E_LUT, E_octants,
-                                                           octants, v_memberships, o_sets)
+            border_points, border_ids = is_simple_point(volume, points, 
+                                                        orientations[i],
+                                                        E_LUT, E_octants,
+                                                        octants, v_memberships, 
+                                                        o_sets)
         
             volume, border_ids = set_zero(volume, border_points, border_ids,
                                   octants, v_memberships, o_sets)
@@ -328,20 +360,20 @@ def load_test(size):
     return volume
 
 if __name__ == "__main__":
-    print ("JIT")
-    volume = load_test(2)
-    skeleton = skeletonize(volume)
+    # print ("JIT")
+    # volume = load_test(2)
+    # skeleton = skeletonize(volume)
     
-    volume = load_volume()
-    skeleton = np.ascontiguousarray(volume.copy())
-    print ("Numba")
-    t = pf()
-    skeleton = skeletonize(skeleton, verbose=True)
-    print (pf() - t)
+    # volume = load_volume()
+    # skeleton = np.ascontiguousarray(volume.copy())
+    # print ("Numba")
+    # t = pf()
+    # skeleton = skeletonize(skeleton, verbose=True)
+    # print (pf() - t)
     
-    print ("IAC")
-    volume = load_volume()
-    t = pf()
-    skeleton = skeletonize_3d(volume)
-    print (pf() - t)
-    
+    # print ("IAC")
+    # volume = load_volume()
+    # t = pf()
+    # skeleton = skeletonize_3d(volume)
+    # print (pf() - t)
+    print (build_Euler_key())

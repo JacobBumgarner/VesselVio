@@ -536,7 +536,6 @@ def update_orbit_frames(path, frames):
     focal_path = path[:, 1]
     viewup = path[:, 2]
     camera = [camera_path[0], focal_path[0], viewup[0]]
-    
     return construct_orbital_path(camera, frames, update=True)
 
 def update_flythrough_frames(path, frames):
@@ -549,7 +548,6 @@ def update_flythrough_frames(path, frames):
     viewup = np.repeat([viewup[0]], frames, axis=0)
     
     return np.stack([camera_path, focal_path, viewup], axis=1)
-
 
 # Path construction for visualiation
 def construct_orbital_path(plotter, points, update=False):
@@ -564,7 +562,6 @@ def construct_orbital_path(plotter, points, update=False):
     focal = np.repeat([camera[1]], points, axis=0)
     viewup = np.repeat([camera[2]], points, axis=0)
     return np.stack([path.points, focal, viewup], axis=1)
-
 
 def construct_flythrough_path(plotter, points, update=False):
     if not update:
@@ -603,7 +600,6 @@ def update_flythrough_orientation(plotter, path, points):
     focus_path = np.linspace(focus_start, focus_end, points)
     return np.stack([camera_path, focus_path, viewup], axis=1)
 
-
 # Taken directly from https://docs.pyvista.org/examples/00-load/create-spline.html
 def polyline_from_points(points):
     poly = pv.PolyData()
@@ -612,7 +608,6 @@ def polyline_from_points(points):
     the_cell = np.insert(the_cell, 0, len(points))
     poly.lines = the_cell
     return poly
-
 
 def create_path_actors(p, path):
     camera_path = path[:, 0]
@@ -702,9 +697,3 @@ def get_resolution(resolution):
         X /= 2
         Y /= 2
     return X, Y
-
-
-
-
-
-

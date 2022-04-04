@@ -216,7 +216,8 @@ class VisualizationDialog(QDialog):
                            volumeHeader, self.loadOriginal, self.loadSmoothed]
         
         # Conditional additions
-        if self.files.dataset_type == 'Volume' and self.graph_options.graph_type != 'Centerlines':
+        if (self.files.dataset_type == 'Volume' 
+            and self.graph_options.graph_type != 'Centerlines'):
             typeLayout = QtO.new_layout(no_spacing=True)
             reducedHeader = QLabel("Network rendering:")
             self.reducedNetwork = QtO.new_combo(["Detailed", "Simplified"], 110)
@@ -241,19 +242,25 @@ class VisualizationDialog(QDialog):
         self.analysisOptions = AnalysisOptions(vis_page=True)
         
         # If a centerline graph was loaded, add centerline smoothing buttons
-        if (self.files.dataset_type == 'Graph' 
-            and self.graph_options.graph_type == 'Centerlines'):
-            self.centerlineLine = QtO.new_widget()
-            clLayout = QtO.new_layout(self.centerlineLine, margins=0)
-            self.centerlineSmoothing = QtO.new_checkbox("Centerline smoothing")
-            QtO.add_widgets(clLayout, [self.centerlineSmoothing])
+        if self.files.dataset_type == 'Graph':
+            # Disable the volume loading buttons if we're loading a graph
+            self.loadOriginal.setDisabled(True)
+            self.loadSmoothed.setDisabled(True)
             
-            self.cliqueLine = QtO.new_widget()
-            cliqueLayout = QtO.new_layout(self.cliqueLine, margins=0)
-            self.cliqueFiltering = QtO.new_checkbox("Clique filtering")
-            QtO.add_widgets(cliqueLayout, [self.cliqueFiltering])
-            widgets = [4, self.centerlineLine, 8, self.cliqueLine]
-            QtO.add_widgets(self.analysisOptions.rightOptionsLayout, widgets, 'Left')
+            # Add centerline smoothing & clique removal options if loading
+                # a centerline-based graph
+            if self.graph_options.graph_type == 'Centerlines':
+                self.centerlineLine = QtO.new_widget()
+                clLayout = QtO.new_layout(self.centerlineLine, margins=0)
+                self.centerlineSmoothing = QtO.new_checkbox("Centerline smoothing")
+                QtO.add_widgets(clLayout, [self.centerlineSmoothing])
+                
+                self.cliqueLine = QtO.new_widget()
+                cliqueLayout = QtO.new_layout(self.cliqueLine, margins=0)
+                self.cliqueFiltering = QtO.new_checkbox("Clique filtering")
+                QtO.add_widgets(cliqueLayout, [self.cliqueFiltering])
+                widgets = [4, self.centerlineLine, 8, self.cliqueLine]
+                QtO.add_widgets(self.analysisOptions.rightOptionsLayout, widgets, 'Left')
         
         QtO.add_widgets(analysisLayout, [self.analysisOptions])
         

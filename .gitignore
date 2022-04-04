@@ -25,3 +25,7 @@ fix_app.py
 Segmented/
 VesselVio Log/
 VesselVio.code-workspace
+VesselVio.spec
+tmp/VesselVio.zip
+build_app.sh
+library/cache/results_cache.csv
