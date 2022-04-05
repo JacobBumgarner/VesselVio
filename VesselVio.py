@@ -15,7 +15,7 @@ os.environ["QT_MAC_WANTS_LAYER"] = '1'
 
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import (QApplication, QStackedWidget,
-                            QMainWindow, QStatusBar)
+                            QMainWindow)
 from PyQt5.QtGui import QIcon
 from multiprocessing import freeze_support
 
@@ -42,11 +42,7 @@ class mainWindow(QMainWindow):
     def __init__(self):
         super().__init__()        
         # Setup the main window.
-        self.statusBar = QStatusBar()
-        self.setStatusBar(self.statusBar)
-        self.statusBar.setVisible(False)
-                
-        self.plotter = QtInteractor()
+        self.plotter = QtInteractor(self)
         light = pv.Light(light_type='headlight', intensity=0.1)
         self.plotter.add_light(light)
         
@@ -62,7 +58,7 @@ class mainWindow(QMainWindow):
         self.qStack = QStackedWidget() # Stacked widget for the pages
         
         self.page1 = p1.AnalysisPage()
-        self.page2 = p2.VisualizationPage(self.statusBar, self.plotter, self)
+        self.page2 = p2.VisualizationPage(self.plotter, self)
         self.page3 = p3.AnnotationPage()
         
         self.pageStack = QtO.new_stacked([self.page1,
