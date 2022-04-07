@@ -662,9 +662,12 @@ class MovieThread(QThread):
         self.started = False
     
     def run(self):
+        ### Honestly I'm not sure why it works, but I've added two buffer
+            # points to this QThread. Without them, the thread was somehow
+            # outrunning the frame writing of the main thread. 
         self.plotter.camera_position = self.path[0]
         self.plotter.render()
-        sleep(0.75)
+        sleep(0.75) # First buffer
 
         while self.rendering:
             if not self.started:
@@ -676,13 +679,12 @@ class MovieThread(QThread):
                 self.plotter.update()
                 self.progress_update.emit(self.current_frame)
                 self.current_frame = self.next_frame
-                sleep(0.01)
+                sleep(0.01) # Repeating buffer for each frame 
                 self.write_frame.emit()
         
         self.rendering_complete.emit()
         return
         
-
 
 ################
 ### JIT Init ###

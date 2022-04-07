@@ -19,10 +19,10 @@ import imageio_ffmpeg
 
 from PyQt5.Qt import pyqtSlot
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import (QApplication, QWidget, QMainWindow, QLabel, QDialog, 
-                             QMessageBox, QSplitter, QGroupBox, 
-                             QColorDialog, QFrame, QProgressBar, QDialogButtonBox, 
-                             QStatusBar)
+from PyQt5.QtWidgets import (QApplication, QWidget, QMainWindow, QLabel, 
+                             QDialog, QMessageBox, QSplitter, QGroupBox, 
+                             QColorDialog, QFrame, QProgressBar, 
+                             QDialogButtonBox)
 
 from library import helpers
 from library import input_classes as IC
@@ -44,11 +44,7 @@ class mainWindow(QMainWindow):
         layout = QtO.new_layout(None, 'H', True, 'None')
         self.centralWidget.setLayout(layout)
         
-        self.statusBar = QStatusBar()
-        self.setStatusBar(self.statusBar)
-        self.statusBar.setVisible(False)
-        
-        annotationpage = VisualizationPage(self.statusBar, self.plotter)
+        annotationpage = VisualizationPage(self.plotter)
         
         layout.addWidget(annotationpage)
         
@@ -56,9 +52,8 @@ class mainWindow(QMainWindow):
 
 
 class VisualizationPage(QSplitter):
-    def __init__(self, statusBar, plotter, mainWindow):
+    def __init__(self, plotter, mainWindow):
         super().__init__()
-        self.statusBar = statusBar
         self.plotter = plotter
         self.meshes = IC.PyVistaMeshes()
         self.actors =IC.PyVistaActors()
@@ -75,7 +70,8 @@ class VisualizationPage(QSplitter):
         pageLayout = QtO.new_layout(self, no_spacing=True)
 
         self.optionsColumn = QtO.new_widget(fixed_width=210)
-        optionsLayout = QtO.new_layout(self.optionsColumn, 'V', margins=(5, 10, 5, 10))
+        optionsLayout = QtO.new_layout(self.optionsColumn, 'V', 
+                                       margins=(5, 10, 5, 10))
         self.optionsScroll = QtO.new_scroll(self.optionsColumn)
         self.optionsScroll.setFixedWidth(235)
         
@@ -85,7 +81,8 @@ class VisualizationPage(QSplitter):
         
         self.generalOptions = GeneralOptions(self.plotter)
         self.tubeOptions = TubeOptions(self.plotter, self.meshes, self.actors, self.generalOptions)
-        self.volumeOptions = VolumeOptions(self.plotter, self.meshes, self.actors)
+        self.volumeOptions = VolumeOptions(self.plotter, self.meshes, 
+                                           self.actors)
         
         line1 = QtO.new_line()
         QtO.add_widgets(optionsLayout, [self.loadingBox, line1, self.generalOptions, 
@@ -95,23 +92,27 @@ class VisualizationPage(QSplitter):
 
         return
 
-
     ## Visualization functions
     def prepare_visualization(self):
         visualizer = VisualizationDialog(self.files, self.graph_options, 
                                          self.plotter, self.actors, self.meshes)
         if visualizer.exec_():
-            # self.statusBar.setVisible(True)
-            # self.statusBar.showMessage("Loading meshes...")
+            # Update the filename and meshes
             self.files.visualized_file = self.files.file1_name()
             self.meshes = visualizer.meshes
             self.loadingBox.update_rendered(self.files.visualized_file)
+            
+            # Clear the old actors from the scene
             self.tubeOptions.remove_tube_actors()
             self.volumeOptions.remove_volume_actors()
-            self.tubeOptions.load_meshes(self.meshes, self.files.annotation_type)
+            
+            # Add the new meshes to the tubeOptions and volumeOptions classes
+            self.tubeOptions.load_meshes(self.meshes, 
+                                         self.files.annotation_type)
             self.volumeOptions.load_meshes(self.meshes)
+            
+            # Update the meshes in the scene
             self.update_meshes(visualizer.analysis_options.image_dimensions)
-            # self.statusBar.setVisible(False)
             del(visualizer)
         else:
             if visualizer.visualizing:
