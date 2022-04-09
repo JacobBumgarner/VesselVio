@@ -59,7 +59,8 @@ def identify_nonzero(volume):
     return points
 
 # Orignal view and smoothed view generation.
-def vol_plot(volume, g, build_original, build_smoothed, status_updater=None, subdivide=True, verbose=False):    
+def vol_plot(volume, g, build_original, build_smoothed, status_updater=None, 
+             subdivide=True, verbose=False):    
             
     if status_updater:
         status_updater.emit(['Preparing volume for visualization...', 70])
@@ -68,7 +69,7 @@ def vol_plot(volume, g, build_original, build_smoothed, status_updater=None, sub
         t = pf()
         print ("Preparing volume for visualization...", end='\r')
             
-    # Find coordinates of all of the structures that we want to keep in the volume.
+    # Find coordinates of all of the structures to keep in the volume.
     clusters = g.components()
     keep_coords = []
     for c in clusters:
@@ -116,8 +117,10 @@ def vol_plot(volume, g, build_original, build_smoothed, status_updater=None, sub
                         
         if subdivide:
             divided = isosurface.subdivide(1, subfilter='butterfly')
-            smoothed = divided.smooth(n_iter=75, relaxation_factor=0.05, boundary_smoothing=True) 
-            smoothed_mesh = smoothed.smooth(n_iter=20, relaxation_factor=0.15, boundary_smoothing=True) 
+            smoothed = divided.smooth(n_iter=75, relaxation_factor=0.05, 
+                                      boundary_smoothing=True) 
+            smoothed_mesh = smoothed.smooth(n_iter=20, relaxation_factor=0.15, 
+                                            boundary_smoothing=True) 
         else:
             smoothed_mesh = isosurface.smooth()
         
@@ -179,7 +182,8 @@ def interpolate_radii(radii, points):
     stop = 0
     for i in range(len(radii) - 1):
         stop += intp_bins[i]
-        intp_radii[start:stop] = np.linspace(radii[i], radii[i+1], intp_bins[i], endpoint=False)
+        intp_radii[start:stop] = np.linspace(radii[i], radii[i+1], 
+                                             intp_bins[i], endpoint=False)
         start = stop
     intp_radii[-1] = radii[-1]
     return intp_radii
@@ -206,12 +210,14 @@ def create_splines(bottom, top):
         line = add_line_attributes(line, s, add_annotations)
         if construct_network:
             # Network tube
-            network_tube = line.tube(radius=0.7, n_sides=tube_sides, capping=False)
+            network_tube = line.tube(radius=0.7, n_sides=tube_sides, 
+                                     capping=False)
             network_tubes.append(network_tube)
             
-        # Scaled tube, first get vis radii, interpolate them, then set as the size
+        # Scaled tube, first get vis radii, interpolate them, then set as size
         if construct_scaled:
-            scaled_tube = line.tube(radius=s['vis_radius'], n_sides=tube_sides, capping=False) ###########
+            scaled_tube = line.tube(radius=s['vis_radius'], n_sides=tube_sides, 
+                                    capping=False) ###########
             scaled_tubes.append(scaled_tube)            
             
     return [network_tubes, scaled_tubes]
@@ -231,7 +237,8 @@ def create_lines(bottom, top):
         
         if construct_network:
             # Network tube
-            network_tube = line.tube(radius=0.7, n_sides=tube_sides) # Capping must be on for the annotations to work, not sure why
+            # Capping must be on for the annotations to work, not sure why
+            network_tube = line.tube(radius=0.7, n_sides=tube_sides) 
             network_tubes.append(network_tube)
         
         if construct_scaled:
@@ -241,7 +248,8 @@ def create_lines(bottom, top):
             
     return [network_tubes, scaled_tubes]
 
-def tube_creation_io(graph, network, scaled, annotations, graph_type, graph_reduction):
+def tube_creation_io(graph, network, scaled, annotations, graph_type, 
+                     graph_reduction):
     global g, segments, construct_network, construct_scaled, add_annotations
     g = graph
     construct_network = network
@@ -256,9 +264,11 @@ def tube_creation_io(graph, network, scaled, annotations, graph_type, graph_redu
     workers = cpu_count()
     if helpers.unix_check() and g.ecount() > workers:
         if graph_type == 'Branches' or graph_reduction:
-            results = helpers.multiprocessing_input(create_lines, seg_count, workers, sublist=True)
+            results = helpers.multiprocessing_input(create_lines, seg_count, 
+                                                    workers, sublist=True)
         else:
-            results = helpers.multiprocessing_input(create_splines, seg_count, workers, sublist=True)
+            results = helpers.multiprocessing_input(create_splines, seg_count, 
+                                                    workers, sublist=True)
         
         for result in results:
             network_tubes.extend(result[0])
@@ -298,7 +308,10 @@ def graph_plot(meshes, g, graph_type, vis_options, status_updater):
     ## Tube construction
     if status_updater:
         status_updater.emit(['Generating tubes...', 70])
-    network_tubes, scaled_tubes = tube_creation_io(g, build_network, build_scaled, render_annotations, graph_type, reduce_graph)
+    network_tubes, scaled_tubes = tube_creation_io(g, build_network, 
+                                                   build_scaled, 
+                                                   render_annotations, 
+                                                   graph_type, reduce_graph)
 
     if build_network:    
         network = pv.MultiBlock(network_tubes)
@@ -396,15 +409,19 @@ def graph_plot(meshes, g, graph_type, vis_options, status_updater):
     
     # Network endcaps
     if build_network:
-        meshes.network_caps = cap_pd.glyph(geom=pv.Sphere(radius=0.7, theta_resolution=theta_phi,
-                                                          phi_resolution=theta_phi), scale=None)
+        meshes.network_caps = cap_pd.glyph(geom=pv.Sphere(radius=0.7, 
+                                                          theta_resolution=theta_phi,
+                                                          phi_resolution=theta_phi), 
+                                           scale=None)
     
     # Scaled endcaps
     if build_scaled:
         cap_pd['size'] = vis_radii
         cap_pd.set_active_scalars('size')
-        meshes.scaled_caps = cap_pd.glyph(geom=pv.Sphere(radius=1, theta_resolution=theta_phi,
-                                                         phi_resolution=theta_phi), scale=True) 
+        meshes.scaled_caps = cap_pd.glyph(geom=pv.Sphere(radius=1, 
+                                                         theta_resolution=theta_phi,
+                                                         phi_resolution=theta_phi), 
+                                          scale=True) 
     
     ## End points
     if status_updater:
@@ -419,14 +436,17 @@ def graph_plot(meshes, g, graph_type, vis_options, status_updater):
         
     # Network
     if build_network:
-        meshes.network_ends = end_pd.glyph(geom=pv.Sphere(radius=1.15, theta_resolution=theta_phi,
+        meshes.network_ends = end_pd.glyph(geom=pv.Sphere(radius=1.15, 
+                                                          theta_resolution=theta_phi,
                                                           phi_resolution=theta_phi))
     # Scaled
     if build_scaled:
         end_pd['size'] = vis_radii[end_locations] * 1.15
         end_pd.set_active_scalars('size')
-        meshes.scaled_ends = end_pd.glyph(geom=pv.Sphere(radius=1, theta_resolution=theta_phi,
-                                                         phi_resolution=theta_phi), scale=True)
+        meshes.scaled_ends = end_pd.glyph(geom=pv.Sphere(radius=1, 
+                                                         theta_resolution=theta_phi,
+                                                         phi_resolution=theta_phi), 
+                                          scale=True)
     
     ## Branch points
     branch_pd = pv.PolyData(coords[branch_locations])
@@ -439,21 +459,26 @@ def graph_plot(meshes, g, graph_type, vis_options, status_updater):
     
     # Network
     if build_network:
-        meshes.network_branches = branch_pd.glyph(geom=pv.Sphere(radius=1.3, theta_resolution=theta_phi,
+        meshes.network_branches = branch_pd.glyph(geom=pv.Sphere(radius=1.3, 
+                                                                 theta_resolution=theta_phi,
                                                                  phi_resolution=theta_phi))
     # Scaled
     if build_scaled:
         branch_pd['size'] = vis_radii[branch_locations] * 1.2
         branch_pd.set_active_scalars('size')
-        meshes.scaled_branches = branch_pd.glyph(geom=pv.Sphere(radius=1, theta_resolution=theta_phi,
-                                                                phi_resolution=theta_phi), scale=True)
+        meshes.scaled_branches = branch_pd.glyph(geom=pv.Sphere(radius=1, 
+                                                                theta_resolution=theta_phi,
+                                                                phi_resolution=theta_phi), 
+                                                 scale=True)
     return meshes
     
 
 
 
 # Loading dock for mesh generation.
-def mesh_construction(graph, vis_options, volume=None, graph_type='Centerlines', iteration=0, application=False, status_updater=None, verbose=False):
+def mesh_construction(graph, vis_options, volume=None, graph_type='Centerlines', 
+                      iteration=0, application=False, 
+                      status_updater=None, verbose=False):
     tic = pf()
     meshes = IC.PyVistaMeshes()
     if verbose:
@@ -462,18 +487,24 @@ def mesh_construction(graph, vis_options, volume=None, graph_type='Centerlines',
     if volume is not None and vis_options.load_smoothed or vis_options.load_original:
         if verbose:
             print ("Preparing volume...", end='\r')
-        meshes.original, meshes.smoothed = vol_plot(volume, graph, vis_options.load_original, vis_options.load_smoothed, status_updater, verbose=verbose)
+        meshes.original, meshes.smoothed = vol_plot(volume, graph, 
+                                                    vis_options.load_original, 
+                                                    vis_options.load_smoothed, 
+                                                    status_updater, 
+                                                    verbose=verbose)
     
     if vis_options.load_network or vis_options.load_scaled:
         if verbose:
             print ("Preparing splines...", end='\r')
-        meshes = graph_plot(meshes, graph, graph_type, vis_options, status_updater)
+        meshes = graph_plot(meshes, graph, graph_type, 
+                            vis_options, status_updater)
                 
     if application:
         return meshes
                
     if vis_options.create_movie == True:
-        p = pv.Plotter(multi_samples=8, window_size=[2928, 1824], off_screen=True)
+        p = pv.Plotter(multi_samples=8, window_size=[2928, 1824], 
+                       off_screen=True)
     else:
         # p = pv.Plotter(window_size=[1800,1800],lighting='light_kit')
         p = pv.Plotter(lighting='light_kit')
@@ -483,25 +514,33 @@ def mesh_construction(graph, vis_options, volume=None, graph_type='Centerlines',
     cmap = plt.cm.get_cmap(vis_options.cmap)
     
     if vis_options.load_scaled:
-        p.add_mesh(meshes.scaled, scalars=vis_options.scalars, smooth_shading=True,
-                    cmap=cmap, rgb=vis_options.render_annotations)
-        p.add_mesh(meshes.scaled_caps, scalars=vis_options.scalars,smooth_shading=True, 
-                    cmap=cmap, rgb=vis_options.render_annotations)
+        p.add_mesh(meshes.scaled, scalars=vis_options.scalars, 
+                   smooth_shading=True, cmap=cmap, 
+                   rgb=vis_options.render_annotations)
+        p.add_mesh(meshes.scaled_caps, 
+                   scalars=vis_options.scalars,smooth_shading=True, 
+                   cmap=cmap, rgb=vis_options.render_annotations)
         if vis_options.show_branches:
-            p.add_mesh(meshes.scaled_branches, color='orange', smooth_shading=True)
+            p.add_mesh(meshes.scaled_branches, color='orange',
+                       smooth_shading=True)
         if vis_options.show_ends:
-            p.add_mesh(meshes.scaled_ends, color='red',smooth_shading=True)
+            p.add_mesh(meshes.scaled_ends, color='red',
+                       smooth_shading=True)
     
     elif vis_options.load_network:
-        p.add_mesh(meshes.network, scalars=vis_options.scalars, smooth_shading=True,
-                    cmap=cmap, rgb=vis_options.render_annotations)
-        p.add_mesh(meshes.network_caps, scalars=vis_options.scalars, smooth_shading=True,
-                    cmap=cmap, rgb=vis_options.render_annotations)
+        p.add_mesh(meshes.network, scalars=vis_options.scalars,
+                   smooth_shading=True, cmap=cmap,
+                   rgb=vis_options.render_annotations)
+        p.add_mesh(meshes.network_caps, scalars=vis_options.scalars,
+                   smooth_shading=True, cmap=cmap, 
+                   rgb=vis_options.render_annotations)
         
         if vis_options.show_branches:
-            p.add_mesh(meshes.network_branches, color='red', smooth_shading=True)
+            p.add_mesh(meshes.network_branches, color='red',
+                       smooth_shading=True)
         if vis_options.show_ends:
-            p.add_mesh(meshes.network_ends, color='yellow', smooth_shading=True)
+            p.add_mesh(meshes.network_ends, color='yellow',
+                       smooth_shading=True)
     if vis_options.load_original:
         p.add_mesh(meshes.original)
     if vis_options.load_smoothed:
@@ -518,12 +557,14 @@ def mesh_construction(graph, vis_options, volume=None, graph_type='Centerlines',
             title = str(vis_options.movie_title) + '.mp4'
         else: 
             title = 'movie.mp4'
-        path = p.generate_orbital_path(factor=5, n_points=60, viewup=vis_options.viewup)
+        path = p.generate_orbital_path(factor=5, n_points=60,
+                                       viewup=vis_options.viewup)
         if iteration == 0:
             p.show(auto_close=False)
             
         p.open_movie(title)
-        p.orbit_on_path(path, write_frames=True ,viewup=vis_options.viewup, step=0.001)
+        p.orbit_on_path(path, write_frames=True,
+                        viewup=vis_options.viewup, step=0.001)
         p.close()
         if verbose:
             print (f'Movie created in {pf() - tic:0.2f} seconds.')
@@ -533,19 +574,10 @@ def mesh_construction(graph, vis_options, volume=None, graph_type='Centerlines',
             p.screenshot('/Users/jacobbumgarner/Desktop/Processed.png')
             print (p.camera_position)
         p.add_checkbox_button_widget(toggle_camera, value=False)
-#         p.camera_position = ([(7.776354251078438, 134.4731379941786, -23.684267388982516),
-#  (131.49384178514165, 214.22071787018777, 73.0585680922623),
-#  (-0.34852290708594763, -0.45404708059120813, 0.8199835558369208)])
         
         if verbose:
             print (f"Plotting completed in {pf() - tic:0.2f} seconds.")
-            
-        # light = pv.Light(position=(101.69644379144263, -128.515091820141, -152.96848242853233), light_type='scene light', intensity=0.8)
-        # p.add_light(light)
-        # light = pv.Light(position=(100.07242421611133, 339.97650943551105, -204.78618782644688), light_type='scene light', intensity=0.8)
-        # p.add_light(light)
-        # light = pv.Light(light_type='headlight', intensity=0.05)
-        # p.add_light(light)
+        
         light = pv.Light(light_type='headlight', intensity=0.1)
         p.add_light(light)
         p.show()
