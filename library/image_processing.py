@@ -36,9 +36,9 @@ def load_volume(file, verbose=False):
         try:
             volume = load_nii_volume(file)
         except:
-            volume = SITK_load(file)
+            volume = skimage_load(file)
     else:
-        volume = SITK_load(file)
+        volume = skimage_load(file)
     
     if volume is None or volume.ndim not in (2,3):
         return None
@@ -58,7 +58,7 @@ def load_nii_volume(file):
     return data
  
 # Load an image volume using SITK, return None upon read failure
-def SITK_load(file):
+def skimage_load(file):
     try:
         volume = imread(file).astype(np.uint8)
     except:
