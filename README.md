@@ -1,5 +1,5 @@
 # VesselVio
-[![DOI](https://zenodo.org/badge/365252628.svg)](https://zenodo.org/badge/latestdoi/365252628)
+[![DOI](https://zenodo.org/badge/365252628.svg)](https://zenodo.org/badge/latestdoi/365252628) [![](https://img.shields.io/badge/Slack-Join%20us%20on%20Slack!-red?logo=slack)](https://communityinviter.com/apps/vesselvio/join-vesselvio-on-slack)
 
 VesselVio is an open-source application designed for the analysis and visualization of segmented vasculature datasets. 
 
