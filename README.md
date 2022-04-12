@@ -49,4 +49,6 @@ If you are looking for help with segmenting your vasculature, there are numerous
 ## Other
 Any suggestions, improvements, or comments should be directed to [Jacob Bumgarner](jrbumgarner@mix.wvu.edu).
 
+Feel free to join us on [Slack](https://communityinviter.com/apps/vesselvio/join-vesselvio-on-slack) for general communication or troubleshooting purposes!
+
 <b>If you use VesselVio in your research, please cite our publication in <i>[Cell Reports Methods](https://www.cell.com/cell-reports-methods/fulltext/S2667-2375(22)00044-3)</i>.
