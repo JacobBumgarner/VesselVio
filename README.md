@@ -32,7 +32,7 @@ VesselVio reconstructs vascular networks to extract whole-network and individual
 </p>
 
 ## Visualization
-Visualization with VesselVio is made possible with [PyVista](https://github.com/pyvista/pyvista), an intuitive and high-level VTK package. Thanks to PyVista, users can easily visualize and examine their vasculature datasets with numerous options intended for accompanying figure images.
+Visualization with VesselVio is made possible with [PyVista](https://github.com/pyvista/pyvista), an intuitive and high-level VTK package. Thanks to PyVista, users can easily visualize and examine their vasculature datasets with numerous options to create for accompanying figure images.
 
 
 Inferior Colliculus | Human Brain 
