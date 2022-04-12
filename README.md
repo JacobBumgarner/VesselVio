@@ -13,7 +13,7 @@ There several options for using VesselVio:
 <img align="center" width="50%" alt="Untitled" src="https://user-images.githubusercontent.com/70919881/149036341-2b1515ba-94f4-4c89-b774-10e70e5e65c1.png" /><img align="center" width="50%" alt="Untitled" src="https://user-images.githubusercontent.com/70919881/149036342-f8aecef3-84fe-4fe7-8e2e-4eac6d543795.png" />
 
 VesselVio is compatible with several different types of segmented vasculature datasets, including:
-- Segmented vascular volumes from any imaging source
+- Segmented vascular volumes from any imaging source (e.g., LSFM, µCT)
 - Annotated volumes, including:
   - Whole-brain vasculature datasets with Allen Brain Institute ID-based annotations
   - Manually labelled datasets with a program such as [ITK-Snap](http://www.itksnap.org/pmwiki/pmwiki.php)
@@ -37,11 +37,6 @@ Visualization with VesselVio is made possible with [PyVista](https://github.com/
 Inferior Colliculus | Human Brain 
 :--: | :--:
 <video src="https://user-images.githubusercontent.com/70919881/121599185-b337d400-ca10-11eb-8d66-1b1bb1e0040c.mp4" /> | <video src="https://user-images.githubusercontent.com/70919881/121599523-28a3a480-ca11-11eb-8340-c29350998f02.mp4" />
-
-## App Design
-
-The application's front-end was designed using [PyQt5](https://github.com/PyQt5/PyQt).
-
 
 ## Segmentation Tips
 If you are looking for help with segmenting your vasculature, there are numerous packages available for this process<sup>[1](https://github.com/ChristophKirst/ClearMap2)[2](https://github.com/vessap/vessap)[3](https://github.com/giesekow/deepvesselnet)</sup>.
