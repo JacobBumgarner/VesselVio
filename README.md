@@ -1,5 +1,5 @@
 # VesselVio
-[![](https://img.shields.io/badge/Article-10.1016%2Fj.crmeth.2022.100189-blueviolet)](https://doi.org/10.1016/j.crmeth.2022.100189) [![Zenodo](https://img.shields.io/badge/Zenodo-10.5281%2Fzenodo.6147198-blue)](https://zenodo.org/badge/latestdoi/365252628) [![](https://img.shields.io/badge/Slack-Join%20us%20on%20Slack!-red?logo=slack)](https://communityinviter.com/apps/vesselvio/join-vesselvio-on-slack)
+[![](https://img.shields.io/badge/Article-10.1016%2Fj.crmeth.2022.100189-blueviolet)](https://doi.org/10.1016/j.crmeth.2022.100189) [![Zenodo](https://img.shields.io/badge/Zenodo-10.5281%2Fzenodo.6147198-blue)](https://zenodo.org/badge/latestdoi/365252628) [![](https://img.shields.io/badge/Slack-Join%20us%20on%20Slack!-orange?logo=slack)](https://communityinviter.com/apps/vesselvio/join-vesselvio-on-slack)
 
 
 VesselVio is an open-source application designed for the analysis and visualization of segmented vasculature datasets. 
