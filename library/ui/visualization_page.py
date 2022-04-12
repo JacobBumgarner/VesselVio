@@ -1,4 +1,3 @@
-
 """
 The PyQt5 code used to create the visualization page for the program.
 """
@@ -10,12 +9,15 @@ __webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
 __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
 
-import sys, os
+import os
+import sys
 import json
+
+import numpy as np
 import pyvista as pv
 from pyvistaqt import QtInteractor
 from imageio import get_writer
-import imageio_ffmpeg
+import imageio_ffmpeg # Needed for PyInstaller
 
 from PyQt5.Qt import pyqtSlot
 from PyQt5.QtCore import Qt, QTimer
@@ -26,6 +28,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QMainWindow, QLabel,
 
 from library import helpers
 from library import input_classes as IC
+from library import image_processing as ImProc
 from library import qt_threading as QtTh
 from library.ui import qt_objects as QtO
 from library.ui.analysis_page import GraphOptions, AnalysisOptions
@@ -55,6 +58,7 @@ class VisualizationPage(QSplitter):
     def __init__(self, plotter, mainWindow):
         super().__init__()
         self.plotter = plotter
+        self.update_plotter_resolution(1)
         self.meshes = IC.PyVistaMeshes()
         self.actors =IC.PyVistaActors()
         self.files = IC.VisualizationFiles()
@@ -102,6 +106,9 @@ class VisualizationPage(QSplitter):
             self.meshes = visualizer.meshes
             self.loadingBox.update_rendered(self.files.visualized_file)
             
+            # Update the plotter resolution
+            self.update_plotter_resolution(visualizer.analysis_options.resolution)
+            
             # Clear the old actors from the scene
             self.tubeOptions.remove_tube_actors()
             self.volumeOptions.remove_volume_actors()
@@ -145,6 +152,12 @@ class VisualizationPage(QSplitter):
     
         self.plotter.reset_camera()
         return
+    
+    def update_plotter_resolution(self, resolution):
+        resolution = ImProc.prep_resolution(resolution)
+        self.plotter._vv_resolution = np.flip(resolution) # Flip due to PyVista
+        return
+        
 
     # Update meshes for all of the widgets
     def file_warning(self):
@@ -169,6 +182,7 @@ class VisualizationPage(QSplitter):
     #     if sizes[0]:
     #         self.optionsScroll.update()
     #         self.optionsColumn.update()
+
 
 class VisualizationDialog(QDialog):
     def __init__(self, files, graph_options, plotter, actors, meshes):
@@ -953,7 +967,7 @@ class ScreenshotDialogue(QDialog):
             self.pathEdit.setText(self.filename)
         return
     
-import numpy as np
+    
 class MovieDialogue(QDialog):
     def __init__(self, plotter, movie_dir, mainWindow):
         super().__init__(mainWindow)
@@ -1349,6 +1363,16 @@ class GeneralOptions(QWidget):
     def toggle_grid(self):
         if self.showGrid.isChecked():
             self.plotter.show_bounds()
+            
+            ### A PR for the feature below was submitted to PyVista
+            ### and will be implemented natively in when the PR is released
+            axes_ranges = np.array(self.plotter.bounds)
+            axes_ranges[::2] *= self.plotter._vv_resolution
+            axes_ranges[1::2] *= self.plotter._vv_resolution
+            axes_actor = self.plotter.renderer.cube_axes_actor
+            axes_actor.SetXAxisRange(axes_ranges[0], axes_ranges[1])
+            axes_actor.SetYAxisRange(axes_ranges[2], axes_ranges[3])
+            axes_actor.SetZAxisRange(axes_ranges[4], axes_ranges[5])
         else:
             self.plotter.remove_bounds_axes()
             
@@ -2187,7 +2211,6 @@ class VolumeOptions(QWidget):
         self.smoothedVolume.setDisabled(self.meshes.smoothed == None)
     
     
-
 ###############
 ### Testing ###    
 ###############
