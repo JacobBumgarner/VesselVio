@@ -76,7 +76,7 @@ def vol_plot(volume, g, build_original, build_smoothed, status_updater=None,
         keep_coords.append(g.vs[c[0]]['v_coords'])     
     
     # For visualization purposes, filter the deleted segments' voxels
-    keep_coords = np.array(keep_coords)
+    keep_coords = np.array(keep_coords, dtype=np.int_)
     volume = VolProc.filter_volume(volume, keep_coords)
     
     if verbose:
