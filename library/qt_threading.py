@@ -10,9 +10,7 @@ __webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
 __download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
 
 
-from PyQt5.QtCore import QThread, pyqtSignal, QObject, pyqtSlot
-from PyQt5.Qt import pyqtSlot
-
+from PyQt5.QtCore import QThread, pyqtSignal
 
 import os
 import numpy as np
