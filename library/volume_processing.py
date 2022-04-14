@@ -75,7 +75,6 @@ def binarize_and_bound_3D(volume):
                      mins[2]:maxes[2]+1]
     return volume, mins
 
-
 # Bound and segment 2D volumes
 def bound_2D(volume):
     """ Binarize and bound 2 dimensional volumes """
@@ -94,17 +93,31 @@ def bound_2D(volume):
                     xmin:xmax+1]  
     return volume, [0, ymin, xmin]
 
-
 # Separate padding function for loading volumes during visualization
 def pad_volume(volume):
     volume = np.pad(volume, 1)
     return volume
 
-
-# Minima carry the dimensionality of parent image
 def absolute_points(points, minima):
-    return points + minima
-
+    """The coordinates of the points are based on the bounded volume.
+    To make sure that the coordinate points match the location of the points
+    in the original volume space, we must add the bounding minima back to 
+    the point values. This function achieves that.
+    
+    Parameters
+    ----------
+    points : np.array with shape (n, 3)
+    
+    minima : np.array with shape (3,)
+    
+    Returns
+    -------
+    (n, 3) np.array
+        Updated array that converts the bounded volume points back to 
+        the original image space.
+    """
+    abs_points = points + minima
+    return abs_points.astype(np.int_)
 
 #########################
 ### Segment Filtering ###
@@ -175,7 +188,6 @@ def radii_calc_input(volume, points, resolution, gen_vis_radii=False,
         
     return skeleton_radii, vis_radii
 
-
 def radii_calc(volume, points, LUT):
     if volume.ndim == 3:
         skeleton_radii = calculate_3Dradii(volume, points, LUT)   
@@ -206,9 +218,8 @@ def calculate_3Dradii(volume, points, LUT):
         for i in range(empty.shape[0]):
             point = points[p]
             mins = point - i  
-            # mins = point * -1
+            # mins = point * -1 ### lots of weird Numba finagling here...
             mins[mins < 0] = 0 # Find the minimum onset of the search box
-            # print (mins)
             zeros = np.vstack(np.where(volume[mins[0]:point[0]+i+1,
                                               mins[1]:point[1]+i+1,
                                               mins[2]:point[2]+i+1] == 0)).T
@@ -225,12 +236,13 @@ def calculate_3Dradii(volume, points, LUT):
                 skeleton_radii[p] = radius
                 break
                 
-            if i == 149: # Arbitrary number to cutoff and prevent deadlock.
+            # Arbitrary number to cutoff and prevent deadlock.
+            # Hard-coding this could be problematic.     
+            if i == 149: 
                 skeleton_radii[p] = LUT[-1,-1,-1]
                 break
     
     return skeleton_radii
-
 
 # Identical copy of 3D functino, save for the z-dimension. See 3D for notes.
 @njit(parallel=True, cache=True, nogil=True)
@@ -259,14 +271,14 @@ def calculate_2Dradii(volume, points, LUT):
                 radius = np.sum(point_radii[:4]) / 4
                 skeleton_radii[p] = radius
                 break  
-                
+
+            # Arbitrary number to cutoff and prevent deadlock.
+            # Hard-coding this could be problematic.     
             if i == 149:
                 skeleton_radii[p] = LUT[0,-1,-1]
                 break   
-            
+ 
     return skeleton_radii
-
-
 
 #######################
 ### Skeletonization ###
@@ -274,7 +286,7 @@ def calculate_2Dradii(volume, points, LUT):
 @njit(cache=True)
 def find_centerlines(skeleton):
     points = np.vstack(np.nonzero(skeleton)).T
-    return points
+    return points.astype(np.int_)
 
 def skeletonize(volume, verbose=False):
     if verbose:

@@ -39,7 +39,8 @@ def simplify_graph(g, reduced_edges,
                                 'length':lengths, 'tortuosity':tortuosities,
                                 'radius_avg':radii_avg, 'radius_max':radii_max,
                                 'radius_min':radii_min, 'radius_SD':radii_SD,
-                                'coords_list':coords_lists, 'radii_list':radii_lists, 
+                                'coords_list':coords_lists, 
+                                'radii_list':radii_lists, 
                                 'vis_radius':vis_radii})
     g.delete_vertices(g.vs.select(_degree = 0))
     return
@@ -50,7 +51,8 @@ def simplify_graph(g, reduced_edges,
 
 ## Scanning orientations for edge detection.
 def orientations():
-    # Prepration for edge point analysis. Directional edge detection based on C. Kirst's algorithm.
+    # Prepration for edge point analysis. Directional edge detection 
+    # based on C. Kirst's algorithm.
     # Matrix preparation for edge detetction
     # Point of interest rests at [1,1,1] in 3x3x3 array.
     scan = np.array([[2, 2, 0],
@@ -99,7 +101,8 @@ def identify_edges(points, vertex_LUT, spaces):
 #########################
 # Isoalte branch points from the graph
 def g_branch_graph(g, components=False):
-    # Start by getting a vertex count for our graph and assign all vertices their original ID.
+    # Start by getting a vertex count for our graph 
+    # and assign all vertices their original ID.
     # This will prevent us from having to look up the IDs from a backlog
     g.vs['id'] = np.arange(g.vcount())    
     
@@ -110,7 +113,8 @@ def g_branch_graph(g, components=False):
         cliques = [clique for clique in gbs.components() if len(clique) > 3]
     else:
         # Eliminate all 1-degree edges that are connected to the cliques
-        # Loop through this process indefinitely until all non-clique branches are removed.
+        # Loop through this process indefinitely until 
+        # all non-clique branches are removed.
         while True:
             count = len(gbs.vs.select(_degree_lt = 2))
             if count == 0:
@@ -129,10 +133,9 @@ def restore_v_neighbors(g, gb_vs):
     for g_v, gb_v in all_vs:
         if g_v.degree() != gb_v.degree(): # find external neighbors
             clique_neighbors = [n['id'] for n in gb_v.neighbors()]
-            neighbors += [n['id'] for n in g_v.neighbors() if n['id'] not in clique_neighbors] # add those not in clique
-    
-    # new_edges = [tuple(sorted([new_vert, target])) for target in new_edge_targets
-    #              if not g.are_connected(new_vert, target)]      
+            neighbors += [n['id'] for n in g_v.neighbors() if n['id'] 
+                          not in clique_neighbors] # add those not in clique
+
     return neighbors
 
 def new_vertex(g, vs, coords=None):
@@ -217,14 +220,16 @@ def class2and3_processing():
     workers = cpu_count()
     if helpers.unix_check() and clique_count > workers:
         results = helpers.multiprocessing_input(class2and3_dispatcher, 
-                                                clique_count, workers, sublist=True)
+                                                clique_count, 
+                                                workers, sublist=True)
         for result in results:
             vertices_togo.extend(result[0])
             class_two += result[1]
             class_three += result[2]
         
     else:
-        vertices_togo, class_two, class_three = class2and3_dispatcher(0, clique_count)
+        vertices_togo, class_two, class_three = class2and3_dispatcher(0, 
+                                                                      clique_count)
         
     # Add the results to the respective lists, see order in class2/3
 
@@ -290,7 +295,8 @@ def class1_processing():
     workers = cpu_count()
     clique_count = len(cliques)
     if helpers.unix_check() and clique_count > workers:
-        edges_togo = helpers.multiprocessing_input(class1_filter, clique_count, workers)
+        edges_togo = helpers.multiprocessing_input(class1_filter, 
+                                                   clique_count, workers)
     else:
         edges_togo = class1_filter(0, clique_count)
         
@@ -326,7 +332,8 @@ def clique_filter_input(g, verbose=False):
     del(g.vs['id'], gbs, cliques)
     
     if verbose:
-        print (f'{processed} branch point clique clusters corrected in {pf() - tic:0.2f} seconds.')
+        print (f'{processed} branch point clique clusters '
+               f'corrected in {pf() - tic:0.2f} seconds.')
         # print (f"{class_one},{class_two},{class_three}")
     return
      
@@ -336,7 +343,8 @@ def clique_filter_input(g, verbose=False):
 #######################
 # Isolate segments/endpoints from the graph
 def segment_isolation(g, filter):
-    segment_ids = g.vs.select(_degree_lt = filter) # Store ids of our segment vertices
+    # Store ids of our segment vertices
+    segment_ids = g.vs.select(_degree_lt = filter) 
     gsegs = g.subgraph(segment_ids)
     segments = gsegs.clusters() # Find segments
     segments = [s for s in segments if len(s) < max(1, g_prune_len)]
@@ -354,7 +362,8 @@ def segment_pruning(bottom, top):
         num_verts = len(segment)
         if num_verts < g_prune_len:
             # Isolate endpoint segments. Should only have one vertex with degree == 1
-            vertices = [segment_ids[vertex].index for vertex in segment] # Faster than calling .indices
+            # Faster than calling .indices
+            vertices = [segment_ids[vertex].index for vertex in segment] 
             degrees = g.degree(vertices)
             ends = degrees.count(1)
 
@@ -362,10 +371,16 @@ def segment_pruning(bottom, top):
             if ends == 1:
                 # Send off to our feature extraction to find the size
                 if num_verts == 1:
-                    segment_length = FeatExt.small_seg_path(g, segment, segment_ids, g_res, centerline_smoothing=g_cl_smoothing,  pruning=True)
+                    segment_length = FeatExt.small_seg_path(g, segment, 
+                                                            segment_ids, g_res, 
+                                                            centerline_smoothing=g_cl_smoothing,  
+                                                            pruning=True)
                 
                 elif num_verts > 1:
-                    segment_length = FeatExt.large_seg_path(g, gsegs, segment, segment_ids, g_res, centerline_smoothing=g_cl_smoothing, pruning=True)
+                    segment_length = FeatExt.large_seg_path(g, gsegs, segment, 
+                                                            segment_ids, g_res, 
+                                                            centerline_smoothing=g_cl_smoothing, 
+                                                            pruning=True)
                         
                 if segment_length < g_prune_len:    
                     pruned += 1
@@ -380,7 +395,8 @@ def v_graph_pruning_io():
     workers = cpu_count()
     seg_count = len(segments)
     if helpers.unix_check() and seg_count > workers:
-        results = helpers.multiprocessing_input(segment_pruning, seg_count, workers, sublist=True)
+        results = helpers.multiprocessing_input(segment_pruning, seg_count, 
+                                                workers, sublist=True)
         for result in results:
             vertices_togo.extend(result[0])
             pruned += result[1]
@@ -412,7 +428,8 @@ def edge_graph_prune(g, segment_ids, segments, prune_length):
 
 
 # Input function for segment pruning of volumes and vertex-graphs
-def prune_input(g, prune_length, resolution, centerline_smoothing=True, graph_type='Centerlines', verbose=False):    
+def prune_input(g, prune_length, resolution, centerline_smoothing=True, 
+                graph_type='Centerlines', verbose=False):    
     if verbose:
         t = pf()
         print ('Pruning end point segments...', end='\r')
@@ -430,7 +447,8 @@ def prune_input(g, prune_length, resolution, centerline_smoothing=True, graph_ty
     
     if graph_type == 'Centerlines':
         # First pass to prune desired endpoint segments
-        p1 = v_graph_pruning_io() # G will update without a return. Stored as a mutable object.
+        # G will update without a return. Stored as a mutable object.
+        p1 = v_graph_pruning_io() 
         
         # Second pass to prune single-vertex endpoints
         g_prune_len = 1.01
@@ -460,15 +478,18 @@ def vgraph_segment_filter(bottom, top):
     vertices_togo = []    
     filtered = 0
     
-    # Iterate through clusters, identify segments, filter those short enough to be removed
+    # Iterate through clusters, identify segments, 
+    # filter those short enough to be removed
     for cluster in clusters[bottom:top]:
         # Check to see that we have an isolated segment, i.e., no branch points
         degrees = g.degree(cluster)
         cluster_length = len(cluster)
         if degrees.count(1) == 2: # Only examine isolated segments
             if cluster_length < 4:
-                segment_length = FeatExt.small_seg_path(g, cluster, resolution=g_res,
-                                                        centerline_smoothing=cl_smoothing,  pruning=True)
+                segment_length = FeatExt.small_seg_path(g, cluster, 
+                                                        resolution=g_res,
+                                                        centerline_smoothing=cl_smoothing,  
+                                                        pruning=True)
             else:
                 segment_length = FeatExt.large_seg_filter(g, cluster, g_res,
                                                           centerline_smoothing=cl_smoothing)
@@ -479,7 +500,8 @@ def vgraph_segment_filter(bottom, top):
             
     return [vertices_togo, filtered]
 
-def vgraph_segment_filter_io(g, filter_length, resolution, centerline_smoothing):
+def vgraph_segment_filter_io(g, filter_length, resolution, 
+                             centerline_smoothing):
     # Set up globals for forked multiprocessing
     global clusters, g_filter_len, g_res, ret_coords, cl_smoothing
     g_filter_len = filter_length
@@ -493,13 +515,16 @@ def vgraph_segment_filter_io(g, filter_length, resolution, centerline_smoothing)
     clusters = g.components()
     
     # If we are here, that means that the filter value is non-zero. 
-        # So find all clusters that are either 2 vertices long or those that are shorter than the filter length, whichever is the largest
+    # So find all clusters that are either 2 vertices long 
+    # or those that are shorter than the filter length, whichever is the largest
     clusters = [c for c in clusters if len(c) <= max(2, g_filter_len)]     
 
     seg_count = len(clusters)
     workers = cpu_count()
     if helpers.unix_check() and seg_count > workers:
-        results = helpers.multiprocessing_input(vgraph_segment_filter, seg_count, workers, sublist=True)
+        results = helpers.multiprocessing_input(vgraph_segment_filter,
+                                                seg_count, workers, 
+                                                sublist=True)
         for result in results:
             vertices_togo.extend(result[0])
             filtered += result[1]
@@ -534,8 +559,8 @@ def egraph_segment_filter(g, filter_length):
     return filtered
 
 
-def filter_input(g, filter_length, resolution, 
-                 centerline_smoothing=True, graph_type='Centerlines', verbose=False):
+def filter_input(g, filter_length, resolution, centerline_smoothing=True,
+                 graph_type='Centerlines', verbose=False):
     if verbose:
         t = pf()
         print ('Filtering isolated segments...', end='\r')
@@ -555,7 +580,8 @@ def filter_input(g, filter_length, resolution,
 
     if verbose:
         if filter_length > 0:
-            print (f'Filtered {filtered} isolated segments in {pf() - t:0.2f} seconds.')
+            print (f'Filtered {filtered} isolated '
+                   f'segments in {pf() - t:0.2f} seconds.')
         else:
             print ('', end='\r')
         
@@ -565,7 +591,8 @@ def filter_input(g, filter_length, resolution,
 ######################
 ### Graph creation ###
 ######################
-def create_graph(volume_shape, skeleton_radii, vis_radii, points, point_minima, verbose=False):
+def create_graph(volume_shape, skeleton_radii, vis_radii, points, point_minima, 
+                 verbose=False):
     if verbose: 
         print (f'Creating Graph...', end='\r')
         tic = pf()
@@ -576,9 +603,9 @@ def create_graph(volume_shape, skeleton_radii, vis_radii, points, point_minima, 
     g.add_vertices(len(points))
     
     # Populate vertices with cartesian coordinates and radii
-    g.vs["v_coords"] = VolProc.absolute_points(points, point_minima)
-    g.vs["v_radius"] = skeleton_radii
-    g.vs["vis_radius"] = vis_radii
+    g.vs['v_coords'] = VolProc.absolute_points(points, point_minima)
+    g.vs['v_radius'] = skeleton_radii
+    g.vs['vis_radius'] = vis_radii
             
     # Prepare what we need for our edge identifictation
     spaces = orientations() #13-neighbor search

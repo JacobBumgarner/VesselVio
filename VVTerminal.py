@@ -187,15 +187,19 @@ def process_volume(volume_file, gen_options, ann_options, vis_options, iteration
         ## Graph construction.
         # region
         # Send information to graph network creation.
-        graph = GProc.create_graph(volume_shape, skeleton_radii, vis_radii, points, point_minima, verbose=verbose)
+        graph = GProc.create_graph(volume_shape, skeleton_radii, 
+                                   vis_radii, points, point_minima, 
+                                   verbose=verbose)
         
         if gen_options.prune_length > 0:
         # Prune connected endpoint segments based on a user-defined length
-            GProc.prune_input(graph, gen_options.prune_length, resolution, verbose=verbose)
+            GProc.prune_input(graph, gen_options.prune_length, resolution, 
+                              verbose=verbose)
         
         # Filter isolated segments that are shorter than defined length
         # If visualizing the dataset, filter these from the volume as well.
-        GProc.filter_input(graph, gen_options.filter_length, resolution, verbose=verbose)
+        GProc.filter_input(graph, gen_options.filter_length, resolution, 
+                           verbose=verbose)
         
         # endregion
         ## Analysis.
@@ -225,7 +229,8 @@ def process_volume(volume_file, gen_options, ann_options, vis_options, iteration
         
         
     if verbose:
-        print (f"Dataset analysis completed in a total of {time.perf_counter() - tic:0.2f} seconds.")        
+        print (f'Dataset analysis completed in a total '
+               f'of {time.perf_counter() - tic:0.2f} seconds.')        
          
         ## Visualization
     if vis_options.visualize:
