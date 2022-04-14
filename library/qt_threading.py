@@ -1,6 +1,6 @@
 
 """
-The QThread page used to run all of the analysis and visualization pipelines in the background of the GUI.
+QThreads used to run the analysis and visualization pipelines for the GUI.
 """
 
 __author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
@@ -38,13 +38,13 @@ from library import helpers
 ################
 ### Analysis ###
 ################
-
 class VolumeThread(QThread):
     button_lock = pyqtSignal(int)
     selection_signal = pyqtSignal(int)
     analysis_status = pyqtSignal(list)
     
-    def __init__(self, analysis_options, volume_files, annotation_files, annotation_data):
+    def __init__(self, analysis_options, volume_files, 
+                 annotation_files, annotation_data):
         QThread.__init__(self)
         self.running = False  
         self.gen_options = analysis_options
@@ -62,7 +62,6 @@ class VolumeThread(QThread):
         annotation_files = self.annotation_files
         annotation_data = self.annotation_data
         self.disk_space_error = 0
-        
         
         # Make sure the resolution is in the proper format
         resolution = ImProc.prep_resolution(gen_options.resolution)
@@ -87,8 +86,10 @@ class VolumeThread(QThread):
                     self.analysis_status.emit([i, 'Canceled.'])
                     break
                 self.selection_signal.emit(i)            
-                self.analysis_status.emit([i, 'Loading file...', 
-                                           f'{j}/{len(annotation_data.keys())}'])
+                self.analysis_status.emit(
+                    [i, 'Loading file...', 
+                     f'{j}/{len(annotation_data.keys())}']
+                    )
                 
                 filename = ImProc.get_filename(volume_file)
                 
@@ -101,7 +102,9 @@ class VolumeThread(QThread):
                 volume, image_shape = ImProc.load_volume(volume_file)
                 if not ImProc.volume_check(volume, loading=True):
                     file_size = helpers.get_file_size(volume_file, GB=True)
-                    self.analysis_status.emit([i, 'Error: Unable to read image.'])
+                    self.analysis_status.emit(
+                        [i, 'Error: Unable to read image.']
+                        )
                     file_analyzed = False
                     break
                 
@@ -110,7 +113,9 @@ class VolumeThread(QThread):
                     if j % 255 == 0:
                         if not helpers.check_storage(volume_file):
                             file_size = helpers.get_file_size(volume_file, GB=True)
-                            self.analysis_status.emit([i, f'Error: Insufficient disk space'])    
+                            self.analysis_status.emit(
+                                [i, f'Error: Insufficient disk space']
+                                )    
                             if file_size > self.disk_space_error:
                                 self.disk_space_error = file_size
                             file_analyzed = False
@@ -122,21 +127,29 @@ class VolumeThread(QThread):
                                                                                     ROI_sub_array, gen_options.annotation_type)
                     
                         if ROI_volumes is None:
-                            self.analysis_status.emit([i, f'Error labeling volume...'])   
+                            self.analysis_status.emit(
+                                [i, f'Error labeling volume...']
+                                )   
                             file_analyzed = False
                             break
                         
                     ROI_volume = ROI_volumes[ROI_id]
                     if ROI_volume > 0:
-                        self.analysis_status.emit([i, f'Segmenting {ROI_name}...'])    
+                        self.analysis_status.emit(
+                            [i, f'Segmenting {ROI_name}...']
+                            )    
                         point_minima, point_maxima = minima[ROI_id], maxima[ROI_id]
-                        volume = AnnProc.segmentation_input(point_minima, point_maxima, ROI_id+1)
+                        volume = AnnProc.segmentation_input(point_minima, 
+                                                            point_maxima, 
+                                                            ROI_id+1)
                         # point_minima += 1
 
                     # Make sure the volume is still present after ROI segmentation
                     if not ROI_volume or not ImProc.volume_check(volume):
                         self.analysis_status.emit([i, f'ROI not in dataset...'])   
-                        ResExp.cache_result([filename, ROI_name, 'ROI not in dataset.']) # Cache results
+                        # Cache results
+                        ResExp.cache_result([filename, ROI_name, 
+                                             'ROI not in dataset.']) 
                         continue
                 else:
                     volume, point_minima = VolProc.volume_prep(volume)
@@ -156,7 +169,9 @@ class VolumeThread(QThread):
                 
                 # Radius calculations
                 self.analysis_status.emit([i, 'Measuring radii...'])
-                skeleton_radii, vis_radii = VolProc.radii_calc_input(volume, points, resolution, 
+                skeleton_radii, vis_radii = VolProc.radii_calc_input(volume, 
+                                                                     points, 
+                                                                     resolution, 
                                                                      gen_vis_radii=gen_options.save_graph)
                 
                 # Treat 2D images as if they were 3D
@@ -179,7 +194,8 @@ class VolumeThread(QThread):
                 
                 ## Graph construction.
                 self.analysis_status.emit([i, 'Reconstructing network...'])
-                graph = GProc.create_graph(volume_shape, skeleton_radii, vis_radii, points, point_minima)
+                graph = GProc.create_graph(volume_shape, skeleton_radii, 
+                                           vis_radii, points, point_minima)
                 
                 ######
                 speeds.append(pf() - g)
@@ -188,7 +204,8 @@ class VolumeThread(QThread):
                 
                 if gen_options.prune_length:
                     self.analysis_status.emit([i, 'Pruning end points...'])
-                    GProc.prune_input(graph, gen_options.prune_length, resolution)
+                    GProc.prune_input(graph, gen_options.prune_length, 
+                                      resolution)
                 
                 self.analysis_status.emit([i, 'Filtering isolated segments...'])
                 GProc.filter_input(graph, gen_options.filter_length, resolution)
@@ -199,10 +216,12 @@ class VolumeThread(QThread):
                 #####
                 
                 self.analysis_status.emit([i, 'Analyzing features...'])
-                result, seg_results = FeatExt.feature_input(graph, resolution, filename,
+                result, seg_results = FeatExt.feature_input(graph, resolution, 
+                                                            filename,
                                                             image_dim=gen_options.image_dimensions, 
                                                             image_shape=image_shape,
-                                                            ROI_name=ROI_name, ROI_volume=ROI_volume,
+                                                            ROI_name=ROI_name, 
+                                                            ROI_volume=ROI_volume,
                                                             save_seg_results=gen_options.save_seg_results,
                                                             reduce_graph=gen_options.save_graph)
                 
@@ -217,7 +236,9 @@ class VolumeThread(QThread):
                 
                 self.analysis_status.emit([i, 'Exporting segment results...'])
                 if gen_options.save_seg_results:
-                    ResExp.write_seg_results(seg_results, gen_options.results_folder, filename, ROI_name)        
+                    ResExp.write_seg_results(seg_results, 
+                                             gen_options.results_folder, 
+                                             filename, ROI_name)        
                 
                 if gen_options.save_graph:
                     if ROI_name != 'None':
@@ -227,7 +248,9 @@ class VolumeThread(QThread):
                         graph.es['hex'] = color
                         graph.es['ROI_ID'] = j
                         
-                    graph = GIO.save_graph(graph, filename, gen_options.results_folder, caching=True)
+                    graph = GIO.save_graph(graph, filename, 
+                                           gen_options.results_folder, 
+                                           caching=True)
                     GIO.cache_graph(graph)
             
             
@@ -237,11 +260,14 @@ class VolumeThread(QThread):
                 
             if self.running and file_analyzed:
                 speed = helpers.get_time(tic)                    
-                self.analysis_status.emit([i, f'Analyzed in {speed}.',
-                                           f'{j+1}/{len(annotation_data.keys())}'])
+                self.analysis_status.emit(
+                    [i, f'Analyzed in {speed}.',
+                     f'{j+1}/{len(annotation_data.keys())}']
+                    )
         
         if self.running:
-            ResExp.write_results(gen_options.results_folder, gen_options.image_dimensions)
+            ResExp.write_results(gen_options.results_folder, 
+                                 gen_options.image_dimensions)
             
         # Make sure we delete the labeled_cache_volume if it exists
         ImProc.clear_labeled_cache()
@@ -261,7 +287,8 @@ class GraphThread(QThread):
     analysis_status = pyqtSignal(list)
 
     
-    def __init__(self, analysis_options, graph_options, column1_files, column2_files):
+    def __init__(self, analysis_options, graph_options, 
+                 column1_files, column2_files):
         QThread.__init__(self)
         self.running = False  
         self.gen_options = analysis_options
@@ -292,16 +319,20 @@ class GraphThread(QThread):
             else:
                 graph_file = file[0]        
         
-            graph = GIO.graph_loading_dock(graph_file, graph_options, resolution)
+            graph = GIO.graph_loading_dock(graph_file, graph_options, 
+                                           resolution)
         
             
-            if graph_options.graph_type == 'Centerlines' and graph_options.filter_cliques:
+            if (graph_options.graph_type == 'Centerlines' 
+                and graph_options.filter_cliques):
                 self.analysis_status.emit([i, 'Filtering cliques...'])
                 GProc.clique_filter_input(graph)
         
             if gen_options.prune_length:
                 self.analysis_status.emit([i, 'Pruning end points...'])
-                GProc.prune_input(graph, gen_options.prune_length, resolution, graph_options.smooth_centerlines, graph_options.graph_type)
+                GProc.prune_input(graph, gen_options.prune_length, resolution, 
+                                  graph_options.smooth_centerlines, 
+                                  graph_options.graph_type)
                 
             self.analysis_status.emit([i, 'Filtering isolated segments...'])
             GProc.filter_input(graph, gen_options.filter_length, resolution,
@@ -309,7 +340,8 @@ class GraphThread(QThread):
                                graph_type=graph_options.graph_type)
                 
             self.analysis_status.emit([i, 'Analyzing graph...'])
-            result, seg_result = FeatExt.feature_input(graph, resolution, filename,
+            result, seg_result = FeatExt.feature_input(graph, resolution, 
+                                                       filename,
                                                        image_dim=gen_options.image_dimensions, 
                                                        graph_type=graph_options.graph_type, 
                                                        centerline_smoothing=graph_options.smooth_centerlines, save_seg_results=gen_options.save_seg_results, 
@@ -318,12 +350,14 @@ class GraphThread(QThread):
             self.analysis_status.emit([i, 'Saving results...'])
             ResExp.cache_result(result)
             if gen_options.save_seg_results:
-                ResExp.write_seg_results(seg_result, gen_options.results_folder, filename, ROI_Name='None')
+                ResExp.write_seg_results(seg_result, gen_options.results_folder, 
+                                         filename, ROI_Name='None')
             
             if gen_options.save_graph:
                 self.analysis_status.emit([i, 'Saving graph...'])
                 graph.es['hex'] = [['FFFFFF']]
-                GIO.save_graph(graph, filename, gen_options.results_folder, main_thread=False)
+                GIO.save_graph(graph, filename, gen_options.results_folder, 
+                               main_thread=False)
             
             if self.running:
                 speed = helpers.get_time(tic)
@@ -331,7 +365,8 @@ class GraphThread(QThread):
             
         if self.running:
             self.analysis_status.emit([i, 'Exporting results...'])
-            ResExp.write_results(gen_options.results_folder, gen_options.image_dimensions)
+            ResExp.write_results(gen_options.results_folder, 
+                                 gen_options.image_dimensions)
             self.analysis_status.emit([i, f'Analyzed in {speed}.'])
         
         self.button_lock.emit(0)
@@ -343,11 +378,9 @@ class GraphThread(QThread):
         self.running = False
 
 
-
 #####################
 ### Visualization ###
 #####################
-
 class VolumeVisualizationThread(QThread):
     button_lock = pyqtSignal(int)
     analysis_status = pyqtSignal(list) # ['Status', %]
@@ -413,7 +446,9 @@ class VolumeVisualizationThread(QThread):
                     # Make sure there is enough disk space for the labeled_volume file
                     if not helpers.check_storage(volume_file):
                         file_size = helpers.get_file_size(volume_file, GB=True)
-                        self.analysis_status.emit([f'Visualization cancelled: Not enough disk space.<br>>{file_size:.f}GB of free space needed.', 0])
+                        self.analysis_status.emit(
+                            [f'Visualization cancelled: Not enough disk space.<br>>{file_size:.f}GB of free space needed.', 0]
+                            )
                         self.failure_emit.emit(1)
                         self.running = False
                         self.complete=True
@@ -424,18 +459,22 @@ class VolumeVisualizationThread(QThread):
                     ROI_volumes, minima, maxima = AnnProc.volume_labeling_input(volume, annotation_file,
                                                                                 ROI_sub_array, annotation_type)
                     if ROI_volumes is None:
-                        self.analysis_status.emit([f'Error labeling volume...', 0])    
+                        self.analysis_status.emit([f'Error labeling volume...', 
+                                                   0])    
                         break
                     
                 ROI_volume = ROI_volumes[ROI_id]
                 if ROI_volume > 0:
-                    self.analysis_status.emit([f'Segmenting {ROI_name}...', progress])    
+                    self.analysis_status.emit([f'Segmenting {ROI_name}...', 
+                                               progress])    
                     point_minima, point_maxima = minima[ROI_id], maxima[ROI_id]
-                    volume = AnnProc.segmentation_input(point_minima, point_maxima, ROI_id+1)
+                    volume = AnnProc.segmentation_input(point_minima, 
+                                                        point_maxima, ROI_id+1)
                 
                 if not ROI_volume or not ImProc.volume_check(volume):
                     progress += step_weight * 7
-                    self.analysis_status.emit([f'ROI not in dataset...', progress])
+                    self.analysis_status.emit([f'ROI not in dataset...', 
+                                               progress])
                     continue
                     
             else:
@@ -453,7 +492,10 @@ class VolumeVisualizationThread(QThread):
             # Radius calculations
             progress += step_weight
             self.analysis_status.emit(['Measuring radii...', progress])
-            skeleton_radii, vis_radii = VolProc.radii_calc_input(volume, points, resolution, gen_vis_radii=True)
+            skeleton_radii, vis_radii = VolProc.radii_calc_input(volume, 
+                                                                 points, 
+                                                                 resolution, 
+                                                                 gen_vis_radii=True)
             
             if volume.ndim == 2:
                 points, volume, volume_shape = ImProc.reshape_2D(points, volume)
@@ -467,7 +509,8 @@ class VolumeVisualizationThread(QThread):
             ## Graph construction.
             progress += step_weight
             self.analysis_status.emit(['Reconstructing network...', progress])
-            graph = GProc.create_graph(volume_shape, skeleton_radii, vis_radii, points, point_minima)
+            graph = GProc.create_graph(volume_shape, skeleton_radii, vis_radii, 
+                                       points, point_minima)
             
             progress += step_weight
             if gen_options.prune_length > 0:
@@ -475,7 +518,8 @@ class VolumeVisualizationThread(QThread):
                 GProc.prune_input(graph, gen_options.prune_length, resolution)
             
             progress += step_weight
-            self.analysis_status.emit(['Filtering isolated segments...', progress])
+            self.analysis_status.emit(['Filtering isolated segments...', 
+                                       progress])
             GProc.filter_input(graph, gen_options.filter_length, resolution)
               
             if not self.running:
@@ -488,7 +532,8 @@ class VolumeVisualizationThread(QThread):
             _, _ = FeatExt.feature_input(graph, resolution, filename, 
                                          image_dim=gen_options.image_dimensions, 
                                          image_shape=image_shape,
-                                         ROI_name=ROI_name, ROI_volume=ROI_volume,
+                                         ROI_name=ROI_name, 
+                                         ROI_volume=ROI_volume,
                                          reduce_graph=True)
 
             ## add mesh colors
@@ -522,23 +567,32 @@ class VolumeVisualizationThread(QThread):
             if main_graph.vcount():
                 self.analysis_status.emit(['Generating meshes...', 70])
                 
-                # Send the volume to be visualized if one of the volume visualization options were selected
-                # Volume is already None, so won't be visualized if neither were selected
-                if any([self.vis_options.load_original,  self.vis_options.load_smoothed]):
+                # Send the volume to be visualized if 
+                # one of the volume visualization options were selected
+                # Volume is already None, 
+                # so it won't be visualized if neither were selected
+                if any([self.vis_options.load_original,  
+                        self.vis_options.load_smoothed]):
                     volume, _ = ImProc.load_volume(volume_file)
                     volume = ImProc.prep_numba_compatability(volume)
                     volume = VolProc.pad_volume(volume)
                     if volume.ndim == 2:
                         _, volume, _ = ImProc.reshape_2D(points, volume)               
                 
-                meshes = VolVis.mesh_construction(main_graph, vis_options, volume, application=True, status_updater=self.analysis_status)
+                meshes = VolVis.mesh_construction(main_graph, vis_options, 
+                                                  volume, application=True, 
+                                                  status_updater=self.analysis_status)
             else:
-                self.analysis_status.emit(['Visualization cancelled: Volume has no vessels.', 0])
+                self.analysis_status.emit(
+                    ['Visualization cancelled: Volume has no vessels.', 0]
+                    )
                 self.failure_emit.emit(1)
                 self.running = False
         
         if self.running:
-            self.analysis_status.emit(['Mesh construction complete: Loading volumes...', 100])
+            self.analysis_status.emit(
+                ['Mesh construction complete: Loading volumes...', 100]
+                )
             self.mesh_emit.emit(meshes)
         
         # Make sure we delete the labeled_cache_volume if it exists
@@ -559,7 +613,8 @@ class GraphVisualizationThread(QThread):
     mesh_emit = pyqtSignal(IC.PyVistaMeshes)
     failure_emit = pyqtSignal(int)
     
-    def __init__(self, analysis_options, graph_options, visualization_options, analysis_files):
+    def __init__(self, analysis_options, graph_options, 
+                 visualization_options, analysis_files):
         QThread.__init__(self)
         self.running = False  
         self.gen_options = analysis_options
@@ -592,19 +647,25 @@ class GraphVisualizationThread(QThread):
 
         # Cover exceptions raised by incorrect graph loading.
         try:
-            graph = GIO.graph_loading_dock(graph_file, graph_options, resolution, Visualize=True)
+            graph = GIO.graph_loading_dock(graph_file, graph_options, 
+                                           resolution, Visualize=True)
         except Exception as error:
-            self.analysis_status.emit([f'Graph loading error: Check that all options were correct when loading the graph.', 0])
+            self.analysis_status.emit(
+                [f'Graph loading error: Check that all options were correct when loading the graph.', 0]
+                )
             self.failure_emit.emit(1)
             return
             
-        if graph_options.graph_type == 'Centerlines' and graph_options.filter_cliques:
+        if (graph_options.graph_type == 'Centerlines' 
+            and graph_options.filter_cliques):
             self.analysis_status.emit(['Filtering cliques...', 15])
             GProc.clique_filter_input(graph)
     
         if gen_options.prune_length:
             self.analysis_status.emit(['Pruning end points...', 30])
-            GProc.prune_input(graph, gen_options.prune_length, resolution, graph_options.smooth_centerlines, graph_options.graph_type)
+            GProc.prune_input(graph, gen_options.prune_length, resolution, 
+                              graph_options.smooth_centerlines, 
+                              graph_options.graph_type)
             
         self.analysis_status.emit(['Filtering isolated segments...', 45])
         GProc.filter_input(graph, gen_options.filter_length, resolution,
@@ -620,7 +681,8 @@ class GraphVisualizationThread(QThread):
         _, _ = FeatExt.feature_input(graph, resolution, filename,
                                      image_dim=gen_options.image_dimensions, 
                                      graph_type=graph_options.graph_type,
-                                     centerline_smoothing=graph_options.smooth_centerlines,reduce_graph=True)
+                                     centerline_smoothing=graph_options.smooth_centerlines,
+                                     reduce_graph=True)
            
         if not self.running:   
             self.analysis_status.emit(['Canceled.'])
@@ -642,6 +704,7 @@ class GraphVisualizationThread(QThread):
     # Cancel option.
     def stop(self):
         self.running = False
+
 
 ######################
 ### Movie Creation ###
@@ -689,18 +752,22 @@ class MovieThread(QThread):
 ################
 ### JIT Init ###
 ################
-# Run a tiny volume through the pipeline to prep any of the functions that need it
+# Run a tiny volume through the pipeline to prep the JIT functions that need it
 def prepare_compilers():
     resolution = np.array([1.0, 1.0, 1.0])
-    file = os.path.join(helpers.get_cwd(), 'library', 'volumes', 'JIT_volume.nii')
+    file = os.path.join(helpers.get_cwd(), 'library', 'volumes', 
+                        'JIT_volume.nii')
     file = helpers.std_path(file)
     volume, image_shape = ImProc.load_volume(file)
     volume, point_minima = VolProc.volume_prep(volume)
     volume = VolProc.pad_volume(volume)
     volume_shape = volume.shape
     points = VolProc.skeletonize(volume)
-    skeleton_radii, vis_radii = VolProc.radii_calc_input(volume, points, resolution, gen_vis_radii=True)
-    graph = GProc.create_graph(volume_shape, skeleton_radii, vis_radii, points, point_minima)
+    skeleton_radii, vis_radii = VolProc.radii_calc_input(volume, points, 
+                                                         resolution, 
+                                                         gen_vis_radii=True)
+    graph = GProc.create_graph(volume_shape, skeleton_radii, vis_radii, 
+                               points, point_minima)
     GProc.prune_input(graph, 5, resolution)
     GProc.filter_input(graph, 5, resolution)
     _, _ = FeatExt.feature_input(graph, resolution, 'None', 
