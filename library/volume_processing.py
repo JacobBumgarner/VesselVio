@@ -27,7 +27,8 @@ def volume_prep(volume):
     """ IO for volume binarization/segmentation and volume bounding
         volume: np.ndarray or np.memmap
     """
-    # Make sure that we're in c-order, was more important for flat skeletonization, but it's 3D now so it's somewhat unnecessary
+    # Make sure that we're in c-order, was more important for flat 
+    # skeletonization, but it's 3D now so it's somewhat unnecessary
     volume = np.asarray(volume, dtype=np.uint8)
     if not volume.data.contiguous: 
         volume = np.ascontiguousarray(volume)
@@ -44,7 +45,8 @@ def volume_prep(volume):
 @njit(parallel=True, nogil=True, cache=True)
 def binarize_and_bound_3D(volume):  
     """ 
-        A function that simultaneously serves to segment an integer from a volume as well as record the bounding box locations
+        A function that simultaneously serves to segment an integer 
+        from a volume as well as record the bounding box locations
         volume: A 3D np.array or np.memmap
     """    
     mins = np.array(volume.shape, dtype=np.int_)
@@ -111,7 +113,9 @@ def absolute_points(points, minima):
 def filter_volume(volume, keep_coords):  
     if keep_coords.shape[0]:
         labeled = label_volume(volume)
-        keep_ids = labeled[keep_coords[:, 0], keep_coords[:, 1], keep_coords[:, 2]]
+        keep_ids = labeled[keep_coords[:, 0], 
+                           keep_coords[:, 1], 
+                           keep_coords[:, 2]]
         volume = filter_segments(labeled, keep_ids)
 
     return volume
@@ -129,7 +133,8 @@ def filter_segments(labeled, keep_ids):
     """Remove specific ids from a labeled np.3darray
         labeled: a 3D np.array or np.memmap that is labeled with specific ids
         remove_ids: a 1D np.array of values that will be removed from the volume
-        returns the labeled volume with all elements of the remove_ids converted to zero
+        returns the labeled volume with all elements of the remove_ids converted 
+        to zero.
     """
     keep_ids = set(keep_ids)
     for z in prange(labeled.shape[0]):
@@ -145,20 +150,23 @@ def filter_segments(labeled, keep_ids):
 ### Radius Calculations ###
 ###########################
 # Loading dock for our volume radii corrections
-def radii_calc_input(volume, points, resolution, gen_vis_radii=False, verbose=False):   
+def radii_calc_input(volume, points, resolution, gen_vis_radii=False, 
+                     verbose=False):   
     if verbose:
         t = pf()
         print ('Calculating radii...', end='\r')
     
     # Calculate radii for feature analysis
-    LUT = RadCor.load_corrections(resolution, verbose=verbose) # Load the mEDT_LUT
+    # Load the mEDT_LUT
+    LUT = RadCor.load_corrections(resolution, verbose=verbose) 
     skeleton_radii = radii_calc(volume, points, LUT)
     del(LUT) # Just for sanity
         
     # If visualizing, rerun to find unit radii of dataset.
     vis_radii = None
     if gen_vis_radii: 
-        LUT = RadCor.load_corrections(Visualize=True, verbose=verbose) # Load the mEDT_LUT using basis units.
+        # Load the mEDT_LUT using basis units.
+        LUT = RadCor.load_corrections(Visualize=True, verbose=verbose) 
         vis_radii = radii_calc(volume, points, LUT)
         del(LUT) # Just for sanity
         
@@ -178,8 +186,10 @@ def radii_calc(volume, points, LUT):
     return skeleton_radii.tolist()
 
 # This function calculates the corrected radii for each centerline point.
-# It is functionally the same as an EDT, but it calculates the distance to the edge (rather than the center) of the nearest non-vessel voxel.
-# Essentially, it searches around a point for four zero neighbors and runs them through the mEDT_LUT.
+# It is functionally the same as an EDT, but it calculates the distance 
+# to the edge (rather than the center) of the nearest non-vessel voxel.
+# Essentially, it searches around a point for four zero neighbors 
+# and runs them through the mEDT_LUT.
 @njit(parallel=True, cache=True)
 def calculate_3Dradii(volume, points, LUT):
     volume = volume
@@ -190,7 +200,8 @@ def calculate_3Dradii(volume, points, LUT):
     skeleton_radii = np.zeros(points.shape[0]) 
     empty = np.zeros(150)
     
-    # Iterate through each skeleton point to find local zeros for radius identifications
+    # Iterate through each skeleton point to find 
+    # local zeros for radius identifications
     for p in prange(points.shape[0]):
         for i in range(empty.shape[0]):
             point = points[p]
