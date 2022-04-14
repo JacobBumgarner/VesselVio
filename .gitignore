@@ -29,3 +29,4 @@ VesselVio.spec
 tmp/VesselVio.zip
 build_app.sh
 library/cache/results_cache.csv
+a.py
