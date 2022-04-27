@@ -78,8 +78,6 @@ def new_doublespin(min, max, start=0, width=None, alignment='Left', suffix=None,
     
     return doublespin
 
-
-
 def new_button(name, connect_to, width=None):
     button = QPushButton(name)
     
@@ -92,7 +90,6 @@ def new_button(name, connect_to, width=None):
         button.setFixedWidth(100)
     
     return button
-
 
 def new_help_button(connection):
     button = QPushButton("?")
@@ -118,7 +115,6 @@ def button_defaulting(button, default):
     button.setAutoDefault(default)
     return
 
-
 def new_combo(items:list, size=None, alignment='Left', connect=None):
     combo = QComboBox()
     alignment = find_alignment(alignment)
@@ -134,8 +130,6 @@ def new_combo(items:list, size=None, alignment='Left', connect=None):
         combo.currentIndexChanged.connect(connect)
     
     return combo
-
-
 
 def new_widget(fixed_width=None, fixed_height=None, min_width=None, min_height=None, color=None):
     widget = QWidget()
@@ -156,8 +150,6 @@ def new_widget(fixed_width=None, fixed_height=None, min_width=None, min_height=N
             
     return widget
 
-
-
 def new_line_edit(default_text=None, alignment=None, width=None, locked=False):
     line_edit = QLineEdit(default_text)
     line_edit.setAlignment(find_alignment(alignment))
@@ -169,8 +161,6 @@ def new_line_edit(default_text=None, alignment=None, width=None, locked=False):
         line_edit.setReadOnly(True)
 
     return line_edit
-
-
 
 def new_line(orient='H', size=None):
     line = QFrame()
@@ -184,10 +174,7 @@ def new_line(orient='H', size=None):
     
     line.setFrameShadow(QFrame.Sunken)
     
-    
     return line
-
-
 
 """Thanks to /u/eyllanesc on StackExchange for the original code base of this box.
 https://stackoverflow.com/questions/52615115/how-to-create-collapsible-box-in-pyqt"""
