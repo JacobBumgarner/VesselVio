@@ -43,7 +43,7 @@ Inferior Colliculus | Human Brain
 If you are looking for help with segmenting your vasculature, there are numerous packages available for this process<sup>[1](https://github.com/ChristophKirst/ClearMap2)[2](https://github.com/vessap/vessap)[3](https://github.com/giesekow/deepvesselnet)</sup>.
 
 ## Other
-Any suggestions, improvements, or comments should be directed to [Jacob Bumgarner](jrbumgarner@mix.wvu.edu).
+Any suggestions, improvements, or comments should be directed to [Jacob Bumgarner](mailto:jrbumgarner@mix.wvu.edu).
 
 Feel free to join us on [Slack](https://communityinviter.com/apps/vesselvio/join-vesselvio-on-slack) for general communication or troubleshooting purposes!
 
