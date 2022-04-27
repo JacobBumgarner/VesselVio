@@ -34,7 +34,7 @@ from library import image_processing as ImProc
 from library.helpers import load_icon
 
 ######
-__version__ = "V 1.1.2"
+__version__ = "V 1.1.1"
 ######
      
 # Main window for the application.
