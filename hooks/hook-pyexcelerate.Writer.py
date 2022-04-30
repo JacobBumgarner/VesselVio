@@ -9,7 +9,8 @@
 
 
 from PyInstaller.utils.hooks import collect_data_files
-datas = collect_data_files('pyexcelerate')
+
+datas = collect_data_files("pyexcelerate")
 # import os
 # from PyInstaller.utils.hooks import exec_statement
 

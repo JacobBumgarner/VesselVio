@@ -1,0 +1,3 @@
+[codespell]
+check-filenames = vesselvio.py,library/
+skip = library/annotation_trees/*,hooks/*
