@@ -24,8 +24,6 @@ from pyvistaqt import QtInteractor
 from library import image_processing as ImProc
 from library import qt_threading as QtTh
 from library.helpers import load_icon
-
-# Import UIs
 from library.ui import analysis_page as p1
 from library.ui import annotation_page as p3
 from library.ui import left_menu as lm
@@ -36,6 +34,7 @@ from library.ui import visualization_page as p2
 ######
 __version__ = "V 1.1.1"
 ######
+
 
 # Main window for the application.
 class mainWindow(QMainWindow):
@@ -89,7 +88,7 @@ class mainWindow(QMainWindow):
         try:
             self.page1.a_thread.stop()
             self.page2.v_thread.close()
-        except:
+        except AttributeError:
             pass
         event.accept()
 

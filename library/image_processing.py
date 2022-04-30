@@ -10,8 +10,6 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
 import os
-
-# Image processing
 from pathlib import Path
 from time import perf_counter as pf
 
