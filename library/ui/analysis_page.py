@@ -13,10 +13,21 @@ import json
 import os
 import sys
 
-from PyQt5.QtWidgets import (QAbstractItemView, QApplication, QDialog,
-                             QFileDialog, QHeaderView, QLabel, QLayout,
-                             QMainWindow, QMessageBox, QTableWidget,
-                             QTableWidgetItem, QTabWidget, QWidget)
+from PyQt5.QtWidgets import (
+    QAbstractItemView,
+    QApplication,
+    QDialog,
+    QFileDialog,
+    QHeaderView,
+    QLabel,
+    QLayout,
+    QMainWindow,
+    QMessageBox,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QWidget,
+)
 
 from library import helpers
 from library import input_classes as IC

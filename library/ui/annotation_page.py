@@ -14,12 +14,27 @@ import os
 import sys
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QAbstractItemView, QApplication, QCompleter,
-                             QDialog, QFileDialog, QGroupBox, QHeaderView,
-                             QLabel, QLineEdit, QListWidget, QListWidgetItem,
-                             QMainWindow, QMessageBox, QPushButton,
-                             QTableWidget, QTableWidgetItem, QTreeWidget,
-                             QTreeWidgetItem, QWidget)
+from PyQt5.QtWidgets import (
+    QAbstractItemView,
+    QApplication,
+    QCompleter,
+    QDialog,
+    QFileDialog,
+    QGroupBox,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QMainWindow,
+    QMessageBox,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QWidget,
+)
 
 from library import annotation_processing as AnProc
 from library import helpers
