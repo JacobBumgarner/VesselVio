@@ -24,6 +24,7 @@ from pyvistaqt import QtInteractor
 from library import image_processing as ImProc
 from library import qt_threading as QtTh
 from library.helpers import load_icon
+
 # Import UIs
 from library.ui import analysis_page as p1
 from library.ui import annotation_page as p3

@@ -12,9 +12,16 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 import datetime
 
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtWidgets import (QDialog, QFrame, QLabel, QListWidget,
-                             QListWidgetItem, QPushButton, QVBoxLayout,
-                             QWidget)
+from PyQt5.QtWidgets import (
+    QDialog,
+    QFrame,
+    QLabel,
+    QListWidget,
+    QListWidgetItem,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 from library.ui import qt_objects as QtO
 from library.ui import stylesheets

@@ -19,10 +19,20 @@ import pyvista as pv
 from imageio import get_writer
 from PyQt5.Qt import pyqtSlot
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import (QApplication, QColorDialog, QDialog,
-                             QDialogButtonBox, QFrame, QGroupBox, QLabel,
-                             QMainWindow, QMessageBox, QProgressBar, QSplitter,
-                             QWidget)
+from PyQt5.QtWidgets import (
+    QApplication,
+    QColorDialog,
+    QDialog,
+    QDialogButtonBox,
+    QFrame,
+    QGroupBox,
+    QLabel,
+    QMainWindow,
+    QMessageBox,
+    QProgressBar,
+    QSplitter,
+    QWidget,
+)
 from pyvistaqt import QtInteractor
 
 from library import helpers
