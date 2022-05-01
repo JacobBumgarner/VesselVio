@@ -15,8 +15,7 @@ import igraph as ig
 import numpy as np
 import pandas
 
-from library import feature_extraction as FeatExt
-from library import helpers
+from library import feature_extraction as FeatExt, helpers
 
 
 ###########################
@@ -275,10 +274,10 @@ def save_graph(
         return g
 
     # Get the dir and name for our graph.
-    if os.path.exists(results_dir) == False:
+    if not os.path.exists(results_dir):
         os.mkdir(results_dir)
     results_dir = os.path.join(results_dir, "Graphs")
-    if os.path.exists(results_dir) == False:
+    if not os.path.exists(results_dir):
         os.mkdir(results_dir)
     file = os.path.join(results_dir, filename + "." + "graphml")
 
@@ -290,10 +289,10 @@ def save_graph(
 
 def save_cache(filename, results_dir):
     # Get the dir and name for our graph.
-    if os.path.exists(results_dir) == False:
+    if not os.path.exists(results_dir):
         os.mkdir(results_dir)
     results_dir = os.path.join(results_dir, "Graphs")
-    if os.path.exists(results_dir) == False:
+    if not os.path.exists(results_dir):
         os.mkdir(results_dir)
 
     # Get the cached result
