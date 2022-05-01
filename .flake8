@@ -1,6 +1,8 @@
 [flake8]
 exclude = .git,__pycache__,build,dist,hooks
 ignore =
+    # Double quotes found but single quotes preferred. Deffering to black here
+    Q000,
     # whitespace before ':'
     E203,
     # line break before binary operator
@@ -10,4 +12,12 @@ ignore =
     # module level import not at top of file. Currently ignoring because of header info
     E402,
     # too many leading '#' for block comment
-    E266
+    E266,
+    # isort found an import in the wrong position
+    I001,
+    # isort expected 1 blank line in imports, found 0
+    I003,
+    # isort found an unexpected blank line in imports
+    I004,
+    # isort found an unexpected missing import
+    I005
