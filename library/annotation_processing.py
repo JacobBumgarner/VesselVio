@@ -14,12 +14,11 @@ import os
 from time import perf_counter as pf
 
 import cv2
-import nibabel
 import numpy as np
-from numba import njit, prange
 
 from library import helpers
-from library import volume_processing as VolProc
+
+from numba import njit, prange
 
 
 #######################

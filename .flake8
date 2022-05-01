@@ -8,4 +8,6 @@ ignore =
     # line length too long
     E501,
     # module level import not at top of file. Currently ignoring because of header info
-    E402
+    E402,
+    # too many leading '#' for block comment
+    E266
