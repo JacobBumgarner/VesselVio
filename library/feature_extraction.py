@@ -16,12 +16,10 @@ from time import perf_counter as pf
 
 import numpy as np
 from geomdl import knotvector
+
+from library import graph_processing as GProc, helpers, image_processing as ImProc
 from numba import njit
 from scipy import interpolate
-
-from library import graph_processing as GProc
-from library import helpers
-from library import image_processing as ImProc
 
 
 #############################
@@ -78,6 +76,8 @@ FeatureSet = namedtuple(
                         radius_avg, radius_max, radius_min, radius_SD,
                         radii_list, coords_list, vis_radius""",
 )
+
+
 # Unified function to extract features from a segment
 def feature_extraction(
     g,
@@ -353,7 +353,7 @@ def loop_path(gsegs, segment, segment_ids=None):
         i = 0
         size = len(segment)
         # Start with random point in the segment.
-        while looped == False:
+        while not looped:
             if i > size:  # Safe guard
                 looped = True
                 break
@@ -377,7 +377,8 @@ def loop_path(gsegs, segment, segment_ids=None):
 
         return point_list
 
-    except:
+    except Exception as error:
+        print(f"Looped error, {error}")
         # If there is some odd case that slipped through...
         return [segment_ids[v] for v in segment[0:2]]
 
@@ -602,7 +603,7 @@ def egraph_analysis(g):
         "length": lengths,
         "tortuosity": tortuosities,
         "radius_avg": radii_avg,
-        "radius_min": radii_max,
+        "radius_max": radii_max,
         "radius_min": radii_min,
         "radius_SD": radii_SD,
         "vis_radius": vis_radii,
