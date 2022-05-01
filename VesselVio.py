@@ -16,20 +16,21 @@ os.environ["QT_MAC_WANTS_LAYER"] = "1"
 from multiprocessing import freeze_support
 
 import pyvista as pv
+
+from library import image_processing as ImProc, qt_threading as QtTh
+from library.helpers import load_icon
+from library.ui import (
+    analysis_page as p1,
+    annotation_page as p3,
+    left_menu as lm,
+    qt_objects as QtO,
+    update_alert,
+    visualization_page as p2,
+)
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from pyvistaqt import QtInteractor
-
-from library import image_processing as ImProc
-from library import qt_threading as QtTh
-from library.helpers import load_icon
-from library.ui import analysis_page as p1
-from library.ui import annotation_page as p3
-from library.ui import left_menu as lm
-from library.ui import qt_objects as QtO
-from library.ui import update_alert
-from library.ui import visualization_page as p2
 
 ######
 __version__ = "V 1.1.1"

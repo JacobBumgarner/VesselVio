@@ -17,12 +17,14 @@ import matplotlib.pyplot as plt
 import mcubes
 import numpy as np
 import pyvista as pv
-from numba import njit, prange
 
-from library import helpers
-from library import image_processing as ImProc
-from library import input_classes as IC
-from library import volume_processing as VolProc
+from library import (
+    helpers,
+    image_processing as ImProc,
+    input_classes as IC,
+    volume_processing as VolProc,
+)
+from numba import njit, prange
 
 
 ############################

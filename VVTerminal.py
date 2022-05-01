@@ -15,16 +15,18 @@ import time
 
 import igraph as ig
 
-from library import annotation_processing as AnnProc
-from library import feature_extraction as FeatExt
-from library import graph_io as GIO
-from library import graph_processing as GProc
-from library import helpers
-from library import image_processing as ImProc
-from library import input_classes as IC
-from library import results_export as ResExp
-from library import volume_processing as VolProc
-from library import volume_visualization as VolVis
+from library import (
+    annotation_processing as AnnProc,
+    feature_extraction as FeatExt,
+    graph_io as GIO,
+    graph_processing as GProc,
+    helpers,
+    image_processing as ImProc,
+    input_classes as IC,
+    results_export as ResExp,
+    volume_processing as VolProc,
+    volume_visualization as VolVis,
+)
 
 
 #######################

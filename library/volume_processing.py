@@ -12,12 +12,11 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 from time import perf_counter as pf
 
 import numpy as np
+
+from library import lee94, radii_corrections as RadCor
 from numba import njit, prange
 from scipy.ndimage import label
 from skimage.morphology import skeletonize_3d
-
-from library import lee94
-from library import radii_corrections as RadCor
 
 
 #######################

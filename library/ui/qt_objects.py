@@ -9,6 +9,7 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
+from library import helpers
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import (
     QButtonGroup,
@@ -29,8 +30,6 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-
-from library import helpers
 
 ###############
 ### Widgets ###
@@ -61,6 +60,7 @@ def new_spinbox(
     suffix=None,
     width=None,
     connect=None,
+    connect_type="editingFinished",
 ):
     spinbox = QSpinBox()
     spinbox.setMinimum(min)
@@ -77,7 +77,10 @@ def new_spinbox(
     if width:
         spinbox.setFixedWidth(width)
     if connect:
-        spinbox.editingFinished.connect(connect)
+        if connect_type == "editingFinished":
+            spinbox.editingFinished.connect(connect)
+        elif connect_type == "valueChanged":
+            spinbox.valueChanged.connect(connect)
 
     return spinbox
 
@@ -91,6 +94,7 @@ def new_doublespin(
     suffix=None,
     decimals=1,
     connect=None,
+    connect_type="editingFinished",
 ):
     doublespin = QDoubleSpinBox()
     doublespin.setMinimum(min)
@@ -106,7 +110,10 @@ def new_doublespin(
         doublespin.setSuffix(suffix)
 
     if connect:
-        doublespin.editingFinished.connect(connect)
+        if connect_type == "editingFinished":
+            doublespin.editingFinished.connect(connect)
+        elif connect_type == "valueChanged":
+            doublespin.valueChanged.connect(connect)
 
     doublespin.setDecimals(decimals)
 

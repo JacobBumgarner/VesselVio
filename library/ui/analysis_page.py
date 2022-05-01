@@ -13,6 +13,11 @@ import json
 import os
 import sys
 
+from library import helpers, input_classes as IC, qt_threading as QtTh
+from library.annotation_processing import RGB_check
+from library.ui import qt_objects as QtO
+from library.ui.annotation_page import RGB_Warning
+
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -28,13 +33,6 @@ from PyQt5.QtWidgets import (
     QTabWidget,
     QWidget,
 )
-
-from library import helpers
-from library import input_classes as IC
-from library import qt_threading as QtTh
-from library.annotation_processing import RGB_check
-from library.ui import qt_objects as QtO
-from library.ui.annotation_page import RGB_Warning
 
 
 class mainWindow(QMainWindow):

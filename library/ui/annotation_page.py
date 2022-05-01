@@ -13,6 +13,9 @@ import json
 import os
 import sys
 
+from library import annotation_processing as AnProc, helpers
+from library.ui import qt_objects as QtO, stylesheets as Styles
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QAbstractItemView,
@@ -35,11 +38,6 @@ from PyQt5.QtWidgets import (
     QTreeWidgetItem,
     QWidget,
 )
-
-from library import annotation_processing as AnProc
-from library import helpers
-from library.ui import qt_objects as QtO
-from library.ui import stylesheets as Styles
 
 
 class mainWindow(QMainWindow):

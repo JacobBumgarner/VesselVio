@@ -17,6 +17,17 @@ import imageio_ffmpeg  # Needed for PyInstaller
 import numpy as np
 import pyvista as pv
 from imageio import get_writer
+
+from library import (
+    helpers,
+    image_processing as ImProc,
+    input_classes as IC,
+    qt_threading as QtTh,
+)
+from library.annotation_processing import RGB_check
+from library.ui import qt_objects as QtO
+from library.ui.analysis_page import AnalysisOptions, GraphOptions
+from library.ui.annotation_page import RGB_Warning
 from PyQt5.Qt import pyqtSlot
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import (
@@ -34,15 +45,6 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 from pyvistaqt import QtInteractor
-
-from library import helpers
-from library import image_processing as ImProc
-from library import input_classes as IC
-from library import qt_threading as QtTh
-from library.annotation_processing import RGB_check
-from library.ui import qt_objects as QtO
-from library.ui.analysis_page import AnalysisOptions, GraphOptions
-from library.ui.annotation_page import RGB_Warning
 
 
 class mainWindow(QMainWindow):
@@ -120,7 +122,11 @@ class VisualizationPage(QSplitter):
     ## Visualization functions
     def prepare_visualization(self):
         visualizer = VisualizationDialog(
-            self.files, self.graph_options, self.plotter, self.actors, self.meshes
+            self.files,
+            self.graph_options,
+            self.plotter,
+            self.actors,
+            self.meshes,
         )
         if visualizer.exec_():
             # Update the filename and meshes
@@ -354,7 +360,8 @@ class VisualizationDialog(QDialog):
         self.helpButton = QtO.new_help_button(self.rendering_help)
         QtO.button_defaulting(self.helpButton, False)
         QtO.add_widgets(
-            bottomLayout, [0, self.cancelButton, self.startButton, self.helpButton]
+            bottomLayout,
+            [0, self.cancelButton, self.startButton, self.helpButton],
         )
 
         QtO.add_widgets(
@@ -416,7 +423,10 @@ class VisualizationDialog(QDialog):
             self.graph_options.smooth_centerlines = self.centerlineSmoothing.isChecked()
             self.graph_options.filter_cliques = self.cliqueFiltering.isChecked()
         self.a_thread = QtTh.GraphVisualizationThread(
-            self.analysis_options, self.graph_options, self.vis_options, self.files
+            self.analysis_options,
+            self.graph_options,
+            self.vis_options,
+            self.files,
         )
         return
 
@@ -592,7 +602,10 @@ class LoadingDialog(QDialog):
 
         QtO.add_form_rows(
             lineLayout,
-            [[self.file1Header, file1Widget], [self.file2Header, self.file2Widget]],
+            [
+                [self.file1Header, file1Widget],
+                [self.file2Header, self.file2Widget],
+            ],
         )
         QtO.add_widgets(topRightLayout, [lineLayout], "Center")
 
@@ -626,7 +639,11 @@ class LoadingDialog(QDialog):
         self.edgeHexEdit = QtO.new_line_edit("hex")
         QtO.add_form_rows(
             self.graphOptions.middleColumn,
-            [colorHeaderWidget, self.hexPresent, [hexHeader, self.edgeHexEdit]],
+            [
+                colorHeaderWidget,
+                self.hexPresent,
+                [hexHeader, self.edgeHexEdit],
+            ],
         )
         self.edgeHexEdit.setDisabled(True)
 
@@ -655,7 +672,8 @@ class LoadingDialog(QDialog):
 
         ## add
         QtO.add_widgets(
-            pageLayout, [pageHeader, topWidget, self.bottomWidget, 10, buttonLine]
+            pageLayout,
+            [pageHeader, topWidget, self.bottomWidget, 10, buttonLine],
         )
 
         self.resize()
@@ -1152,7 +1170,8 @@ class MovieDialogue(QDialog):
         self.pathDefaultStyle = self.pathEdit.styleSheet()
         self.changePathButton = QtO.new_button("Change...", self.get_save_path)
         QtO.add_widgets(
-            filePathLayout, [titleLabel, 5, self.pathEdit, 5, self.changePathButton]
+            filePathLayout,
+            [titleLabel, 5, self.pathEdit, 5, self.changePathButton],
         )
 
         buttons = QtO.new_layout(None)
@@ -1539,7 +1558,8 @@ class TubeOptions(QWidget):
         QtO.button_grouping([self.noTubes, self.networkTubes, self.scaledTubes])
 
         QtO.add_widgets(
-            tubeButtonLayout, [self.noTubes, self.networkTubes, self.scaledTubes]
+            tubeButtonLayout,
+            [self.noTubes, self.networkTubes, self.scaledTubes],
         )
 
         self.networkTubes.setDisabled(True)
@@ -1573,10 +1593,16 @@ class TubeOptions(QWidget):
             0.1,
             decimals=2,
             connect=self.update_clim,
+            connect_type="valueChanged",
         )
         unitTo = QLabel("to")
         self.unitMax = QtO.new_doublespin(
-            0.01, 1000000, 1, decimals=2, connect=self.update_clim
+            0.01,
+            1000000,
+            1,
+            decimals=2,
+            connect=self.update_clim,
+            connect_type="valueChanged",
         )
         QtO.add_widgets(minmaxLayout, [self.unitMin, unitTo, self.unitMax])
 
@@ -1608,7 +1634,15 @@ class TubeOptions(QWidget):
         self.updateVesselColor = QtO.new_button("Change...", self.color_change, 90)
         QtO.add_widgets(
             vColorLayout,
-            [0, vColorHeader, 4, self.vesselColor, 4, self.updateVesselColor, 0],
+            [
+                0,
+                vColorHeader,
+                4,
+                self.vesselColor,
+                4,
+                self.updateVesselColor,
+                0,
+            ],
         )
         self.vesselColorBox.hide()
 
@@ -1622,7 +1656,8 @@ class TubeOptions(QWidget):
         )
         vAnnotationHeader = QLabel("Annotation color:")
         self.vesselAnnotationType = QtO.new_combo(
-            ["Original", "Rainbow", "Shifted"], connect=self.update_vessel_annotation
+            ["Original", "Rainbow", "Shifted"],
+            connect=self.update_vessel_annotation,
         )
         QtO.add_widgets(
             vAnnotationLayout, [vAnnotationHeader, self.vesselAnnotationType]
@@ -1687,7 +1722,8 @@ class TubeOptions(QWidget):
         aBCBoxLayout = QtO.new_layout(self.aBranchColorBox, "V", no_spacing=True)
         branchAnnotationHeader = QLabel("Annotation color:")
         self.branchAnnotationType = QtO.new_combo(
-            ["Original", "Rainbow", "Shifted"], connect=self.update_branch_annotation
+            ["Original", "Rainbow", "Shifted"],
+            connect=self.update_branch_annotation,
         )
         QtO.add_widgets(
             aBCBoxLayout, [branchAnnotationHeader, self.branchAnnotationType]
@@ -1727,7 +1763,8 @@ class TubeOptions(QWidget):
         self.endColor = QtO.new_widget(20, 20, color=[0, 255, 0])
         self.updateEndColor = QtO.new_button("Change...", self.color_change, 90)
         QtO.add_widgets(
-            endColorLayout, [0, endHeader, 4, self.endColor, 4, self.updateEndColor, 0]
+            endColorLayout,
+            [0, endHeader, 4, self.endColor, 4, self.updateEndColor, 0],
         )
 
         # annotation color
@@ -1738,7 +1775,8 @@ class TubeOptions(QWidget):
         aECBoxLayout = QtO.new_layout(self.aEndColorBox, "V", no_spacing=True)
         endAnnotationHeader = QLabel("Annotation color:")
         self.endAnnotationType = QtO.new_combo(
-            ["Original", "Rainbow", "Shifted"], connect=self.update_end_annotation
+            ["Original", "Rainbow", "Shifted"],
+            connect=self.update_end_annotation,
         )
         QtO.add_widgets(aECBoxLayout, [endAnnotationHeader, self.endAnnotationType])
         self.aEndColorBox.hide()
@@ -1911,7 +1949,10 @@ class TubeOptions(QWidget):
                 )
 
             self.actors.branches = self.plotter.add_mesh(
-                mesh, show_scalar_bar=False, smooth_shading=True, reset_camera=False
+                mesh,
+                show_scalar_bar=False,
+                smooth_shading=True,
+                reset_camera=False,
             )
 
             # Update the colors
@@ -1946,7 +1987,10 @@ class TubeOptions(QWidget):
                 )
 
             self.actors.ends = self.plotter.add_mesh(
-                mesh, show_scalar_bar=False, smooth_shading=True, reset_camera=False
+                mesh,
+                show_scalar_bar=False,
+                smooth_shading=True,
+                reset_camera=False,
             )
 
             # Update the colors
@@ -2279,14 +2323,23 @@ class TubeOptions(QWidget):
         self.endAnnotationColor.setVisible(annotation != "None")
 
         QtO.signal_block(
-            True, [self.vesselFeatureColor, self.branchSingleColor, self.endSingleColor]
+            True,
+            [
+                self.vesselFeatureColor,
+                self.branchSingleColor,
+                self.endSingleColor,
+            ],
         )
         self.vesselFeatureColor.setChecked(True)
         self.branchSingleColor.setChecked(True)
         self.endSingleColor.setChecked(True)
         QtO.signal_block(
             False,
-            [self.vesselFeatureColor, self.branchSingleColor, self.endSingleColor],
+            [
+                self.vesselFeatureColor,
+                self.branchSingleColor,
+                self.endSingleColor,
+            ],
         )
 
 
@@ -2313,7 +2366,8 @@ class VolumeOptions(QWidget):
         self.originalVolume = QtO.new_radio("Original", self.add_volume)
         self.smoothedVolume = QtO.new_radio("Smoothed", self.add_volume)
         QtO.add_widgets(
-            volumeGroupLayout, [self.noVolume, self.originalVolume, self.smoothedVolume]
+            volumeGroupLayout,
+            [self.noVolume, self.originalVolume, self.smoothedVolume],
         )
 
         self.originalVolume.setDisabled(True)
@@ -2334,8 +2388,15 @@ class VolumeOptions(QWidget):
         opacityLine = QtO.new_widget()
         opacityLayout = QtO.new_layout(opacityLine, no_spacing=True)
         opacityHeader = QLabel("Opacity:")
-        self.volumeOpacity = QtO.new_spinbox(0, 100, 100, step=10, suffix="%")
-        self.volumeOpacity.editingFinished.connect(self.update_opacity)
+        self.volumeOpacity = QtO.new_spinbox(
+            0,
+            100,
+            100,
+            step=10,
+            suffix="%",
+            connect=self.update_opacity,
+            connect_type="valueChanged",
+        )
         QtO.add_widgets(opacityLayout, [opacityHeader, 4, self.volumeOpacity])
 
         QtO.add_widgets(optionsLayout, [colorLine, opacityLine], "Center")

@@ -11,6 +11,8 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 import datetime
 
+from library.ui import qt_objects as QtO, stylesheets
+
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import (
     QDialog,
@@ -22,9 +24,6 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-
-from library.ui import qt_objects as QtO
-from library.ui import stylesheets
 
 
 class LeftMenu(QFrame):

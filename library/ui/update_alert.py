@@ -13,10 +13,10 @@ import http.client as httplib
 import re
 import urllib.request
 
-from PyQt5.QtWidgets import QDialog, QLabel
-
 from library import helpers
 from library.ui import qt_objects as QtO
+
+from PyQt5.QtWidgets import QDialog, QLabel
 
 #####################
 ### Version Check ###
