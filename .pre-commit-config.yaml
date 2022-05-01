@@ -3,10 +3,6 @@ repos:
   rev: v1.3.1
   hooks:
   - id: ufmt
-# - repo: https://github.com/psf/black
-#   rev: 22.3.0
-#   hooks:
-#   - id: black
 
 - repo: https://gitlab.com/PyCQA/flake8
   rev: 3.9.2
