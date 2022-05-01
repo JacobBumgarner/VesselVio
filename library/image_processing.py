@@ -16,12 +16,13 @@ from time import perf_counter as pf
 import cv2
 import nibabel
 import numpy as np
-from skimage.io import imread
 
 from library import helpers
+from skimage.io import imread
 
 ## Global min_resolution variable
 min_resolution = 1
+
 
 ########################
 #### Volume Loading ####
@@ -34,7 +35,8 @@ def load_volume(file, verbose=False):
     if helpers.get_ext(file) == ".nii":
         try:
             volume = load_nii_volume(file)
-        except:
+        except Exception as error:
+            print(f"Could not load .nii file using nibabel: {error}")
             volume = skimage_load(file)
     else:
         volume = skimage_load(file)
@@ -62,7 +64,8 @@ def load_nii_volume(file):
 def skimage_load(file):
     try:
         volume = imread(file).astype(np.uint8)
-    except:
+    except Exception as error:
+        print(f"Unable to read image file using skimage.io.imread: {error}")
         volume = None
     return volume
 
@@ -188,10 +191,10 @@ def clear_labeled_cache():
 #### Image Processing ####
 ##########################
 def prep_resolution(resolution):
-    if type(resolution) != list:
-        r = resolution
-        resolution = np.array([r, r, r])
+    if not isinstance(resolution, list):
+        resolution = np.repeat(resolution, 3)
     else:
+        # Flip the resolution, as numpy first index will represent image depth
         resolution = np.flip(np.array(resolution))
     min_resolution = np.min(resolution)
     return resolution

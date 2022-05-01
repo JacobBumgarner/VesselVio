@@ -21,13 +21,12 @@ from time import perf_counter as pf
 
 import numpy as np
 import pyvista as pv
+
+from library import input_classes as IC
 from matplotlib.cm import get_cmap
-from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QFileDialog
 from pyvista.plotting.colors import hex_to_rgb as pv_hex_to_rgb
-
-from library import input_classes as IC
 
 
 ##########################
@@ -178,8 +177,8 @@ def load_graph(graph_format):
 
 
 def load_nii_annotation():
-    message = f"Load '.nii' file"
-    file_filter = f"nii (*.nii)"
+    message = "Load '.nii' file"
+    file_filter = "nii (*.nii)"
     file = QFileDialog.getOpenFileName(
         QFileDialog(), message, get_dir("Desktop"), file_filter
     )[0]
@@ -683,7 +682,7 @@ def create_path_actors(p, path):
     B = camera_path[0]
     C = viewup_path[0]
     v1 = A - B
-    v2 = B + C
+    # v2 = B + C
 
     b1 = v1 / np.linalg.norm(v1)
     b2 = C

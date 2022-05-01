@@ -9,19 +9,14 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
-import concurrent.futures as cf
-from itertools import chain, repeat
-from math import floor
 from multiprocessing import cpu_count
 from time import perf_counter as pf
 
 import igraph as ig
 import numpy as np
-from numba import njit
 
-from library import feature_extraction as FeatExt
-from library import helpers
-from library import volume_processing as VolProc
+from library import feature_extraction as FeatExt, helpers, volume_processing as VolProc
+from numba import njit
 
 #######################
 ### Graph Reduction ###
@@ -146,7 +141,6 @@ def g_branch_graph(g, components=False):
                 break
             gbs = gbs.subgraph(gbs.vs.select(_degree_gt=1))
         cliques = [clique for clique in gbs.maximal_cliques() if 2 < len(clique) < 5]
-    lens = [len(c) for c in cliques]
     return gbs, cliques
 
 
@@ -653,7 +647,7 @@ def create_graph(
     volume_shape, skeleton_radii, vis_radii, points, point_minima, verbose=False
 ):
     if verbose:
-        print(f"Creating Graph...", end="\r")
+        print("Creating Graph...", end="\r")
         tic = pf()
 
     # Create graph, populate graph with correct number of vertices.
