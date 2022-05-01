@@ -1,5 +1,7 @@
 [flake8]
 exclude = .git,__pycache__,build,dist,hooks
+per-file-ignores =
+    library/image_processing.py: F841
 ignore =
     # Double quotes found but single quotes preferred. Deffering to black here
     Q000,
