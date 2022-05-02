@@ -401,7 +401,7 @@ class VisualizationDialog(QDialog):
             if actor:
                 self.plotter.remove_actor(actor, reset_camera=False)
                 helpers.remove_legend(self.plotter, actor)
-                # self.plotter.remove_scalar_bar()
+
         self.actors.reset()
         self.meshes.reset()
 
@@ -1197,14 +1197,9 @@ class MovieDialogue(QDialog):
     @pyqtSlot()
     def visualize_path(self):
         self.remove_camera_actors()
-
-        first = np.array([0, 0, 0])
-        last = np.array([0, 0, 0])
         if self.movieType.currentText() == "Orbit":
             self.path = helpers.construct_orbital_path(self.plotter, 120)
         elif self.movieType.currentText() == "Flythrough":
-            first = self.path[0, 0]
-            last = self.path[-1, 0]
             if self.sender() in [self.updatePath, self.movieType]:
                 self.path = helpers.construct_flythrough_path(self.plotter, 120)
             elif self.sender() == self.updateOrientation:
@@ -1368,7 +1363,7 @@ class RenderDialogue(QDialog):
                 f"<center>Writing frame {progress}/{self.movie_options.frame_count}..."
             )
         else:
-            message = f"<center>Compressing video..."
+            message = "<center>Compressing video..."
 
         self.progressBarText.setText(message)
         self.progressBar.setValue(progress)
@@ -1846,33 +1841,10 @@ class TubeOptions(QWidget):
     def remove_tube_actors(self):
         self.showBranches.setChecked(False)
         self.showEnds.setChecked(False)
-        for actor in self.actors.iter_vessels():
-            if actor:
-                helpers.remove_legend(self.plotter, actor)
-                self.plotter.remove_actor(actor, reset_camera=False)
-        if self.genOptions.showLegend.isChecked():
-            self.genOptions.showLegend.setChecked(False)
-        else:
-            self.genOptions.showLegend.setChecked(False)
-
-        self.actors.reset()
-        return
-
-    # Remove all tube actors from the scene
-    def remove_tube_actors(self, hide_box=True):
-        for actor in self.get_vessel_actors():
-            if actor:
-                helpers.remove_legend(self.plotter, actor)
-                self.plotter.remove_actor(actor, reset_camera=False)
-        if self.genOptions.showLegend.isChecked():
-            self.genOptions.showLegend.setChecked(False)
-        else:
-            self.genOptions.showLegend.setChecked(False)
-        if hide_box:
-            self.tubeOptions.lock(True)
-            self.tubeOptions.setVisible(False)
-
-        self.actors.reset_vessels()
+        self.genOptions.showLegend.setChecked(False)
+        self.tubeOptions.lock(True)
+        self.tubeOptions.setVisible(False)
+        self.actors.destroy_vessel_actors(self.plotter)
         return
 
     @pyqtSlot()
@@ -1881,7 +1853,7 @@ class TubeOptions(QWidget):
             return
 
         # Clear old actors in case switching from
-        self.remove_tube_actors(hide_box=False)
+        self.remove_tube_actors()
         self.tubeOptions.setVisible(True)
         self.tubeOptions.lock(False)
 
@@ -2171,14 +2143,14 @@ class TubeOptions(QWidget):
     ## Mesh color and scalar updating
     # region
     def update_vessel_feature(self):
-        if self.vesselFeatureColor.isChecked() == False:
+        if not self.vesselFeatureColor.isChecked():
             return
         self.update_vessel_locking(show_feature=True)
         self.render_feature()
         return
 
     def update_vessel_color(self):
-        if self.vesselSingleColor.isChecked() == False:
+        if not self.vesselSingleColor.isChecked():
             return
         self.update_vessel_locking(show_color=True)
         rgb = helpers.get_widget_rgb(self.vesselColor)
@@ -2187,7 +2159,7 @@ class TubeOptions(QWidget):
 
     def update_vessel_annotation(self):
         self.toggle_randomization_lock()
-        if self.vesselAnnotationColor.isChecked() == False:
+        if not self.vesselAnnotationColor.isChecked():
             return
         self.update_vessel_locking(show_annotation=True)
         annotation = f"{self.vesselAnnotationType.currentText()}_RGB"
@@ -2317,8 +2289,8 @@ class TubeOptions(QWidget):
     ## Meshes updater
     def load_meshes(self, meshes, annotation):
         self.meshes = meshes
-        self.networkTubes.setDisabled(self.meshes.network == None)
-        self.scaledTubes.setDisabled(self.meshes.scaled == None)
+        self.networkTubes.setDisabled(self.meshes.network is None)
+        self.scaledTubes.setDisabled(self.meshes.scaled is None)
         self.vesselAnnotationColor.setVisible(annotation != "None")
         self.branchAnnotationColor.setVisible(annotation != "None")
         self.endAnnotationColor.setVisible(annotation != "None")
@@ -2413,14 +2385,12 @@ class VolumeOptions(QWidget):
         return
 
     ## Actor addition and removal
-    def remove_volume_actors(self, hide_box=True):
-        if self.actors.volume:
-            self.plotter.remove_actor(self.actors.volume, reset_camera=False)
+    def remove_volume_actors(self):
+        self.actors.destroy_volume_actors(self.plotter)
         self.toggle_options()
 
-        if hide_box:
-            self.volumeOptions.lock(True)
-            self.volumeOptions.setVisible(False)
+        self.volumeOptions.lock(True)
+        self.volumeOptions.setVisible(False)
 
         return
 
@@ -2443,7 +2413,7 @@ class VolumeOptions(QWidget):
         self.volumeOptions.setVisible(True)
 
         # remove old meshes
-        self.remove_volume_actors(hide_box=False)
+        self.remove_volume_actors()
         self.actors.volume = self.plotter.add_mesh(
             mesh,
             show_scalar_bar=False,
@@ -2485,8 +2455,8 @@ class VolumeOptions(QWidget):
 
     def load_meshes(self, meshes):
         self.meshes = meshes
-        self.originalVolume.setDisabled(self.meshes.original == None)
-        self.smoothedVolume.setDisabled(self.meshes.smoothed == None)
+        self.originalVolume.setDisabled(self.meshes.original is None)
+        self.smoothedVolume.setDisabled(self.meshes.smoothed is None)
 
 
 ###############

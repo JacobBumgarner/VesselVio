@@ -14,37 +14,12 @@ from time import perf_counter as pf
 
 import matplotlib
 import matplotlib.pyplot as plt
-<<<<<<< Updated upstream
 import mcubes
 import numpy as np
 import pyvista as pv
 
-=======
-<<<<<<< Updated upstream
-
-from multiprocessing import cpu_count
-
-from library import image_processing as ImProc
-from library import volume_processing as VolProc
-from library import input_classes as IC
-from library import helpers
-=======
-import mcubes
-import numpy as np
-import pyvista as pv
-
->>>>>>> Stashed changes
-from library import (
-    helpers,
-    image_processing as ImProc,
-    input_classes as IC,
-    volume_processing as VolProc,
-)
+from library import helpers, input_classes as IC, volume_processing as VolProc
 from numba import njit, prange
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 
 ############################
@@ -260,7 +235,7 @@ def create_splines(bottom, top):
         if construct_scaled:
             scaled_tube = line.tube(
                 radius=s["vis_radius"], n_sides=tube_sides, capping=False
-            )  ###########
+            )
             scaled_tubes.append(scaled_tube)
 
     return [network_tubes, scaled_tubes]
@@ -569,7 +544,7 @@ def mesh_construction(
     if application:
         return meshes
 
-    if vis_options.create_movie == True:
+    if not vis_options.create_movie:
         p = pv.Plotter(multi_samples=8, window_size=[2928, 1824], off_screen=True)
     else:
         # p = pv.Plotter(window_size=[1800,1800],lighting='light_kit')

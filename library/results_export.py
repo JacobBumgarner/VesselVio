@@ -13,27 +13,11 @@ import csv
 import os
 from decimal import Decimal, InvalidOperation
 
-<<<<<<< Updated upstream
 from library import helpers
 
-=======
-<<<<<<< Updated upstream
-import csv
-=======
-from library import helpers
-
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 from openpyxl import load_workbook
 from pyexcelerate import Alignment, Font, Style, Workbook
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-from library import helpers
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 ###########################
 ### Results Header Text ###
@@ -62,11 +46,10 @@ def load_headers():
         "Mean Segment Volume",
         "Mean Segment Surface Area",
     ]
-    bins = []
     for i in range(3):
         for i in range(20):
-            bin = str(i) + " - " + str(i + 1)
-            results_header.append(bin)
+            bin_range = str(i) + " - " + str(i + 1)
+            results_header.append(bin_range)
         results_header.append("20+")
     results_header = [results_topper, results_header]
 
@@ -111,7 +94,7 @@ def read_ws(ws):
 def write_results(results_folder, image_dimensions=3, verbose=False):
     if verbose:
         print("Exporting results...", end="\r")
-    if os.path.exists(results_folder) == False:
+    if not os.path.exists(results_folder):
         os.mkdir(results_folder)
 
     results_header, segment_results_header = load_headers()

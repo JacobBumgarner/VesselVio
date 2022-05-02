@@ -14,7 +14,7 @@ from time import perf_counter as pf
 
 import nibabel
 import numpy as np
-from numba import njit, objmode, prange
+from numba import njit, prange
 from skimage.morphology import skeletonize_3d
 
 
@@ -244,6 +244,7 @@ def build_Euler_key():
 
 
 E_octant = load_Euler_octants()
+
 
 #######################
 ### Octree Labeling ###
@@ -556,20 +557,20 @@ def load_test(size):
 
 
 if __name__ == "__main__":
-    # print ("JIT")
-    # volume = load_test(2)
-    # skeleton = skeletonize(volume)
+    print("JIT")
+    volume = load_test(2)
+    skeleton = skeletonize(volume)
 
-    # volume = load_volume()
-    # skeleton = np.ascontiguousarray(volume.copy())
-    # print ("Numba")
-    # t = pf()
-    # skeleton = skeletonize(skeleton, verbose=True)
-    # print (pf() - t)
+    volume = load_volume()
+    skeleton = np.ascontiguousarray(volume.copy())
+    print("Numba")
+    t = pf()
+    skeleton = skeletonize(skeleton, verbose=True)
+    print(pf() - t)
 
-    # print ("IAC")
-    # volume = load_volume()
-    # t = pf()
-    # skeleton = skeletonize_3d(volume)
-    # print (pf() - t)
+    print("IAC")
+    volume = load_volume()
+    t = pf()
+    skeleton = skeletonize_3d(volume)
+    print(pf() - t)
     print(build_Euler_key())

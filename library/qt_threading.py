@@ -8,42 +8,13 @@ __copyright__ = "Copyright 2022 by Jacob Bumgarner"
 __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-from PyQt5.QtCore import QThread, pyqtSignal
-=======
-import os
-from time import perf_counter as pf, sleep
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 import os
 from time import perf_counter as pf, sleep
 
 import igraph as ig
-import nibabel
-<<<<<<< Updated upstream
 import numpy as np
 
-=======
-<<<<<<< Updated upstream
-
-
-from library import image_processing as ImProc
-from library import graph_io as GIO
-from library import graph_processing as GProc
-from library import feature_extraction as FeatExt 
-from library import results_export as ResExp
-from library import volume_processing as VolProc
-from library import volume_visualization as VolVis
-from library import annotation_processing as AnnProc
-from library import input_classes as IC
-from library import helpers
-=======
-import numpy as np
-
->>>>>>> Stashed changes
 from library import (
     annotation_processing as AnnProc,
     feature_extraction as FeatExt,
@@ -57,10 +28,6 @@ from library import (
     volume_visualization as VolVis,
 )
 from PyQt5.QtCore import pyqtSignal, QThread
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 
 ################
@@ -110,7 +77,7 @@ class VolumeThread(QThread):
                 speeds = []
 
                 ## File initialization
-                if self.running == False:
+                if not self.running:
                     self.analysis_status.emit([i, "Canceled."])
                     break
                 self.selection_signal.emit(i)
@@ -139,14 +106,14 @@ class VolumeThread(QThread):
                         if not helpers.check_storage(volume_file):
                             file_size = helpers.get_file_size(volume_file, GB=True)
                             self.analysis_status.emit(
-                                [i, f"Error: Insufficient disk space"]
+                                [i, "Error: Insufficient disk space"]
                             )
                             if file_size > self.disk_space_error:
                                 self.disk_space_error = file_size
                             file_analyzed = False
                             break
 
-                        self.analysis_status.emit([i, f"Labeling volume..."])
+                        self.analysis_status.emit([i, "Labeling volume..."])
                         ROI_sub_array = ROI_array[j : j + 255]
                         ROI_volumes, minima, maxima = AnnProc.volume_labeling_input(
                             volume,
@@ -156,7 +123,7 @@ class VolumeThread(QThread):
                         )
 
                         if ROI_volumes is None:
-                            self.analysis_status.emit([i, f"Error labeling volume..."])
+                            self.analysis_status.emit([i, "Error labeling volume..."])
                             file_analyzed = False
                             break
 
@@ -171,7 +138,7 @@ class VolumeThread(QThread):
 
                     # Make sure the volume is still present after ROI segmentation
                     if not ROI_volume or not ImProc.volume_check(volume):
-                        self.analysis_status.emit([i, f"ROI not in dataset..."])
+                        self.analysis_status.emit([i, "ROI not in dataset..."])
                         # Cache results
                         ResExp.cache_result([filename, ROI_name, "ROI not in dataset."])
                         continue
@@ -204,9 +171,8 @@ class VolumeThread(QThread):
                     volume_shape = volume.shape
 
                 del volume
-                volume = None
 
-                if self.running == False:
+                if not self.running:
                     self.analysis_status.emit([i, "Canceled."])
                     break
 
@@ -235,7 +201,7 @@ class VolumeThread(QThread):
 
                 #####
                 speeds.append(pf() - fp)
-                r = pf()
+                # r = pf()
                 #####
 
                 self.analysis_status.emit([i, "Analyzing features..."])
@@ -495,13 +461,13 @@ class VolumeVisualizationThread(QThread):
                         self.complete = True
                         return
 
-                    self.analysis_status.emit([f"Labeling volume...", progress])
+                    self.analysis_status.emit(["Labeling volume...", progress])
                     ROI_sub_array = ROI_array[i : i + 255]
                     ROI_volumes, minima, maxima = AnnProc.volume_labeling_input(
                         volume, annotation_file, ROI_sub_array, annotation_type
                     )
                     if ROI_volumes is None:
-                        self.analysis_status.emit([f"Error labeling volume...", 0])
+                        self.analysis_status.emit(["Error labeling volume...", 0])
                         break
 
                 ROI_volume = ROI_volumes[ROI_id]
@@ -514,7 +480,7 @@ class VolumeVisualizationThread(QThread):
 
                 if not ROI_volume or not ImProc.volume_check(volume):
                     progress += step_weight * 7
-                    self.analysis_status.emit([f"ROI not in dataset...", progress])
+                    self.analysis_status.emit(["ROI not in dataset...", progress])
                     continue
 
             else:
@@ -701,7 +667,7 @@ class GraphVisualizationThread(QThread):
         except Exception as error:
             self.analysis_status.emit(
                 [
-                    f"Graph loading error: Check that all options were correct when loading the graph.",
+                    f"Graph loading error: Check that all options were correct when loading the grap. {error}",
                     0,
                 ]
             )

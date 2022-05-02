@@ -85,14 +85,14 @@ class InfoStrip(QWidget):
     def infoclick(self):
         text = f"""<center>
                     <b>Version {self.version[2:]}</b><br><br>
-                    A tutorial on how to use VesselVio can be found <a href='https://jacobbumgarner.github.io/VesselVio/Instructions.html'>on our website</a>.<br><br> 
-                    
-                    
+                    A tutorial on how to use VesselVio can be found <a href='https://jacobbumgarner.github.io/VesselVio/Instructions.html'>on our website</a>.<br><br>
+
+
                     VesselVio was developed by Jacob Bumgarner in Randy Nelson's lab at West Virginia University.   This software is <a href='https://github.com/JacobBumgarner/VesselVio'>open-source</a> under the GNU GPLv3 license.<br><br>
-                    
+
                     Don't forget to cite us if you use the program in your research!<br><br>
-                    
-                    Please <a href='mailto:vesselvio@gmail.com'>contact us</a> with any suggestions, issues, or questions.                    
+
+                    Please <a href='mailto:vesselvio@gmail.com'>contact us</a> with any suggestions, issues, or questions.
                     """
 
         msgBox = QDialog()

@@ -11,6 +11,8 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 import os
 
+from library import helpers
+
 
 class AnalysisOptions:
     def __init__(
@@ -252,9 +254,19 @@ class PyVistaActors:
             if item != "volume":
                 yield (self.__dict__[item])
 
-    def reset_vessels(self):
-        self.vessels = None
-        self.vessel_caps = None
+    def destroy_vessel_actors(self, plotter):
+        for key in ["vessels", "vessel_caps", "branches", "ends"]:
+            actor = self.__dict__[key]
+            if actor:
+                helpers.remove_legend(plotter, actor)
+                plotter.remove_actor(actor, reset_camera=False)
+                self.__dict__[actor] = None
+
+    def destroy_volume_actors(self, plotter):
+        if self.volume:
+            self.volume = None
+            helpers.remove_legend(plotter, self.volume)
+            plotter.remove_actor(self.volume, reset_camera=False)
 
     def reset(self):
         items = list(self.__dict__.keys())

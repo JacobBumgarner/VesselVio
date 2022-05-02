@@ -12,26 +12,13 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 from time import perf_counter as pf
 
 import numpy as np
-<<<<<<< Updated upstream
-=======
 
 from library import lee94, radii_corrections as RadCor
-from numba import njit, prange
->>>>>>> Stashed changes
 
-from library import lee94, radii_corrections as RadCor
 from numba import njit, prange
 from scipy.ndimage import label
 from skimage.morphology import skeletonize_3d
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-from library import radii_corrections as RadCor
-from library import lee94
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 #######################
 ### Volume Bounding ###

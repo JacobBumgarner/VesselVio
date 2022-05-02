@@ -1,7 +1,7 @@
 """
 A numba-based implementation of the Palagyi and Kuba 1999 12-subiteration thinning algorithm.
 https://www.sciencedirect.com/science/article/pii/S1077316999904987
-This code was HEAVILY inspired and sourced from Christoph Kirst's TubeMap skeletonization code: 
+This code was HEAVILY inspired and sourced from Christoph Kirst's TubeMap skeletonization code:
 https://github.com/ChristophKirst/ClearMap2
 Ultimately, VesselVio does not implement the PK12 algorithm.
 """
@@ -487,6 +487,7 @@ Kirst creates the tables using right-shifted ints & 0x01 in range(2**26) to crea
 Unfortunately, this algorithm produces skeletons that are not as well-structured as the Lee '94 algorithm, so it wasn't used for the program. However, it has been left for potential future implementations.
 """
 
+
 ###########
 ### JIT ###
 ###########
@@ -537,7 +538,7 @@ def PK12_skeletonize(volume, verbose=False):
         keep = np.ones(border.shape[0], bool)
 
         removal_count = 0
-        examine = np.ones(border_points.shape[0], bool)
+        # examine = np.ones(border_points.shape[0], bool)
         for i in range(12):
             point_fate = PK12_LUT[convolve_input(volume, templates[i], border_points)]
             removals = border_points[point_fate]

@@ -18,11 +18,10 @@ import numpy as np
 from library import feature_extraction as FeatExt, helpers, volume_processing as VolProc
 from numba import njit
 
+
 #######################
 ### Graph Reduction ###
 #######################
-
-
 def simplify_graph(
     g,
     reduced_edges,

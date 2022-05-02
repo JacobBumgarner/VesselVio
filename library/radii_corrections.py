@@ -1,6 +1,6 @@
 """
 The Euclidian Distance Transformation (EDT) algorithm equation calculates point distance between the centers of voxels/pixels.
-Because of this, radius of vessel segments is overestimated, as the true 'edge' of the vessel exists at the border of the nearest black voxel, not the center. 
+Because of this, radius of vessel segments is overestimated, as the true 'edge' of the vessel exists at the border of the nearest black voxel, not the center.
 
 This program calculates the EDT to the edge of face-connected voxels rather than their centers. Edge and corner voxel EDTS are computed normally.
 
@@ -106,7 +106,8 @@ def load_corrections(
             if rebuild:
                 LUT = build(resolution)
 
-        except:
+        except Exception as error:
+            print(f"Unexpected error encountered: {error}")
             LUT = build(resolution)
 
     return LUT

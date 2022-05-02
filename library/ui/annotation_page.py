@@ -11,10 +11,9 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 import json
 import os
-import sys
 
 from library import annotation_processing as AnProc, helpers
-from library.ui import qt_objects as QtO, stylesheets as Styles
+from library.ui import qt_objects as QtO
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
@@ -22,7 +21,6 @@ from PyQt5.QtWidgets import (
     QApplication,
     QCompleter,
     QDialog,
-    QFileDialog,
     QGroupBox,
     QHeaderView,
     QLabel,
@@ -106,7 +104,6 @@ class AnnotationPage(QWidget):
         completer.activated.connect(self.find_search)
 
         spacingwidget = QtO.new_widget(fixed_height=40)
-        spacinglayout = QtO.new_layout(spacingwidget, no_spacing=True)
 
         QtO.add_widgets(c2Layout, [self.search_bar, 5, self.aTree, spacingwidget])
 
@@ -166,9 +163,9 @@ class AnnotationPage(QWidget):
             except KeyError:
                 msgbox = QMessageBox()
                 message = """
-                <center>Error loading tree file.<br><br> Make sure all tree information was typed correctly and that the tree item contains the following identifiers:<br> 
+                <center>Error loading tree file.<br><br> Make sure all tree information was typed correctly and that the tree item contains the following identifiers:<br>
                 - Name<br>
-                - ID<br> 
+                - ID<br>
                 - Color<br>
                 - Children<br><br>
                 Each tree should be loaded with a root structure that contains all items.
@@ -497,7 +494,7 @@ class LoadTreeFile(QDialog):
         advancedOptions = QtO.CollapsibleBox("AdvancedOptions", advanced_help)
         advancedLayout = QtO.new_layout(None, "V", no_spacing=True)
 
-        info = QLabel("<b><center>JSON Identifiers - Case Sensitive!</b>")
+        # info = QLabel("<b><center>JSON Identifiers - Case Sensitive!</b>")
         nameLayout = QtO.new_layout()
         name = QLabel("Name: ")
         self.nameEdit = QtO.new_line_edit("name", "Right", 150)
@@ -564,7 +561,7 @@ class RGB_Warning(QMessageBox):
         self.setWindowTitle("Warning!")
         message = """<center><b>Warning!</b>
         The same color was found in multiple annotation regions.<br><br>
-        Using this annotation file will cause the same structure to be included in multiple regions.<br><br> 
+        Using this annotation file will cause the same structure to be included in multiple regions.<br><br>
         Are you sure you want to continue with the analysis? <br>
         (Not recommended!)"""
         self.setText(message)

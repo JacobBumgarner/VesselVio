@@ -10,26 +10,10 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
 import os
-import re
 import time
 
 import igraph as ig
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-from library import image_processing as ImProc
-from library import graph_io as GIO
-from library import graph_processing as GProc
-from library import feature_extraction as FeatExt 
-from library import results_export as ResExp
-from library import volume_processing as VolProc
-from library import volume_visualization as VolVis
-from library import annotation_processing as AnnProc
-from library import input_classes as IC
-from library import helpers
-=======
->>>>>>> Stashed changes
 from library import (
     annotation_processing as AnnProc,
     feature_extraction as FeatExt,
@@ -42,10 +26,6 @@ from library import (
     volume_processing as VolProc,
     volume_visualization as VolVis,
 )
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 
 #######################

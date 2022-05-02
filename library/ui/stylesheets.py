@@ -12,15 +12,15 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 # Style Sheets
 buttonstyle = """
     QPushButton{
-        border: 1px solid rgb(217, 209, 207); 
-        border-radius: 0.3em; 
-        padding: 1px; 
-        width: 60px; 
-        color: black; 
+        border: 1px solid rgb(217, 209, 207);
+        border-radius: 0.3em;
+        padding: 1px;
+        width: 60px;
+        color: black;
         background: white;}
     QPushButton:pressed{
-        border: none; 
-        color: white; 
+        border: none;
+        color: white;
         background-color:rgb(42, 113, 227);}
     """
 
