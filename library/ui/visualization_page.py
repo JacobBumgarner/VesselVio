@@ -936,8 +936,7 @@ class TopWidget(QWidget):
 
     def movie(self):
         self.toggle_splitter(lock=True)
-        movie_dir = helpers.load_movie_dir()
-        self.movieDialogue = MovieDialogue(self.plotter, movie_dir, self.mainWindow)
+        self.movieDialogue = MovieDialogue(self.plotter, self.mainWindow)
         self.movieDialogue.accepted.connect(self.render_movie)
         self.movieDialogue.rejected.connect(self.delete_movie_dialogue)
         self.movieDialogue.show()

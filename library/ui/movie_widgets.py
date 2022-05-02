@@ -39,7 +39,7 @@ class OrbitWidget(QWidget):
     def __init__(self, plotter):
         super().__init__()
         self.plotter = plotter
-        self.pathActors = IC.CameraActors()
+        self.cameraActors = IC.CameraActors()
 
         layout = QtO.new_form_layout(self)
 
@@ -55,6 +55,8 @@ class OrbitWidget(QWidget):
             layout, [[pathLabel, updateOrbit], [lengthLabel, self.movieLength]]
         )
 
+        self.update_orbit()
+
     def update_orbit(self):
         path_seed = self.plotter.camera_position
         self.orbit_path = MovProc.generate_orbital_path(path_seed)
@@ -62,21 +64,22 @@ class OrbitWidget(QWidget):
         return
 
     def update_path_actors(self):
-        self.pathActors = MovProc.create_orbit_path_actors(
+        self.cameraActors = MovProc.generate_orbit_path_actors(
             self.plotter, self.orbit_path
         )
         return
 
     def remove_path_actors(self):
-        for actor in self.pathActors:
-            self.plotter.remove_actor(actor)
-            del actor
+        for actor in self.cameraActors.iter_actors():
+            if actor:
+                self.plotter.remove_actor(actor)
+                del actor
         return
 
-    def return_final_path(self, framerate):
-        frames = MovProc.time_to_frames(framerate, self.moveLength.value())
-        path_seed = self.orbit_path[0]
-        return MovProc.generate_orbital_path(path_seed, frames)
+    def generate_final_path(self, framerate):
+        frames = MovProc.orbit_time_to_frames(framerate, self.movieLength.value())
+        self.plotter.camera_position = self.orbit_path[0]
+        return MovProc.generate_orbital_path(self.plotter.camera_position, frames)
 
 
 class FlythroughWidget(QWidget):
@@ -109,6 +112,10 @@ class FlythroughWidget(QWidget):
         return
 
     def remove_path_actors(self):
+
+        return
+
+    def update_orbit(self):
 
         return
 
@@ -190,8 +197,8 @@ class MovieDialogue(QDialog):
         pathBox = QGroupBox()
         boxLayout = QtO.new_layout(pathBox, "V")
 
-        self.orbitWidget = OrbitWidget()
-        self.flythroughWidget = FlythroughWidget()
+        self.orbitWidget = OrbitWidget(self.plotter)
+        self.flythroughWidget = FlythroughWidget(self.plotter)
         self.flythroughWidget.setVisible(False)
 
         QtO.add_widgets(boxLayout, [0, self.orbitWidget, self.flythroughWidget, 0])
@@ -224,7 +231,6 @@ class MovieDialogue(QDialog):
         self.setWindowFlags(self.windowFlags() ^ Qt.WindowStaysOnTopHint)
 
         self.set_fixed_size()
-        return
 
     def toggle_path_options(self):
         """Toggle the visbiility of the rendering path options"""
@@ -258,7 +264,7 @@ class MovieDialogue(QDialog):
         # Get the plotter path
         framerate = int(self.movieFPS.currentText())
         if self.movieType.currentText() == "Orbit":
-            self.path = self.orbitWidget.return_final_path(framerate)
+            self.path = self.orbitWidget.generate_final_path(framerate)
         elif self.movieType.currentText() == "Flythrough":
             self.path = MovProc.update_flythrough_frames(
                 self.path, self.movieFrames.value()
@@ -268,7 +274,7 @@ class MovieDialogue(QDialog):
             self.savePathEdit.text(),
             self.movieResolution.currentText(),
             framerate,
-            self.movieFrames.value(),
+            self.path.shape[0],
             self.path,
         )
 
@@ -299,7 +305,6 @@ class MovieDialogue(QDialog):
         """Throw a warning if a save path hasn't been selected"""
         self.savePathEdit.setStyleSheet("border: 1px solid red;")
         self.savePathEdit.setText("Select save path")
-        return
 
     # Window management
     def set_fixed_size(self):
@@ -313,10 +318,13 @@ class MovieDialogue(QDialog):
         else:
             event.accept()
 
-    def closeEvent(self, event=None):
+    def remove_camera_actors(self):
         """Remove all of the path actors and close the widget"""
+        self.orbitWidget.remove_path_actors()
+        self.flythroughWidget.remove_path_actors()
+
+    def closeEvent(self, event=None):
         self.remove_camera_actors()
-        self.plotter.camera_position = self.path[0]
         self.reject()
 
 
@@ -367,7 +375,6 @@ class RenderDialogue(QDialog):
 
         self.current_frame = 0
         self.movieRenderer.start()
-        return
 
     def advance_frame(self):
         self.current_frame += 1
@@ -395,25 +402,21 @@ class RenderDialogue(QDialog):
 
         self.progressBarText.setText(message)
         self.progressBar.setValue(progress)
-        return
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.cancel()
         else:
             event.accept()
-        return
 
     def cancel(self):
         # Don't delete movie, just end it.
         self.movieRenderer.rendering = False
-        return
 
     def rendering_complete(self):
         self.movieRenderer.quit()
         self.plotter.mwriter.close()
         self.accept()
-        return
 
 
 if __name__ == "__main__":

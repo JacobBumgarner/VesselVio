@@ -11,7 +11,6 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 import os
 import sys
 
-
 os.environ["QT_MAC_WANTS_LAYER"] = "1"
 
 from multiprocessing import freeze_support
