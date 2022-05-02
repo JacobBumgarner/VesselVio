@@ -4,6 +4,7 @@ per-file-ignores =
     library/image_processing.py:F841
     library/volume_visualization.py:F401
     library/ui/visualization_page.py:F401
+    library/ui/movie_widgets.py:F401
 ignore =
     # Double quotes found but single quotes preferred. Deffering to black here
     Q000,
