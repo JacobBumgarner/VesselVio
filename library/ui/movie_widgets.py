@@ -1,13 +1,116 @@
+import sys
+
 import imageio_ffmpeg  # Needed for PyInstaller
 import numpy as np
+
+import pyvista as pv
 from imageio import get_writer
 
-from library import helpers, input as IC, qt_threading as QtTh
+from library import (
+    helpers,
+    input_classes as IC,
+    movie_processing as MovProc,
+    qt_threading as QtTh,
+)
 from library.ui import qt_objects as QtO
 
 from PyQt5.Qt import pyqtSlot
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QGroupBox, QLabel, QProgressBar
+from PyQt5.QtWidgets import (
+    QApplication,
+    QDialog,
+    QGroupBox,
+    QLabel,
+    QMainWindow,
+    QProgressBar,
+    QWidget,
+)
+
+
+class OrbitWidget(QWidget):
+    """The dialogue used to create an orbital movie around a mesh.
+
+    Parameters
+    ----------
+    plotter: PyVista.Plotter
+
+    """
+
+    def __init__(self, plotter):
+        super().__init__()
+        self.plotter = plotter
+        self.pathActors = IC.CameraActors()
+
+        layout = QtO.new_form_layout(self)
+
+        pathLabel = QLabel("Camera Path")
+        updateOrbit = QtO.new_button("Update", self.update_orbit)
+
+        lengthLabel = QLabel("Movie Duration")
+        self.movieLength = QtO.new_doublespin(
+            1, 1000, 10, 100, alignment="Center", suffix="s"
+        )
+
+        QtO.add_form_rows(
+            layout, [[pathLabel, updateOrbit], [lengthLabel, self.movieLength]]
+        )
+
+    def update_orbit(self):
+        path_seed = self.plotter.camera_position
+        self.orbit_path = MovProc.generate_orbital_path(path_seed)
+        self.update_path_actors()
+        return
+
+    def update_path_actors(self):
+        self.pathActors = MovProc.create_orbit_path_actors(
+            self.plotter, self.orbit_path
+        )
+        return
+
+    def remove_path_actors(self):
+        for actor in self.pathActors:
+            self.plotter.remove_actor(actor)
+            del actor
+        return
+
+    def return_final_path(self, framerate):
+        frames = MovProc.time_to_frames(framerate, self.moveLength.value())
+        path_seed = self.orbit_path[0]
+        return MovProc.generate_orbital_path(path_seed, frames)
+
+
+class FlythroughWidget(QWidget):
+    """The dialogue used to create a path-based movie of a mesh.
+
+    Parameters
+    ----------
+    plotter: PyVista.Plotter
+
+    """
+
+    def __init__(self, plotter):
+        super().__init__()
+        layout = QtO.new_form_layout(self)
+
+        pathLabel = QLabel("Camera Path")
+        updateOrbit = QtO.new_button("Update", self.update_orbit)
+
+        lengthLabel = QLabel("Step Duration")
+        self.movieLength = QtO.new_doublespin(
+            1, 1000, 10, 100, alignment="Center", suffix="s"
+        )
+
+        QtO.add_form_rows(
+            layout, [[pathLabel, updateOrbit], [lengthLabel, self.movieLength]]
+        )
+
+    def add_path_actors(self):
+
+        return
+
+    def remove_path_actors(self):
+
+        return
 
 
 class MovieDialogue(QDialog):
@@ -31,8 +134,6 @@ class MovieDialogue(QDialog):
         self.plotter = plotter
         self.movie_dir = helpers.load_movie_dir()
 
-        self.pathActors = IC.CameraActors()
-
         self.setWindowTitle("Movie Options")
 
         ## Layout, two rows
@@ -52,9 +153,8 @@ class MovieDialogue(QDialog):
 
         typeLabel = QLabel("Movie Type:")
         self.movieType = QtO.new_combo(
-            ["Orbit", "Flythrough"], 120, connect=self.toggle_type
+            ["Orbit", "Flythrough"], 120, connect=self.toggle_path_options
         )
-        self.movieType.currentIndexChanged.connect(self.visualize_path)
 
         formatLabel = QLabel("File Format:")
         self.movieFormat = QtO.new_combo(
@@ -70,9 +170,6 @@ class MovieDialogue(QDialog):
         self.movieFPS = QtO.new_combo(["24", "30", "60"], 120)
         self.movieFPS.setCurrentIndex(1)
 
-        frameLabel = QLabel("Movie Frames:")
-        self.movieFrames = QtO.new_spinbox(60, 100000, 120, step=10, width=120)
-
         QtO.add_form_rows(
             optionsLayout,
             [
@@ -80,7 +177,6 @@ class MovieDialogue(QDialog):
                 [formatLabel, self.movieFormat],
                 [resolutionLabel, self.movieResolution],
                 [fpsLabel, self.movieFPS],
-                [frameLabel, self.movieFrames],
             ],
         )
 
@@ -89,31 +185,18 @@ class MovieDialogue(QDialog):
         # Top right
         pathColumn = QtO.new_widget(260)
         pathColumnLayout = QtO.new_layout(pathColumn, orient="V", no_spacing=True)
-        pathColumnHeader = QLabel("<b>Path Options")
+        self.pathColumnHeader = QLabel("<b>Path Options")
 
         pathBox = QGroupBox()
         boxLayout = QtO.new_layout(pathBox, "V")
 
-        pathLayout = QtO.new_form_layout()
+        self.orbitWidget = OrbitWidget()
+        self.flythroughWidget = FlythroughWidget()
+        self.flythroughWidget.setVisible(False)
 
-        pathHeader = QLabel("Camera path:")
-        self.updatePath = QtO.new_button("Update", self.visualize_path)
+        QtO.add_widgets(boxLayout, [0, self.orbitWidget, self.flythroughWidget, 0])
 
-        self.orientationHeader = QLabel("Camera Orientation:")
-        self.updateOrientation = QtO.new_button("Update", self.visualize_path)
-        self.orientationHeader.setVisible(False)
-        self.updateOrientation.setVisible(False)
-
-        QtO.add_form_rows(
-            pathLayout,
-            [
-                [pathHeader, self.updatePath],
-                [self.orientationHeader, self.updateOrientation],
-            ],
-        )
-        QtO.add_widgets(boxLayout, [0, pathLayout, 0])
-
-        QtO.add_widgets(pathColumnLayout, [pathColumnHeader, pathBox])
+        QtO.add_widgets(pathColumnLayout, [self.pathColumnHeader, pathBox])
 
         QtO.add_widgets(topRowLayout, [optionsColumn, pathColumn])
 
@@ -121,16 +204,16 @@ class MovieDialogue(QDialog):
         filePathWidget = QtO.new_widget()
         filePathLayout = QtO.new_layout(filePathWidget, no_spacing=True)
         titleLabel = QLabel("Save path:")
-        self.pathEdit = QtO.new_line_edit("None", 150, locked=True)
-        self.pathDefaultStyle = self.pathEdit.styleSheet()
+        self.savePathEdit = QtO.new_line_edit("None", 150, locked=True)
+        self.pathDefaultStyle = self.savePathEdit.styleSheet()
         self.changePathButton = QtO.new_button("Change...", self.get_save_path)
         QtO.add_widgets(
-            filePathLayout, [titleLabel, 5, self.pathEdit, 5, self.changePathButton]
+            filePathLayout, [titleLabel, 5, self.savePathEdit, 5, self.changePathButton]
         )
 
         buttons = QtO.new_layout(None)
         cancelButton = QtO.new_button("Cancel", self.closeEvent)
-        renderButton = QtO.new_button("Render", self.return_results)
+        renderButton = QtO.new_button("Render", self.return_movie_path)
         QtO.add_widgets(buttons, [0, cancelButton, renderButton])
 
         QtO.button_defaulting(cancelButton, False)
@@ -140,110 +223,101 @@ class MovieDialogue(QDialog):
 
         self.setWindowFlags(self.windowFlags() ^ Qt.WindowStaysOnTopHint)
 
-        self.resize()
-
-        self.visualize_path()
-
+        self.set_fixed_size()
         return
 
-    # Movie path procesing
-    @pyqtSlot()
-    def visualize_path(self):
-        self.remove_camera_actors()
+    def toggle_path_options(self):
+        """Toggle the visbiility of the rendering path options"""
+        show_orbit = True if self.movieType.currentText() == "Orbit" else False
 
-        if self.movieType.currentText() == "Orbit":
-            self.path = helpers.construct_orbital_path(self.plotter, 120)
-        elif self.movieType.currentText() == "Flythrough":
-            if self.sender() in [self.updatePath, self.movieType]:
-                self.path = helpers.construct_flythrough_path(self.plotter, 120)
-            elif self.sender() == self.updateOrientation:
-                self.path = helpers.update_flythrough_orientation(
-                    self.plotter, self.path, 120
-                )
+        # Update the path options header
+        options_text = "Orbit Options" if show_orbit else "Flythrough Options"
+        self.pathColumnHeader.setText(options_text)
 
-        # Create camera actor
-        self.pathActors = helpers.create_path_actors(self.plotter, self.path)
-        return
+        # Remove the path actors
+        self.orbitWidget.remove_path_actors()
+        self.flythroughWidget.remove_path_actors()
 
-    def remove_camera_actors(self):
-        for actor in self.pathActors.iter_actors():
-            if actor:
-                self.plotter.remove_actor(
-                    self.pathActors.iter_actors(), reset_camera=False
-                )
-        self.pathActors.reset_actors()
-        return
+        # Update the widget visibility
+        self.orbitWidget.setVisible(show_orbit)
+        self.flythroughWidget.setVisible(not show_orbit)
+        if show_orbit:  # Add a defaul orbit from the current view
+            self.orbitWidget.update_orbit()
 
-    def toggle_type(self):
-        show = False if self.movieType.currentText() == "Orbit" else True
-        self.orientationHeader.setVisible(show)
-        self.updateOrientation.setVisible(show)
-        self.resize()
+        self.set_fixed_size()
 
-    def return_results(self):
-        if self.pathEdit.text() in ["None", "Select save path"]:
-            self.path_warning()
+    def return_movie_path(self):
+        """Return the generated path, if created."""
+        if self.savePathEdit.text() in ["None", "Select save path"]:
+            self.save_path_warning()
             return
 
         # Make sure the save path exists
-        helpers.prep_media_dir(self.pathEdit.text())
+        helpers.prep_media_dir(self.savePathEdit.text())
 
-        # Get the at-frame path
+        # Get the plotter path
+        framerate = int(self.movieFPS.currentText())
         if self.movieType.currentText() == "Orbit":
-            self.path = helpers.update_orbit_frames(self.path, self.movieFrames.value())
+            self.path = self.orbitWidget.return_final_path(framerate)
         elif self.movieType.currentText() == "Flythrough":
-            self.path = helpers.update_flythrough_frames(
+            self.path = MovProc.update_flythrough_frames(
                 self.path, self.movieFrames.value()
             )
+
         self.movie_settings = IC.MovieOptions(
-            self.pathEdit.text(),
+            self.savePathEdit.text(),
             self.movieResolution.currentText(),
-            int(self.movieFPS.currentText()),
+            framerate,
             self.movieFrames.value(),
             self.path,
         )
 
         self.remove_camera_actors()
         self.accept()
-        return
 
     # File path processing
     def get_save_path(self):
-        format = self.movieFormat.currentText().lower()
-        path = helpers.get_save_file("Save movie as...", self.movie_dir, format)
+        """Load the save path of the movie"""
+        movie_format = self.movieFormat.currentText().lower()
+        path = helpers.get_save_file("Save movie as...", self.movie_dir, movie_format)
+
         if path:
-            self.pathEdit.setText(path)
-            self.pathEdit.setStyleSheet(self.pathDefaultStyle)
-        return
+            self.savePathEdit.setText(path)
+            self.savePathEdit.setStyleSheet(self.pathDefaultStyle)
 
     def update_format(self):
-        path = self.pathEdit.text()
+        """Update the file format of the save path."""
+        path = self.savePathEdit.text()
+        # Make sure a path is selected
         if path not in ["None", "Select save path"]:
             path = list(path)
             path[-3:] = self.movieFormat.currentText().lower()
             path = ("").join(path)
-            self.pathEdit.setText(path)
+            self.savePathEdit.setText(path)
 
-    def path_warning(self):
-        self.pathEdit.setStyleSheet("border: 1px solid red;")
-        self.pathEdit.setText("Select save path")
+    def save_path_warning(self):
+        """Throw a warning if a save path hasn't been selected"""
+        self.savePathEdit.setStyleSheet("border: 1px solid red;")
+        self.savePathEdit.setText("Select save path")
         return
 
     # Window management
-    def resize(self):
+    def set_fixed_size(self):
+        """Lock the size of the window widget"""
         self.window().setFixedSize(self.window().sizeHint())
-        return
 
     def keyPressEvent(self, event):
+        """Catch escape key press events to close the widget"""
         if event.key() == Qt.Key_Escape:
             self.closeEvent()
-        return  # for cleanliness
+        else:
+            event.accept()
 
     def closeEvent(self, event=None):
+        """Remove all of the path actors and close the widget"""
         self.remove_camera_actors()
         self.plotter.camera_position = self.path[0]
         self.reject()
-        return  # for cleanliness
 
 
 class RenderDialogue(QDialog):
@@ -275,7 +349,7 @@ class RenderDialogue(QDialog):
 
         ## Movie thread construction
         if self.movie_options.resolution != "Current":
-            X, Y = helpers.get_resolution(self.movie_options.resolution)
+            X, Y = MovProc.get_resolution(self.movie_options.resolution)
             self.plotter.resize(X, Y)
             self.plotter.render()
 
@@ -340,3 +414,14 @@ class RenderDialogue(QDialog):
         self.plotter.mwriter.close()
         self.accept()
         return
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    p = pv.Plotter()
+    window = QMainWindow()
+    window.show()
+
+    demo = MovieDialogue(p, window)
+    demo.exec_()
+    sys.exit(app.exec_())
