@@ -13,11 +13,50 @@ import sys
 
 os.environ["QT_MAC_WANTS_LAYER"] = "1"
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+os.environ["QT_MAC_WANTS_LAYER"] = "1"
+
 from multiprocessing import freeze_support
 
 import pyvista as pv
 
 from library import image_processing as ImProc, qt_threading as QtTh
+from library.helpers import load_icon
+from library.ui import (
+    analysis_page,
+    annotation_page,
+    left_menu,
+    qt_objects as QtO,
+    update_alert,
+    visualization_page,
+)
+>>>>>>> Stashed changes
+from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import (QApplication, QStackedWidget,
+                            QMainWindow)
+from PyQt5.QtGui import QIcon
+>>>>>>> Stashed changes
+from multiprocessing import freeze_support
+
+import pyvista as pv
+
+<<<<<<< Updated upstream
+from library import image_processing as ImProc, qt_threading as QtTh
+=======
+<<<<<<< Updated upstream
+# Import UIs
+from library.ui import qt_objects as QtO
+from library.ui import left_menu as lm
+from library.ui import analysis_page as p1
+from library.ui import visualization_page as p2
+from library.ui import annotation_page as p3
+from library.ui import update_alert
+from library import qt_threading as QtTh
+from library import image_processing as ImProc
+>>>>>>> Stashed changes
 from library.helpers import load_icon
 from library.ui import (
     analysis_page as p1,
@@ -32,6 +71,8 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from pyvistaqt import QtInteractor
 
+=======
+>>>>>>> Stashed changes
 ######
 __version__ = "V 1.1.1"
 ######
@@ -53,6 +94,7 @@ class mainWindow(QMainWindow):
         self.centralLayout = QtO.new_layout(self.centralWidget, no_spacing=True)
 
         # Setup the individual pages of the application.
+<<<<<<< Updated upstream
         self.leftMenu = lm.LeftMenu(__version__)
 
         self.qStack = QStackedWidget()  # Stacked widget for the pages
@@ -60,9 +102,28 @@ class mainWindow(QMainWindow):
         self.page1 = p1.AnalysisPage()
         self.page2 = p2.VisualizationPage(self.plotter, self)
         self.page3 = p3.AnnotationPage()
+<<<<<<< Updated upstream
 
         self.pageStack = QtO.new_stacked([self.page1, self.page2, self.page3])
 
+=======
+        
+        self.pageStack = QtO.new_stacked([self.page1,
+                                          self.page2, self.page3])
+        
+=======
+        self.leftMenu = left_menu.LeftMenu(__version__)
+
+        self.qStack = QStackedWidget()  # Stacked widget for the pages
+
+        self.page1 = analysis_page.AnalysisPage()
+        self.page2 = visualization_page.VisualizationPage(self.plotter, self)
+        self.page3 = annotation_page.AnnotationPage()
+
+        self.pageStack = QtO.new_stacked([self.page1, self.page2, self.page3])
+
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
         # Connect sour left menu to our pages.
         self.leftMenu.pageTabs.currentRowChanged.connect(self.pageStack.setCurrentIndex)
         self.leftMenu.pageTabs.setCurrentRow(0)

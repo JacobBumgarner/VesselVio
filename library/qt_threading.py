@@ -8,14 +8,42 @@ __copyright__ = "Copyright 2022 by Jacob Bumgarner"
 __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+from PyQt5.QtCore import QThread, pyqtSignal
+=======
+import os
+from time import perf_counter as pf, sleep
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 import os
 from time import perf_counter as pf, sleep
 
 import igraph as ig
 import nibabel
+<<<<<<< Updated upstream
 import numpy as np
 
+=======
+<<<<<<< Updated upstream
+
+
+from library import image_processing as ImProc
+from library import graph_io as GIO
+from library import graph_processing as GProc
+from library import feature_extraction as FeatExt 
+from library import results_export as ResExp
+from library import volume_processing as VolProc
+from library import volume_visualization as VolVis
+from library import annotation_processing as AnnProc
+from library import input_classes as IC
+from library import helpers
+=======
+import numpy as np
+
+>>>>>>> Stashed changes
 from library import (
     annotation_processing as AnnProc,
     feature_extraction as FeatExt,
@@ -29,6 +57,10 @@ from library import (
     volume_visualization as VolVis,
 )
 from PyQt5.QtCore import pyqtSignal, QThread
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 
 ################

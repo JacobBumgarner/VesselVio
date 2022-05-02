@@ -11,7 +11,10 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio_Web/Downloads"
 
 import http.client as httplib
 import re
+<<<<<<< Updated upstream
 import urllib.request
+=======
+>>>>>>> Stashed changes
 
 from library import helpers
 from library.ui import qt_objects as QtO
