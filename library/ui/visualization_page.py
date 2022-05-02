@@ -13,19 +13,11 @@ import json
 import os
 import sys
 
-import imageio_ffmpeg  # Needed for PyInstaller
+import imageio_ffmpeg  # Needed for PyInstaller  # Needed for PyInstaller
 import numpy as np
 import pyvista as pv
 from imageio import get_writer
-<<<<<<< Updated upstream
 
-=======
-<<<<<<< Updated upstream
-import imageio_ffmpeg # Needed for PyInstaller
-
-=======
-
->>>>>>> Stashed changes
 from library import (
     helpers,
     image_processing as ImProc,
@@ -33,25 +25,7 @@ from library import (
     qt_threading as QtTh,
 )
 from library.annotation_processing import RGB_check
-<<<<<<< Updated upstream
-=======
-from library.ui import qt_objects as QtO
-from library.ui.analysis_page import AnalysisOptions, GraphOptions
-from library.ui.annotation_page import RGB_Warning
->>>>>>> Stashed changes
-from PyQt5.Qt import pyqtSlot
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import (QApplication, QWidget, QMainWindow, QLabel, 
-                             QDialog, QMessageBox, QSplitter, QGroupBox, 
-                             QColorDialog, QFrame, QProgressBar, 
-                             QDialogButtonBox)
 
-<<<<<<< Updated upstream
-from library import helpers
-from library import input_classes as IC
-from library import image_processing as ImProc
-from library import qt_threading as QtTh
->>>>>>> Stashed changes
 from library.ui import qt_objects as QtO
 from library.ui.analysis_page import AnalysisOptions, GraphOptions
 from library.ui.annotation_page import RGB_Warning
@@ -73,8 +47,6 @@ from PyQt5.QtWidgets import (
 )
 from pyvistaqt import QtInteractor
 
-=======
->>>>>>> Stashed changes
 
 class mainWindow(QMainWindow):
     def __init__(self):

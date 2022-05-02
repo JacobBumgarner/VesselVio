@@ -13,33 +13,12 @@ import json
 import os
 import sys
 
-<<<<<<< Updated upstream
 from library import helpers, input_classes as IC, qt_threading as QtTh
-=======
-<<<<<<< Updated upstream
-from PyQt5.QtWidgets import (QApplication, QWidget, QMainWindow, QHeaderView, 
-                             QLabel, QTableWidget, QTableWidgetItem, QDialog, 
-                             QFileDialog, QTabWidget, QLayout, QMessageBox, 
-                             QAbstractItemView)
 
-from library import helpers
-from library import input_classes as IC
-from library import qt_threading as QtTh
-from library.ui import qt_objects as QtO
->>>>>>> Stashed changes
 from library.annotation_processing import RGB_check
 from library.ui import qt_objects as QtO
 from library.ui.annotation_page import RGB_Warning
 
-<<<<<<< Updated upstream
-=======
-=======
-from library import helpers, input_classes as IC, qt_threading as QtTh
-from library.annotation_processing import RGB_check
-from library.ui import qt_objects as QtO
-from library.ui.annotation_page import RGB_Warning
-
->>>>>>> Stashed changes
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -56,10 +35,6 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 class mainWindow(QMainWindow):
     def __init__(self):

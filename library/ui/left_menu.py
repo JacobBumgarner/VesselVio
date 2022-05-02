@@ -11,15 +11,6 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 import datetime
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtWidgets import (QWidget, QLabel, QPushButton, QFrame, QListWidget, 
-                             QListWidgetItem, QVBoxLayout, QDialog)
-
-=======
->>>>>>> Stashed changes
 from library.ui import qt_objects as QtO, stylesheets
 
 from PyQt5.QtCore import QSize, Qt
@@ -33,10 +24,6 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 
 class LeftMenu(QFrame):

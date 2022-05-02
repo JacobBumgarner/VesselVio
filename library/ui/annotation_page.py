@@ -15,7 +15,6 @@ import sys
 
 from library import annotation_processing as AnProc, helpers
 from library.ui import qt_objects as QtO, stylesheets as Styles
-<<<<<<< Updated upstream
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
@@ -39,20 +38,7 @@ from PyQt5.QtWidgets import (
     QTreeWidgetItem,
     QWidget,
 )
-=======
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QApplication, QWidget, QMainWindow,  QTreeWidget, QTreeWidgetItem, QHeaderView, QLineEdit, QCompleter, QLabel, QTableWidget, QTableWidgetItem, QListWidget, QListWidgetItem, QDialog, QGroupBox, QFileDialog, QPushButton, QMessageBox, QAbstractItemView)
-
-<<<<<<< Updated upstream
-from library import helpers
-from library import annotation_processing as AnProc
-from library.ui import qt_objects as QtO
-from library.ui import stylesheets as Styles
->>>>>>> Stashed changes
-
-=======
->>>>>>> Stashed changes
 
 class mainWindow(QMainWindow):
     def __init__(self):

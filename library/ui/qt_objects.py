@@ -2,26 +2,6 @@
 A helper file used to create, manage, and update PyQt5 widgets.
 """
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-__author__    = 'Jacob Bumgarner <jrbumgarner@mix.wvu.edu>'
-__license__   = 'GPLv3 - GNU General Pulic License v3 (see LICENSE)'
-__copyright__ = 'Copyright 2022 by Jacob Bumgarner'
-__webpage__   = 'https://jacobbumgarner.github.io/VesselVio/'
-__download__  = 'https://jacobbumgarner.github.io/VesselVio/Downloads'
-
-
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtWidgets import (QWidget, QPushButton, QSpinBox, QDoubleSpinBox, 
-                             QHBoxLayout, QVBoxLayout, QToolButton, QLineEdit, 
-                             QComboBox, QStyledItemDelegate, QCheckBox, 
-                             QFormLayout, QFrame, QRadioButton, QButtonGroup, 
-                             QScrollArea, QStackedWidget)
-
-from library import helpers 
-=======
->>>>>>> Stashed changes
 __author__ = "Jacob Bumgarner <jrbumgarner@mix.wvu.edu>"
 __license__ = "GPLv3 - GNU General Pulic License v3 (see LICENSE)"
 __copyright__ = "Copyright 2022 by Jacob Bumgarner"
@@ -50,16 +30,11 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
+
 
 ###############
 ### Widgets ###
 ###############
-
-
 def new_radio(title, connect=None):
     radio = QRadioButton(title)
     if connect:
