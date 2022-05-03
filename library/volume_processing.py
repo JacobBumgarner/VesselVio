@@ -257,7 +257,7 @@ def calculate_3Dradii(volume, points, LUT):
     return skeleton_radii
 
 
-# Identical copy of 3D functino, save for the z-dimension. See 3D for notes.
+# Identical copy of 3D function, save for the z-dimension. See 3D for notes.
 @njit(parallel=True, cache=True, nogil=True)
 def calculate_2Dradii(volume, points, LUT):
     volume = volume

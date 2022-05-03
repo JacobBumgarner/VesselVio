@@ -245,12 +245,12 @@ class MovieDialogue(QDialog):
         self.flythroughWidget.remove_path_actors()
 
         # Update the widget visibility
-        self.orbitWidget.setVisible(show_orbit)
         self.flythroughWidget.setVisible(not show_orbit)
-        if show_orbit:  # Add a defaul orbit from the current view
+        self.orbitWidget.setVisible(show_orbit)
+        if show_orbit:  # Add a default orbit from the current view
             self.orbitWidget.update_orbit()
 
-        self.set_fixed_size()
+        self.set_fixed_size()  #
 
     def return_movie_path(self):
         """Return the generated path, if created."""

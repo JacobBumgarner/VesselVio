@@ -56,7 +56,7 @@ def identify_nonzero(volume):
     return points
 
 
-# Orignal view and smoothed view generation.
+# Original view and smoothed view generation.
 def vol_plot(
     volume,
     g,
@@ -137,7 +137,7 @@ def vol_plot(
 ##########################
 ### Tube Visualization ###
 ##########################
-# 0, 1, 2; 0 higest, 2 lowest
+# 0, 1, 2; 0 highest, 2 lowest
 def get_rendering_features(rendering_quality):
     if rendering_quality == 0:
         n_sides, theta_phi, tube_points = 20, 30, 8

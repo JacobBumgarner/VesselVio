@@ -119,7 +119,7 @@ def feature_extraction(
     delta = np.array([coords[0], coords[-1]])
     cord_length = length_calc(delta, resolution)
 
-    # See gobal variable min_res in feature_input.
+    # See global variable min_res in feature_input.
     # Had some issues with loop start/ends being altered by minute fractions, causing issues.
     if cord_length >= ImProc.min_resolution:
         tortuosity = segment_length / cord_length
@@ -704,7 +704,7 @@ def feature_input(
     # Surface area
     network_SA = np.sum(surface_areas)
 
-    # Brach points and end points
+    # Branch points and end points
     bs = g.vs.select(_degree_gt=2)
     branchpoints = len(bs)
     es = g.vs.select(_degree=1)

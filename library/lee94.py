@@ -232,7 +232,7 @@ def build_Euler_key():
     # Sort the indexed cube based on the flattened 0-26 indices.
     # This way, when we flatten the neighborhood for Euler analysis,
     # we can access the elements as described in the original ms,
-    # rather than trying to re-index everyting ourselves (hello bugs...)
+    # rather than trying to re-index everything ourselves (hello bugs...)
     indexed = sorted(list(indexed), key=lambda x: x[0])
     # Sample of indexed...
     # (0, 0), (0, 13), (1, 9), (2, 18), (3, 1), (4, 10), (5, 19)
@@ -492,7 +492,7 @@ def set_zero(volume, points, border_ids, octants, v_memberships, o_set):
 def skeletonize(volume, verbose=False):
     orientations = init_filters()
 
-    # Euler characterstic loading
+    # Euler characteristic loading
     E_LUT = load_Euler_LUT()
     E_octants = E_octant
 

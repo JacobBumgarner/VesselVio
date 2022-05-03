@@ -453,7 +453,8 @@ def get_unique_hexes(hexes):
     return unique
 
 
-# Build an id array that matches to the corresponding unique hex values in the origianl array
+# Build an id array that matches to the corresponding
+# unique hex values in the original array
 def match_hex_ids(hexes, unique_hexes):
     hex_array = np.array(hexes)
     id_array = np.zeros(hex_array.shape[0])
