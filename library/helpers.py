@@ -673,7 +673,7 @@ def polyline_from_points(points):
     return poly
 
 
-def create_path_actors(p, path):
+def create_orbit_path_actors(p, path):
     camera_path = path[:, 0]
     focal_path = path[:, 1]
     viewup_path = path[:, 2]
@@ -695,7 +695,7 @@ def create_path_actors(p, path):
     bfactor = max(1, radius / 100)
 
     # Add the camera actors
-    actors = IC.CameraActors()
+    actors = IC.OrbitActors()
     camera = pv.Line(B - b1 * 2 * bfactor, B + b1 * 2 * bfactor)
     camera = camera.tube(radius=2 * bfactor, n_sides=4)
 

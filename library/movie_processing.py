@@ -14,6 +14,107 @@ import pyvista as pv
 
 from library import helpers, input_classes as IC
 
+from scipy import interpolate
+
+
+################################
+### Generate Path Processing ###
+################################
+def path_actor_scaling(seed_point):
+    """Given a camera position seed point and the current position of the
+    plotter relative to the focal point, generate a scaling factor for the
+    path actors.
+
+    Parameters
+    ----------
+    seed_point: PyVista.CameraPosition, list, tuple, np.array
+        An (n,3,3) shaped iterable containing:
+            - The plotter camera position
+            - The plotter focal poin
+            - The plotter view 'up' vector
+
+    Returns
+    -------
+    resize_factor : float
+    """
+    # focal_pos - camera_pos
+    radius = np.linalg.norm(seed_point[1] - seed_point[0])
+    resize_factor = max(1, radius / 100)  # emperically determined scaling
+    return float(resize_factor)
+
+
+def load_path_basis(seed_point):
+    """Returns new basis vectors based on an input
+    PyVista.Plotter.camera_position
+
+    Parameters
+    ----------
+    seed_point: PyVista.CameraPosition, list, tuple, np.array
+        An (n,3,3) shaped iterable containing:
+            - The plotter camera position
+            - The plotter focal poin
+            - The plotter view 'up' vector
+
+    Returns
+    -------
+    b1 : list
+
+    b2 : list
+
+    b3 : list
+
+    """
+    if isinstance(seed_point, (pv.CameraPosition, tuple, list)):
+        seed_point = np.array([pos for pos in seed_point])
+    camera_pos = seed_point[0]
+    focal_pos = seed_point[1]
+    viewup = seed_point[2]
+    v1 = focal_pos - camera_pos
+    # v2 = B + C
+
+    b1 = v1 / np.linalg.norm(v1)
+    b2 = viewup
+    v3 = np.cross(b1, b2)
+    b3 = v3 / np.linalg.norm(v3)
+    return b1, b2, b3
+
+
+# Taken directly from https://docs.pyvista.org/examples/00-load/create-spline.html
+def polyline_from_points(points):
+    poly = pv.PolyData()
+    poly.points = points
+    the_cell = np.arange(0, len(points), dtype=np.int_)
+    the_cell = np.insert(the_cell, 0, len(points))
+    poly.lines = the_cell
+    return poly
+
+
+def post_path_plotter_update(plotter, seed_position):
+    """Given the plotter and a seed point, update the plotter's view to be
+    shifted slightly up and back from that view. This function is useful to
+    avoid placing the plotter at the exact seed_position, which might place
+    it inside of path camera actors during movie creation.
+
+    Parameters
+    ----------
+    plotter : PyVista.Plotter
+
+    seed_position : PyVista.Plotter.camera_position
+
+    """
+    seed_position = np.array([pos for pos in seed_position])
+
+    b1, b2, b3 = load_path_basis(seed_position)
+    resize_factor = path_actor_scaling(seed_position)
+
+    plotter.camera_position = [
+        seed_position[0] + b2 * resize_factor * 20 - b1 * resize_factor * 100,
+        seed_position[1],
+        seed_position[2],
+    ]
+
+    return
+
 
 ###############################
 ### Orbital Path Processing ###
@@ -30,11 +131,11 @@ def orbit_time_to_frames(framerate, movie_time):
 
     Returns
     -------
-    int
+    frames : int
 
     """
     frames = ceil(framerate * movie_time)
-    return frames
+    return int(frames)
 
 
 def generate_orbital_path(camera_position, n_points=100):
@@ -51,8 +152,8 @@ def generate_orbital_path(camera_position, n_points=100):
 
     Returns
     -------
-    np.array
-        Returns a (n,3,3) array containing a time-series of camera_positions
+    orbital_path : np.array
+        An (n,3,3) array containing a time-series of camera_positions
     """
 
     if not isinstance(camera_position, (pv.CameraPosition)):
@@ -77,49 +178,67 @@ def generate_orbital_path(camera_position, n_points=100):
 
 
 def generate_orbit_path_actors(plotter, path):
-    """Generate actors that help the user visualize the orbital movie path"""
-    camera_path = path[:, 0]
-    focal_path = path[:, 1]
-    viewup_path = path[:, 2]
+    """Generate actors that help the user visualize the orbital movie path
+
+    Parameters
+    ----------
+    plotter : PyVista.Plotter
+
+    path : list
+        An (n,3,3) list where each n index represents a
+        pyvista.plotter.camera_position
+
+    Returns
+    -------
+    OrbitPathActors
+
+    """
+    seed_point = path[0]
+    camera_pos = seed_point[0]
 
     # Get local basis vectors from initial path position
-    A = focal_path[0]
-    B = camera_path[0]
-    C = viewup_path[0]
-    v1 = A - B
-    # v2 = B + C
-
-    b1 = v1 / np.linalg.norm(v1)
-    b2 = C
-    v3 = np.cross(b1, b2)
-    b3 = v3 / np.linalg.norm(v3)
+    b1, b2, b3 = load_path_basis(seed_point)
 
     # Bounds resizing factor
-    radius = np.linalg.norm(B - A)
-    bfactor = max(1, radius / 100)
+    resize_factor = path_actor_scaling(seed_point)
 
     # Add the camera actors
-    actors = IC.CameraActors()
-    camera = pv.Line(B - b1 * 2 * bfactor, B + b1 * 2 * bfactor)
-    camera = camera.tube(radius=2 * bfactor, n_sides=4)
+    actors = IC.OrbitActors()
+    camera = pv.Line(
+        camera_pos - b1 * 2 * resize_factor, camera_pos + b1 * 2 * resize_factor
+    )
+    camera = camera.tube(radius=2 * resize_factor, n_sides=4)
 
     actors.camera = plotter.add_mesh(camera, color="f2f2f2", reset_camera=False)
 
-    lens = pv.Line(B, B + b1 * 2 * bfactor + b1 * bfactor)
-    lens["size"] = [0.2 * bfactor, 1.3 * bfactor]
+    lens = pv.Line(camera_pos, camera_pos + b1 * 2 * resize_factor + b1 * resize_factor)
+    lens["size"] = [0.2 * resize_factor, 1.3 * resize_factor]
     factor = max(lens["size"]) / min(lens["size"])
     lens = lens.tube(radius=min(lens["size"]), scalars="size", radius_factor=factor)
     actors.lens = plotter.add_mesh(
         lens, color="9fd6fc", smooth_shading=True, reset_camera=False
     )
 
-    leg0 = pv.Line(B, B - b2 * 4 * bfactor + b1 * 2 * bfactor).tube(radius=bfactor / 2)
-    leg1 = pv.Line(B, B - b2 * 4 * bfactor - b1 * 2 * bfactor + b3 * 2 * bfactor).tube(
-        radius=bfactor / 2
+    leg0 = pv.Line(
+        camera_pos, camera_pos - b2 * 4 * resize_factor + b1 * 2 * resize_factor
     )
-    leg2 = pv.Line(B, B - b2 * 4 * bfactor - b1 * 2 * bfactor - b3 * 2 * bfactor).tube(
-        radius=bfactor / 2
+    leg0 = leg0.tube(radius=resize_factor / 2)
+    leg1 = pv.Line(
+        camera_pos,
+        camera_pos
+        - b2 * 4 * resize_factor
+        - b1 * 2 * resize_factor
+        + b3 * 2 * resize_factor,
     )
+    leg1 = leg1.tube(radius=resize_factor / 2)
+    leg2 = pv.Line(
+        camera_pos,
+        camera_pos
+        - b2 * 4 * resize_factor
+        - b1 * 2 * resize_factor
+        - b3 * 2 * resize_factor,
+    )
+    leg2 = leg2.tube(radius=resize_factor / 2)
     legs = leg0 + leg1 + leg2
 
     actors.camera_legs = plotter.add_mesh(
@@ -127,78 +246,191 @@ def generate_orbit_path_actors(plotter, path):
     )
 
     # Create the line
-    line_path = polyline_from_points(camera_path[1:-1]).tube(
-        radius=0.5 * bfactor, capping=True
-    )
+    line_path = polyline_from_points(path[1:-1, 0])
+    line_path = line_path.tube(radius=0.5 * resize_factor, capping=True)
     actors.path = plotter.add_mesh(
         line_path, color="ff0000", smooth_shading=True, reset_camera=False
     )
 
-    path_direction = pv.Line(camera_path[-2], camera_path[-1])
-    path_direction["size"] = [bfactor * 2, 0.1]
+    path_direction = pv.Line(path[-2, 0], path[-1, 0])
+    path_direction["size"] = [resize_factor * 2, 0.1]
     path_direction = path_direction.tube(
-        radius=0.1, scalars="size", radius_factor=bfactor * 2 / 0.1
+        radius=0.1, scalars="size", radius_factor=resize_factor * 2 / 0.1
     )
     actors.path_direction = plotter.add_mesh(
         path_direction, color="ff0000", smooth_shading=True, reset_camera=False
     )
 
-    plotter.camera_position = [B + b2 * bfactor * 20 - b1 * bfactor * 100, A, C]
+    # update the plotter position
+    post_path_plotter_update(plotter, seed_point)
 
     return actors
 
 
-#######################
-### Path Processing ###
-#######################
+##############################
+### Fly Through Processing ###
+##############################
+def prep_keyframes(key_frames):
+    """Given a list of keyframes for a flythrough movie, this function iterates
+    through and makes sure that no pair of keyframes share the same plotter
+    position. If two adjacent frames share identical positions, the position
+    is altered by a minute amount.
+
+    Parameters
+    ----------
+    key_frames : list
+        (n,3,3) list where each n index contains a
+        PyVista.Plotter.camera_position
+
+    Returns
+    -------
+    key_frames : np.array
+        An (n,3,3) shaped array with updated keyframes without any sequentially
+        duplicated frames
+    """
+    # The keyframes will come as a list of CameraPositions
+    # Convert them to an array
+    key_frames = [[list(pos) for pos in frame] for frame in key_frames]
+
+    key_frames = np.asarray(key_frames)
+
+    for i in range(1, len(key_frames)):  # dumb to iterate, i know
+        pos0 = key_frames[i - 1, 0]
+        pos1 = key_frames[i, 0]
+        if np.all(pos0 == pos1):
+            key_frames[i, 0] += 0.0001
+
+    return key_frames
 
 
-# def construct_flythrough_path(plotter, points, update=False):
-#     if not update:
-#         camera = np.array([position for position in plotter.camera_position])
-#     else:
-#         camera = [plotter[0], plotter[1], plotter[2]]
+def generate_linear_flythrough_path(plotter, key_frames, keyframe_durations, framerate):
+    """Generates a linear flythrough path with specified frame durations
 
-#     # starting with a -> b,  a + (a - b) will get us the path b -> a -> c
-#     A = camera[1]
-#     B = camera[0]
-#     v1 = A - B
-#     C = A + v1
+    Parameters
+    ----------
+    plotter : PyVista.Plotter
 
-#     # focal path of a -> c -> d
-#     D = C + v1
+    key_frames : list
+        A list of PyVista.CameraPositions
 
-#     camera_path = np.linspace(B, C, points, endpoint=True)
-#     focal_path = np.linspace(A, D, points, endpoint=True)
-#     viewup = np.repeat([camera[2]], points, axis=0)
-#     return np.stack([camera_path, focal_path, viewup], axis=1)
+    keyframe_durations : list
+        A (n,) shaped list containing float elements that indicate the duration
+        of each key_frame transition in seconds
 
+    framerate : int
+        The framerate used to convert the frame_durations into frames
 
-# def update_flythrough_orientation(plotter, path, points):
-#     # Get the orientation of the camera and build the updated basis
-#     camera = np.array([position for position in plotter.camera_position])
-#     camera_path = path[:, 0]
-#     path_length = np.linalg.norm(camera_path[-1] - camera_path[0])
+    Returns
+    -------
+    path : np.array
+        A (n,3,3) shaped array that represents a time-series of
+        PyVista.CameraPositions. The amount of frames (n) will be determined
+        by the input frame_durations and the input frame_rate
 
-#     v1 = camera[1] - camera[0]
-#     focus_vector = v1 / np.linalg.norm(v1) * path_length / 2
-
-#     focus_start = camera_path[0] + focus_vector
-#     focus_end = camera_path[-1] + focus_vector
-
-#     viewup = np.repeat([camera[2]], points, axis=0)
-#     focus_path = np.linspace(focus_start, focus_end, points)
-#     return np.stack([camera_path, focus_path, viewup], axis=1)
+    """
+    # path_points = [pos[0] for pos in key_frames]
+    return
 
 
-# Taken directly from https://docs.pyvista.org/examples/00-load/create-spline.html
-def polyline_from_points(points):
-    poly = pv.PolyData()
-    poly.points = points
-    the_cell = np.arange(0, len(points), dtype=np.int_)
-    the_cell = np.insert(the_cell, 0, len(points))
-    poly.lines = the_cell
-    return poly
+def generate_spline_flythrough_path(plotter, key_frames, keyframe_durations, framerate):
+    """Generates a linear flythrough path with specified frame durations
+
+    Parameters
+    ----------
+    plotter : PyVista.Plotter
+
+    key_frames : list
+        A list of PyVista.CameraPositions
+
+    keyframe_durations : list
+        A (n,) shaped list containing float elements that indicate the duration
+        of each key_frame transition in seconds
+
+    framerate : int
+        The framerate used to convert the frame_durations into frames
+
+    Returns
+    -------
+    path : np.array
+        A (n,3,3) shaped array that represents a time-series of
+        PyVista.CameraPositions. The amount of frames (n) will be determined
+        by the input frame_durations and the input frame_rate    path_points = [pos[0] for pos in key_frames]
+    """
+
+    return
+
+
+def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
+    """Given a series of keyframes, creates a path actor tube that helps the
+    user visualize the proposed path of the movie.
+
+    Parameters
+    ----------
+    plotter : PyVista.Plotter
+
+    key_frames : list
+        A list of PyVista.CameraPositions, or a (n,3,3) shaped list where each
+        n index contains a camera position, focal point, and viewup vector
+
+    path_type : str
+        Options: ['linear', 'spline']
+
+    current_index : int, optional
+        An optional argument that is used to update the plotter position to
+        the specified index of the key_frames
+
+    Returns
+    -------
+    FlyThroughActors
+
+    """
+
+    key_frames = prep_keyframes(key_frames)
+    actors = IC.FlyThroughActors()
+
+    seed_point = key_frames[current_index]
+
+    # Bounds resizing factor
+    resize_factor = path_actor_scaling(seed_point)
+
+    path_points = key_frames[:, 0]
+    if path_type == "Linear":
+        line = polyline_from_points(path_points)
+    elif path_type == "Spline":
+        tck, u = interpolate.splprep(
+            [path_points[:, 0], path_points[:, 1], path_points[:, 2]],
+            k=int(min(2, path_points.shape[0] - 1)),
+            s=0,
+        )
+        u = np.linspace(0, 1, num=path_points.shape[0] * 100, endpoint=True)
+        out = interpolate.splev(u, tck)
+        out = np.asarray(out).T
+        line = pv.Spline(out)
+    else:
+        raise ValueError("The path_type must either be 'Linear' or 'Spline'")
+
+    # Create the path actor
+    line_path = line.tube(radius=0.5 * resize_factor, capping=True)
+
+    actors.path = plotter.add_mesh(
+        line_path, color="ff0000", smooth_shading=True, reset_camera=False
+    )
+
+    # add start/end spheres
+    start_sphere = pv.Sphere(radius=1 * resize_factor, center=path_points[0])
+    actors.start_sphere = plotter.add_mesh(
+        start_sphere, color="green", smooth_shading=True, reset_camera=False
+    )
+
+    end_sphere = pv.Sphere(radius=1 * resize_factor, center=path_points[-1])
+    actors.end_sphere = plotter.add_mesh(
+        end_sphere, color="orange", smooth_shading=True, reset_camera=False
+    )
+
+    # camera position update, based on the currently selected keyframe
+    post_path_plotter_update(plotter, seed_point)
+
+    return actors
 
 
 # Pyvista movie resolution processing

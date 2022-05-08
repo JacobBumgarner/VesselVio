@@ -14,6 +14,46 @@ import os
 from library import helpers
 
 
+class VisualizationFiles:
+    def __init__(
+        self,
+        dataset_type="Volume",
+        file1=None,
+        file2=None,
+        annotation_data=None,
+        annotation_type="None",
+        visualized=None,
+    ):
+        self.dataset_type = dataset_type
+        self.file1 = file1
+        self.file2 = file2
+        self.annotation_data = annotation_data
+        self.annotation_type = annotation_type
+        self.visualized_file = visualized
+
+    def clear(self):
+        for item in self.__dict__:
+            self.__dict__[item] = None
+        self.annotation_type = "None"
+
+    def file1_name(self):
+        return os.path.basename(self.file1) if self.file1 else "None"
+
+    def file2_name(self):
+        if self.file2:
+            if os.path.isdir(self.file2):
+                return self.file2
+            elif os.path.isfile(self.file2):
+                return os.path.basename(self.file2)
+        else:
+            return "None"
+
+    def clear_annotation(self):
+        self.file2 = None
+        self.annotation_type = "None"
+        self.annotation_data = None
+
+
 class AnalysisOptions:
     def __init__(
         self,
@@ -35,6 +75,51 @@ class AnalysisOptions:
         self.save_graph = save_graph
         self.image_dimensions = image_dimensions
         self.graph_file = False
+
+
+class VisualizationOptions:
+    def __init__(
+        self,
+        visualize,
+        load_simplified,
+        load_scaled,
+        load_network,
+        load_original,
+        load_smoothed,
+        scalars="Radius",
+        cmap="viridis",
+        show_branches=False,
+        show_ends=False,
+        create_movie=False,
+        movie_title=None,
+        viewup=[1, 1, 1],
+        render_annotations=False,
+        rendering_quality=0,
+    ):
+        # Rendering options
+        self.visualize = visualize
+        self.load_simplified = load_simplified
+        self.rendering_quality = (
+            rendering_quality  # 0, 1, 2 (0 best, 2 worst based on index of combo box)
+        )
+
+        # Mesh construction instructions
+        self.load_scaled = load_scaled
+        self.load_network = load_network
+        self.load_original = load_original
+        self.load_smoothed = load_smoothed
+
+        # Scalar options
+        self.scalars = scalars
+        self.cmap = cmap
+        self.render_annotations = render_annotations
+
+        # VVT options
+        self.show_branches = show_branches
+        self.show_ends = show_ends
+        self.create_movie = create_movie
+        self.movie_title = movie_title
+        self.viewup = viewup
 
 
 class AnnotationOptions:
@@ -97,49 +182,16 @@ class AttributeKey:
         self.edge_hex = edge_hex
 
 
-class VisualizationOptions:
-    def __init__(
-        self,
-        visualize,
-        load_simplified,
-        load_scaled,
-        load_network,
-        load_original,
-        load_smoothed,
-        scalars="Radius",
-        cmap="viridis",
-        show_branches=False,
-        show_ends=False,
-        create_movie=False,
-        movie_title=None,
-        viewup=[1, 1, 1],
-        render_annotations=False,
-        rendering_quality=0,
-    ):
-        # Rendering options
-        self.visualize = visualize
-        self.load_simplified = load_simplified
-        self.rendering_quality = (
-            rendering_quality  # 0, 1, 2 (0 best, 2 worst based on index of combo box)
-        )
-
-        # Mesh construction instructions
-        self.load_scaled = load_scaled
-        self.load_network = load_network
-        self.load_original = load_original
-        self.load_smoothed = load_smoothed
-
-        # Scalar options
-        self.scalars = scalars
-        self.cmap = cmap
-        self.render_annotations = render_annotations
-
-        # VVT options
-        self.show_branches = show_branches
-        self.show_ends = show_ends
-        self.create_movie = create_movie
-        self.movie_title = movie_title
-        self.viewup = viewup
+#####################
+### Movie Classes ###
+#####################
+class MovieOptions:
+    def __init__(self, path, resolution, fps, frame_count, camera_path):
+        self.filepath = path
+        self.resolution = resolution
+        self.fps = fps
+        self.frame_count = frame_count
+        self.camera_path = camera_path
 
 
 class PyVistaMeshes:
@@ -275,56 +327,7 @@ class PyVistaActors:
             self.__dict__[item] = None
 
 
-class VisualizationFiles:
-    def __init__(
-        self,
-        dataset_type="Volume",
-        file1=None,
-        file2=None,
-        annotation_data=None,
-        annotation_type="None",
-        visualized=None,
-    ):
-        self.dataset_type = dataset_type
-        self.file1 = file1
-        self.file2 = file2
-        self.annotation_data = annotation_data
-        self.annotation_type = annotation_type
-        self.visualized_file = visualized
-
-    def clear(self):
-        for item in self.__dict__:
-            self.__dict__[item] = None
-        self.annotation_type = "None"
-
-    def file1_name(self):
-        return os.path.basename(self.file1) if self.file1 else "None"
-
-    def file2_name(self):
-        if self.file2:
-            if os.path.isdir(self.file2):
-                return self.file2
-            elif os.path.isfile(self.file2):
-                return os.path.basename(self.file2)
-        else:
-            return "None"
-
-    def clear_annotation(self):
-        self.file2 = None
-        self.annotation_type = "None"
-        self.annotation_data = None
-
-
-class MovieOptions:
-    def __init__(self, path, resolution, fps, frame_count, camera_path):
-        self.filepath = path
-        self.resolution = resolution
-        self.fps = fps
-        self.frame_count = frame_count
-        self.camera_path = camera_path
-
-
-class CameraActors:
+class OrbitActors:
     def __init__(
         self, path=None, path_direction=None, camera=None, lens=None, camera_legs=None
     ):
@@ -342,5 +345,32 @@ class CameraActors:
     def reset_actors(self):
         items = list(self.__dict__.keys())
         for item in items:
-            # del(self.__dict__[item])
+            del self.__dict__[item]
+            self.__dict__[item] = None
+
+
+class FlyThroughActors:
+    """An object class used to hold the PyVista actors that help the user
+    visualize the path that their flythrough movie will follow.
+
+    Parameters
+    ----------
+    path_glyph: PyVista.UnstructuredGrid, optional
+
+    returns: FlyThroughActors
+    """
+
+    def __init__(self, path_direction=None, start_sphere=None, end_sphere=None):
+        self.path_direction = path_direction
+        self.start_sphere = start_sphere
+        self.end_sphere = end_sphere
+
+    def iter_actors(self):
+        for item in self.__dict__:
+            yield (self.__dict__[item])
+
+    def reset_actors(self):
+        items = list(self.__dict__.keys())
+        for item in items:
+            del self.__dict__[item]
             self.__dict__[item] = None
