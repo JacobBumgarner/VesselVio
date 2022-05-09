@@ -19,6 +19,7 @@ def test_generate_flythrough_path():
     path = MovProc.generate_flythrough_path(key_frames)
     assert path.shape == (300, 3, 3)
     path = MovProc.generate_flythrough_path(key_frames, path_type="smoothed")
+    assert path.shape == (300, 3, 3)
     return
 
 
