@@ -7,6 +7,8 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
+import json
+
 from math import ceil
 
 import numpy as np
@@ -89,7 +91,7 @@ def polyline_from_points(points):
     return poly
 
 
-def post_path_plotter_update(plotter, seed_position):
+def post_path_plotter_update(plotter, seed_position, orbit=True):
     """Given the plotter and a seed point, update the plotter's view to be
     shifted slightly up and back from that view. This function is useful to
     avoid placing the plotter at the exact seed_position, which might place
@@ -105,7 +107,10 @@ def post_path_plotter_update(plotter, seed_position):
     seed_position = np.array([pos for pos in seed_position])
 
     b1, b2, b3 = load_path_basis(seed_position)
-    resize_factor = path_actor_scaling(seed_position)
+    if orbit:
+        resize_factor = path_actor_scaling(seed_position)
+    else:
+        resize_factor = 1
 
     plotter.camera_position = [
         seed_position[0] + b2 * resize_factor * 20 - b1 * resize_factor * 100,
@@ -113,6 +118,56 @@ def post_path_plotter_update(plotter, seed_position):
         seed_position[2],
     ]
 
+    return
+
+
+def load_options(filepath):
+    """Given a save path, load a movie options file.
+
+    Parameters
+    ----------
+    filepath : str
+
+
+    Returns
+    -------
+    movie_options : MovieOptions
+    """
+    with open(filepath) as f:
+        data = json.load(f)
+        if len(data) != 1 or "VesselVio Movie Options" not in data.keys():
+            return None
+        data = data["VesselVio Movie Options"]
+
+    movie_type = data["movie_type"]
+    key_frames = data["key_frames"]
+    movie_options = IC.MovieExportOptions(movie_type, key_frames)
+
+    return movie_options
+
+
+def export_options(filepath, movie_options: IC.MovieExportOptions):
+    """Given a save path and a set of keyframes, save the movie options.
+
+    Parameters
+    ----------
+    filepath : str
+
+    movie_options : MovieOptions
+        A MovieOptions object
+    """
+    # parse the options into a json format
+    options = {}
+    options["movie_type"] = movie_options.movie_type
+    key_frames = prep_keyframes(movie_options.key_frames)
+    options["key_frames"] = key_frames.tolist()
+
+    if filepath:
+        with open(filepath, "w") as f:
+            annotation_data = {"VesselVio Movie Options": options}
+            file_info = json.dumps(annotation_data)
+            f.write(file_info)
+            f.close()
     return
 
 
@@ -298,12 +353,12 @@ def prep_keyframes(key_frames):
         pos0 = key_frames[i - 1, 0]
         pos1 = key_frames[i, 0]
         if np.all(pos0 == pos1):
-            key_frames[i, 0] += 0.0001
+            key_frames[i, 0] += 0.000001
 
     return key_frames
 
 
-def generate_3D_spline_path(input_path):
+def generate_3D_spline_path(input_path, path_points=40):
     """Given a series of keyframes, generate a quadratic b-spline curve that
     passes through all of the original input points.
 
@@ -324,8 +379,7 @@ def generate_3D_spline_path(input_path):
         k=int(min(2, input_path.shape[0] - 1)),
         s=0,
     )
-    u = np.linspace(0, 1, num=input_path.shape[0] * 100, endpoint=True)
-
+    u = np.linspace(0, 1, num=path_points, endpoint=True)
     out = interpolate.splev(u, tck)
     path = np.asarray(out).T
     return path
@@ -369,7 +423,7 @@ def interpolate_linear_path(position_a, position_b, n_points, endpoint=False):
 
 
 def generate_flythrough_path(
-    key_frames, keyframe_durations=5, framerate=30, path_type="linear"
+    key_frames, movie_duration=10, framerate=30, path_type="linear"
 ):
     """Generates a linear flythrough path with specified frame durations
 
@@ -378,9 +432,8 @@ def generate_flythrough_path(
     key_frames : list
         A list of PyVista.CameraPositions
 
-    keyframe_durations : list, optional
-        A (n,) shaped list containing float elements that indicate the duration
-        of each key_frame transition in seconds
+    keyframe_durations : float, optional
+        The duration of the movie in seconds
 
     framerate : int, optional
         The framerate used to convert the frame_durations into frames
@@ -396,19 +449,22 @@ def generate_flythrough_path(
         by the input frame_durations and the input frame_rate
         path_points = [pos[0] for pos in key_frames]
     """
+    # convert the key_frames into a numpy array
+    key_frames = prep_keyframes(key_frames)
+
     # first path frame acts as seed for appends
     path = np.zeros((1, 3, 3), dtype=float)
 
-    # make sure the keyframe durations are prepped
-    if isinstance(keyframe_durations, int):
-        keyframe_durations = [keyframe_durations for _ in range(len(key_frames))]
+    # indicate how long each movie step should be
+    approx_frames = time_to_frames(framerate, movie_duration)
+    step_frames = int(approx_frames / (key_frames.shape[0] - 1))
+    total_frames = step_frames * (key_frames.shape[0] - 1)
 
     for i in range(len(key_frames) - 1):  # don't iterate the last frame
         pos_a = key_frames[i]
         pos_b = key_frames[i + 1]
-        frame_duration = time_to_frames(framerate, keyframe_durations[i])
         frame_path = interpolate_linear_path(
-            pos_a, pos_b, frame_duration, endpoint=i == len(key_frames) - 2
+            pos_a, pos_b, step_frames, endpoint=i == len(key_frames) - 2
         )
         path = np.append(path, frame_path, axis=0)
 
@@ -421,10 +477,8 @@ def generate_flythrough_path(
         )
 
     if path_type.lower() == "smoothed":
-        camera_path = path[:, 0]
-        for frame in key_frames:
-            frame_index = np.where(np.any(camera_path == np.asarray(frame[0]), axis=1))
-            print(frame_index)
+        camera_path = generate_3D_spline_path(key_frames[:, 0], total_frames)
+        path[:, 0] = camera_path
     return path
 
 
@@ -453,10 +507,7 @@ def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
 
     """
 
-    key_frames = prep_keyframes(key_frames)
     actors = IC.FlyThroughActors()
-
-    seed_point = key_frames[current_index]
 
     path = generate_flythrough_path(key_frames, path_type=path_type)
     path_points = path[:, 0]  # only pull the camera position
@@ -479,9 +530,6 @@ def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
     actors.end_sphere = plotter.add_mesh(
         end_sphere, color="orange", smooth_shading=True, reset_camera=False
     )
-
-    # camera position update, based on the currently selected keyframe
-    post_path_plotter_update(plotter, seed_point)
 
     return actors
 

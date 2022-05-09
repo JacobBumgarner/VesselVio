@@ -331,8 +331,8 @@ def add_widgets(parent, widgets: list, alignment=None):
 
         elif isinstance(widget, list):  # Deprecated
             if type(widget[1]) == str:
-                alignment = find_alignment(widget[1])
-                parent.addWidget(widget[0], alignment=alignment)
+                sub_alignment = find_alignment(widget[1])
+                parent.addWidget(widget[0], alignment=sub_alignment)
             else:
                 parent.addWidget(widget[0], widget[1])
 

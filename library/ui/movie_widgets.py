@@ -122,17 +122,9 @@ class OrbitWidget(QWidget):
         self.update_orbit()
 
 
-class FlyThroughTableSpin(QWidget):
-    def __init__(self):
-        super().__init__()
-        layout = QtO.new_layout(self, no_spacing=True)
-        self.spinner = QtO.new_doublespin(0.1, 1000, 1, alignment="right")
-        QtO.add_widgets(layout, [self.spinner])
-
-
 class FlyThroughTable(QTableWidget):
     """The table widget used to keep track of and modifiy the keyframes for the
-    flythrough movie. As long as there is at least one row in the table, it will
+    flythrough movie. As long as there is at least one column in the table, it will
     be selected. Also contains a key_frame list that keeps track of the keyframe
     plotter.camera_positions
 
@@ -150,7 +142,7 @@ class FlyThroughTable(QTableWidget):
     """
 
     key_frames = []
-    selected_row = 0
+    selected_column = 0
 
     def __init__(self, plotter, update_path_actors):
         super().__init__()
@@ -159,44 +151,44 @@ class FlyThroughTable(QTableWidget):
 
         # Boiler plate
         self.setShowGrid(False)
-        self.setSelectionBehavior(QTableWidget.SelectRows)
+        self.setSelectionBehavior(QTableWidget.SelectColumns)
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.horizontalHeader().setStretchLastSection(True)
+        # self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        # self.horizontalHeader().setStretchLastSection(True)
         self.verticalHeader().hide()
+        self.horizontalHeader().hide()
+        self.horizontalHeader().setDefaultSectionSize(30)
         self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.verticalHeader().setDefaultSectionSize(20)
+        self.verticalHeader().setStretchLastSection(True)
 
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        # self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        self.setFixedSize(200, 120)
+        self.setFixedSize(200, 40)
 
         # Set the column headers
-        self.setColumnCount(2)
-        self.setHorizontalHeaderLabels(["Key Frame", "Duration (s)"])
-        widths = [80, 120]
-        for i in range(2):
-            self.setColumnWidth(i, widths[i])
+        self.setRowCount(1)
+        self.setHorizontalHeaderLabels(["Key Frame"])
+        # self.setMinimumColumnWidth(40)
 
         # Connect the selection changed to the plotter
         self.selectionModel().selectionChanged.connect(self.update_plotter_view)
 
     # Selection processing
     def default_selection(self):
-        """Selects the first row of the table by default"""
+        """Selects the first column of the table by default"""
         if not self.selectionModel().hasSelection():
-            self.selectRow(0)
+            self.selectColumn(0)
 
-    def get_selected_row_index(self):
-        """Identifies the selected row of the model"""
+    def get_selected_column_index(self):
+        """Identifies the selected column of the model"""
         if self.selectionModel().hasSelection():
             model = self.selectionModel()
-            selection = model.selectedRows()[0]
-            row_index = selection.row()
+            selection = model.selectedColumns()[0]
+            keyframe_index = selection.column()
         else:
-            row_index = 0
-        return int(row_index)
+            keyframe_index = 0
+        return int(keyframe_index)
 
     def update_plotter_view(self):
         """Updates the position of the plotter based on the current table
@@ -204,59 +196,57 @@ class FlyThroughTable(QTableWidget):
         """
         model = self.selectionModel()
         if not model.hasSelection():
-            self.selected_row = 0
+            self.selected_column = 0
             return
-        # Prevent within row selection camera updates
-        new_selection = model.selectedRows()[0].row()
-        if self.selected_row != new_selection:
-            self.selected_row = new_selection
+
+        new_selection = model.selectedColumns()[0].column()
+        if self.selected_column != new_selection:
+            self.selected_column = new_selection
             MovProc.post_path_plotter_update(
-                self.plotter, self.key_frames[self.selected_row]
+                self.plotter, self.key_frames[self.selected_column], orbit=False
             )
 
-    # Row Processing
+    # column Processing
     @pyqtSlot()
-    def add_row(self):
-        """Inserts a row into the table at the current index, either before
-        or after the selected row. Uses a pyqtSlot to find the current selected
-        row
+    def add_column(self):
+        """Inserts a column into the table at the current index, either before
+        or after the selected column. Uses a pyqtSlot to find the
+        currently selected column
         """
-        row_index = self.get_selected_row_index()
+        column_index = self.get_selected_column_index()
 
-        if "After" in self.sender().text() and self.rowCount() > 0:
-            row_index += 1
-        self.insertRow(row_index)  # add a row
-        self.default_selection()  # make sure a row is selected
+        if "After" in self.sender().text() and self.columnCount() > 0:
+            column_index += 1
+        self.insertColumn(column_index)  # add a column
+        self.default_selection()  # make sure a column is selected
         # add the keyframe index
-        self.setItem(row_index, 0, QTableWidgetItem("new_frame"))
-        # add the keyframe step duration
-        self.setCellWidget(row_index, 1, FlyThroughTableSpin())
+        item = QTableWidgetItem("new_frame")
+        item.setTextAlignment(Qt.AlignCenter)
+        self.setItem(0, column_index, item)
 
         # update keyframes
         self.key_frames.append(self.plotter.camera_position)
 
-        # update rows - must happen after key_frames is updated
-        self.rename_rows()
-        self.lock_last_row()
-        self.selectRow(row_index)
+        # update columns - must happen after key_frames is updated
+        self.rename_columns()
+        self.selectColumn(column_index)
 
         # update the plotter actors from the parent widget
         self.update_path_actors()
 
-    def remove_row(self):
-        """Removes the actively selected row"""
-        index = self.currentRow()
+    def remove_column(self):
+        """Removes the actively selected column"""
+        index = self.currentColumn()
         if index >= 0:
-            # update the selection, if there are rows left
+            # update the selection, if there are columns left
             if index - 1 >= 0:
-                self.selectRow(index - 1)
-            elif index + 1 < self.rowCount():
-                self.selectRow(index + 1)
+                self.selectColumn(index - 1)
+            elif index + 1 < self.columnCount():
+                self.selectColumn(index + 1)
 
-            # update the rows
-            self.removeRow(index)
-            self.rename_rows()
-            self.lock_last_row()
+            # update the columns
+            self.removeColumn(index)
+            self.rename_columns()
 
             # update the plotter actors from the parent widget
             self.update_path_actors()
@@ -264,52 +254,34 @@ class FlyThroughTable(QTableWidget):
             # update the key_frame list
             self.key_frames.pop(index)
 
-    def rename_rows(self):
+    def rename_columns(self):
         """Renames the keyframes of the table by ascending order"""
-        for i in range(self.rowCount()):
-            item = self.item(i, 0)
+        for i in range(self.columnCount()):
+            item = self.item(0, i)
             item.setText(str(i + 1))
 
-    def lock_last_row(self):
-        """Locks the timing of the last row from being edited"""
-        if self.rowCount() <= 0:  # exit the table is empty
-            return
-        # first make sure all of the rows are unlocked, then lock the last one
-        for i in range(self.rowCount()):
-            widget = self.cellWidget(i, 1)
-            widget.spinner.setEnabled(True)
-            if widget.spinner.value() == 0:  # reset value for prev. last frames
-                widget.spinner.setValue(1)
-            widget.spinner.setMinimum(0.1)
-        widget = self.cellWidget(self.rowCount() - 1, 1)
-        widget.spinner.setMinimum(0)
-        widget.spinner.setValue(0)
-        widget.spinner.setDisabled(True)
+    def load_frames(self, key_frames):
+        """Loads keyframes from previously saved options"""
+        self.key_frames = key_frames
+
+        # Reset the columns, add new items
+        self.setColumnCount(len(key_frames))
+        for i in range(self.columnCount()):
+            item = QTableWidgetItem(str(i + 1))
+            item.setTextAlignment(Qt.AlignCenter)
+            self.setItem(0, i, item)
+
+        self.update_path_actors()
 
     def reset(self):
-        """Resets the table to have zero rows"""
-        self.setRowCount(0)
+        """Resets the table to have zero columns"""
+        self.setColumnCount(0)
         self.key_frames = []
-
-    # Export
-    def load_keyframe_durations(self):
-        """Loads the specified durations for each keyframe in seconds
-
-        Returns
-        -------
-        keyframe_durations : list
-        """
-        keyframe_durations = []
-        for i in range(self.rowCount()):
-            widget = self.cellWidget(i, 1)
-            duration = widget.spinner.value()
-            keyframe_durations.append(duration)
-        return keyframe_durations
 
     # Force constant selection
     def mousePressEvent(self, event):
-        """Tracks mousepress events to ensure that a row is always selected, so
-        long as there is at least one row in the table"""
+        """Tracks mousepress events to ensure that a column is always selected, so
+        long as there is at least one column in the table"""
         if self.indexAt(event.pos()).isValid():
             QTableWidget.mousePressEvent(self, event)
 
@@ -348,7 +320,14 @@ class FlythroughWidget(QWidget):
             stepLayout, [pathStepStart, pathStepBack, pathStepForward, pathStepEnd]
         )
 
-        QtO.add_widgets(leftLayout, [self.pathTable, 5, stepWidget])
+        lengthLayout = QtO.new_layout()
+        lengthLabel = QLabel("Movie Duration")
+        self.movieLength = QtO.new_doublespin(
+            1, 1000, 10, 100, alignment="Center", suffix="s"
+        )
+        QtO.add_widgets(lengthLayout, [lengthLabel, self.movieLength])
+
+        QtO.add_widgets(leftLayout, [self.pathTable, 5, stepWidget, lengthLayout])
 
         # right widget, horizontal layout, two widgets:
         # keyframes management, path type
@@ -357,17 +336,19 @@ class FlythroughWidget(QWidget):
         # keyframe management
         framesLabel = QLabel("<b><center>Keyframes:")
         self.insertFrameBefore = QtO.new_button(
-            "Add Before", self.pathTable.add_row, 120
+            "Add Before", self.pathTable.add_column, 120
         )
-        self.insertFrameAfter = QtO.new_button("Add After", self.pathTable.add_row, 120)
+        self.insertFrameAfter = QtO.new_button(
+            "Add After", self.pathTable.add_column, 120
+        )
         self.deleteCurrentFrame = QtO.new_button(
-            "Delete Current", self.pathTable.remove_row, 120
+            "Delete Current", self.pathTable.remove_column, 120
         )
 
         # path type
         pathTypeLabel = QLabel("<b><center>Path Type:")
         self.pathTypeDropdown = QtO.new_combo(
-            ["Linear", "Smoothed"], connect=self.update_path_actors
+            ["Linear", "Smoothed"], 120, connect=self.update_path_actors
         )
 
         QtO.add_widgets(
@@ -389,41 +370,41 @@ class FlythroughWidget(QWidget):
         QtO.add_widgets(layout, [leftLayout, 5, rightLayout])
 
     # Frame movement
-    def check_rows(self, rows_needed=1):
-        """Check that there are sufficient rows for the steps
+    def check_columns(self, columns_needed=1):
+        """Check that there are sufficient columns for the steps
 
         Returns
         -------
         bool
         """
-        has_rows = False
-        if self.pathTable.rowCount() >= rows_needed:
+        has_columns = False
+        if self.pathTable.columnCount() >= columns_needed:
             return True
-        return has_rows
+        return has_columns
 
     def step_start(self):
         """Moves the plotter to the first keyframe"""
-        if self.check_rows():
-            self.pathTable.selectRow(0)
+        if self.check_columns():
+            self.pathTable.selectColumn(0)
 
     def step_backward(self):
         """Moves the plotter to the previous keyframe, if there is one"""
-        if self.check_rows(rows_needed=2):
-            selected_row = self.pathTable.get_selected_row_index()
-            if selected_row > 0:
-                self.pathTable.selectRow(selected_row - 1)
+        if self.check_columns(columns_needed=2):
+            selected_column = self.pathTable.get_selected_column_index()
+            if selected_column > 0:
+                self.pathTable.selectColumn(selected_column - 1)
 
     def step_forward(self):
         """Moves the plotter to the next keyframe, if there is one"""
-        if self.check_rows(rows_needed=2):
-            selected_row = self.pathTable.get_selected_row_index()
-            if selected_row < self.pathTable.rowCount() - 1:
-                self.pathTable.selectRow(selected_row + 1)
+        if self.check_columns(columns_needed=2):
+            selected_column = self.pathTable.get_selected_column_index()
+            if selected_column < self.pathTable.columnCount() - 1:
+                self.pathTable.selectColumn(selected_column + 1)
 
     def step_end(self):
         """Moves the plotter to the last keyframe"""
-        if self.check_rows():
-            self.pathTable.selectRow(self.pathTable.rowCount() - 1)
+        if self.check_columns():
+            self.pathTable.selectColumn(self.pathTable.columnCount() - 1)
 
     # Path actor management
     def update_path_actors(self):
@@ -431,14 +412,14 @@ class FlythroughWidget(QWidget):
         self.remove_path_actors()
 
         # make sure there are enough keyframes to update the path actors
-        if self.pathTable.rowCount() > 1:
+        if self.pathTable.columnCount() > 1:
 
             # add the udpated actors
             self.flyThroughPathActors = MovProc.generate_flythrough_actors(
                 self.plotter,
                 self.pathTable.key_frames,
                 self.pathTypeDropdown.currentText(),  # linear/spline
-                current_index=self.pathTable.selected_row,
+                current_index=self.pathTable.selected_column,
             )
 
     def remove_path_actors(self):
@@ -457,7 +438,7 @@ class FlythroughWidget(QWidget):
         frame_check : bool
             True if > 1 keyframes, False otherwise
         """
-        key_frame_check = True if self.pathTable.rowCount() > 1 else False
+        key_frame_check = True if self.pathTable.columnCount() > 1 else False
         return key_frame_check
 
     def keyframe_warning(self):
@@ -474,9 +455,9 @@ class FlythroughWidget(QWidget):
         """Exports the created keyframes into a path for movie rendering"""
         camera_path = MovProc.generate_flythrough_path(
             self.pathTable.key_frames,
-            self.pathTable.load_keyframe_durations(),
+            self.movieLength.value(),
             framerate,
-            path_type=self.patyTypeDropdown.currentText(),
+            path_type=self.pathTypeDropdown.currentText(),
         )
         return camera_path
 
@@ -596,17 +577,22 @@ class MovieDialogue(QDialog):
         titleLabel = QLabel("Save path:")
         self.savePathEdit = QtO.new_line_edit("None", 150, locked=True)
         self.pathDefaultStyle = self.savePathEdit.styleSheet()
-        self.changePathButton = QtO.new_button("Change...", self.get_save_path)
+        self.changePathButton = QtO.new_button("Change...", self.get_movie_save_path)
         QtO.add_widgets(
             filePathLayout, [titleLabel, 5, self.savePathEdit, 5, self.changePathButton]
         )
 
         # add bottom row buttons to initia.
         buttons = QtO.new_layout(None)
+        saveLabel = QLabel("<b>Movie Options:")
+        loadButton = QtO.new_button("Load", self.load_options)
+        saveButton = QtO.new_button("Save", self.save_options)
         cancelButton = QtO.new_button("Cancel", self.closeEvent)
         renderButton = QtO.new_button("Render", self.return_movie_path)
         renderButton.setAutoDefault(True)
-        QtO.add_widgets(buttons, [0, cancelButton, renderButton])
+        QtO.add_widgets(
+            buttons, [saveLabel, loadButton, saveButton, 0, cancelButton, renderButton]
+        )
 
         QtO.button_defaulting(cancelButton, False)
         QtO.button_defaulting(renderButton, True)
@@ -615,6 +601,7 @@ class MovieDialogue(QDialog):
 
         self.setWindowFlags(self.windowFlags() ^ Qt.WindowStaysOnTopHint)
 
+    # Movie path processing
     def toggle_path_options(self):
         """Toggle the visbiility of the rendering path options"""
         show_orbit = True if self.movieType.currentText() == "Orbit" else False
@@ -666,9 +653,45 @@ class MovieDialogue(QDialog):
         self.remove_path_actors()
         self.accept()
 
+    def load_options(self):
+        """Load previously saved movie options"""
+        filename = helpers.load_JSON(helpers.get_dir("Desktop"))
+        if not filename:
+            return
+
+        movie_options = MovProc.load_options(filename)
+
+        type_index = 0 if movie_options.movie_type == "Orbit" else 1
+        self.movieType.setCurrentIndex(type_index)
+
+        if type_index == 0:
+            self.orbitWidget.orbit_path = movie_options.key_frames
+            self.orbitWidget.update_path_actors()
+        if type_index == 1:
+            self.flythroughWidget.pathTable.load_frames(movie_options.key_frames)
+
+        return
+
+    def save_options(self):
+        """Save the movie options for future reuse."""
+        filename = helpers.get_save_file(
+            "Save File As...", helpers.get_dir("Desktop"), "json"
+        )
+        if not filename:  # abandon if no filename
+            return
+
+        movie_type = self.movieType.currentText()
+        if movie_type == "Orbit":
+            key_frames = self.orbitWidget.orbit_path
+        elif movie_type == "Flythrough":
+            key_frames = self.flythroughWidget.pathTable.key_frames
+
+        movie_options = IC.MovieExportOptions(movie_type, key_frames)
+        MovProc.export_options(filename, movie_options)
+
     # File path processing
-    def get_save_path(self):
-        """Load the save path of the movie"""
+    def get_movie_save_path(self):
+        """Get the save path of the movie"""
         movie_format = self.movieFormat.currentText().lower()
         path = helpers.get_save_file("Save movie as...", self.movie_dir, movie_format)
 

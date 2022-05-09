@@ -197,18 +197,22 @@ def load_RGB_folder():
     return folder
 
 
-def get_save_file(message, dir, format):
-    filter = f"{format} (*.{format})"
-    file_name = QFileDialog.getSaveFileName(QFileDialog(), message, dir, filter)[0]
+def get_save_file(message, directory, format):
+    file_filter = f"{format} (*.{format})"
+    file_name = QFileDialog.getSaveFileName(
+        QFileDialog(), message, directory, file_filter
+    )[0]
     if file_name:
         file_name = std_path(file_name)
     return file_name
 
 
-def load_JSON(dir):
+def load_JSON(directory):
     message = "Select JSON Tree File"
-    filter = "json (*.json)"
-    loaded_file = QFileDialog.getOpenFileName(QFileDialog(), message, dir, filter)[0]
+    file_filter = "json (*.json)"
+    loaded_file = QFileDialog.getOpenFileName(
+        QFileDialog(), message, directory, file_filter
+    )[0]
     if loaded_file:
         loaded_file = std_path(loaded_file)
     return loaded_file

@@ -327,6 +327,9 @@ class PyVistaActors:
             self.__dict__[item] = None
 
 
+##############
+### Movies ###
+##############
 class OrbitActors:
     def __init__(
         self, path=None, path_direction=None, camera=None, lens=None, camera_legs=None
@@ -374,3 +377,9 @@ class FlyThroughActors:
         for item in items:
             del self.__dict__[item]
             self.__dict__[item] = None
+
+
+class MovieExportOptions:
+    def __init__(self, movie_type, key_frames):
+        self.movie_type = movie_type
+        self.key_frames = key_frames

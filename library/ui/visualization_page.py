@@ -794,7 +794,6 @@ class LoadingDialog(QDialog):
                     or "VesselVio Annotations" not in annotation_data.keys()
                 ):
                     self.JSON_error("Incorrect filetype!")
-                    self.JSON_error("Incorrect filetype!")
                 else:
                     # If loading an RGB filetype, make sure there's no duplicate colors.
                     if self.annotationType.currentText() == "RGB" and RGB_check(
@@ -2031,7 +2030,7 @@ class VolumeOptions(QWidget):
 
         ## Volume options
         message = "Visualization options for rendered volumes"
-        self.volumeOptions = QtO.CollapsibleBox("Visualization Options", message)
+        self.volumeOptions = QtO.CollapsibleBox("Volume Options", message)
         optionsLayout = QtO.new_layout(None, "V", spacing=5, margins=(10, 10, 0, 10))
 
         colorLine = QtO.new_widget()
@@ -2074,7 +2073,6 @@ class VolumeOptions(QWidget):
 
         self.volumeOptions.lock(True)
         self.volumeOptions.setVisible(False)
-
         return
 
     @pyqtSlot()
@@ -2134,6 +2132,7 @@ class VolumeOptions(QWidget):
     def toggle_options(self):
         checked = self.noVolume.isChecked()
         self.volumeOptions.lock(checked)
+        self.volumeOptions.setVisible(not checked)
         return
 
     def load_meshes(self, meshes):
