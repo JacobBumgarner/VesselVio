@@ -94,7 +94,7 @@ class OrbitWidget(QWidget):
                 self.plotter.remove_actor(actor, reset_camera=False)
                 del actor
 
-    def generate_final_path(self, framerate):
+    def export_path(self, framerate):
         """Generates an orbital path with with the requested frame count
 
         Parameters
@@ -109,7 +109,7 @@ class OrbitWidget(QWidget):
             plotter.camera_position
 
         """
-        frames = MovProc.orbit_time_to_frames(framerate, self.movieLength.value())
+        frames = MovProc.time_to_frames(framerate, self.movieLength.value())
         self.plotter.camera_position = self.orbit_path[0]
         return MovProc.generate_orbital_path(self.plotter.camera_position, frames)
 
@@ -291,6 +291,21 @@ class FlyThroughTable(QTableWidget):
         self.setRowCount(0)
         self.key_frames = []
 
+    # Export
+    def load_keyframe_durations(self):
+        """Loads the specified durations for each keyframe in seconds
+
+        Returns
+        -------
+        keyframe_durations : list
+        """
+        keyframe_durations = []
+        for i in range(self.rowCount()):
+            widget = self.cellWidget(i, 1)
+            duration = widget.spinner.value()
+            keyframe_durations.append(duration)
+        return keyframe_durations
+
     # Force constant selection
     def mousePressEvent(self, event):
         """Tracks mousepress events to ensure that a row is always selected, so
@@ -352,7 +367,7 @@ class FlythroughWidget(QWidget):
         # path type
         pathTypeLabel = QLabel("<b><center>Path Type:")
         self.pathTypeDropdown = QtO.new_combo(
-            ["Linear", "Spline"], connect=self.update_path_actors
+            ["Linear", "Smoothed"], connect=self.update_path_actors
         )
 
         QtO.add_widgets(
@@ -455,10 +470,15 @@ class FlythroughWidget(QWidget):
         )
         warning.exec_()
 
-    def export_frames(self):
+    def export_path(self, framerate):
         """Exports the created keyframes into a path for movie rendering"""
-
-        return
+        camera_path = MovProc.generate_flythrough_path(
+            self.pathTable.key_frames,
+            self.pathTable.load_keyframe_durations(),
+            framerate,
+            path_type=self.patyTypeDropdown.currentText(),
+        )
+        return camera_path
 
     # Defaulting and resetting
     def default_setup(self):
@@ -628,14 +648,12 @@ class MovieDialogue(QDialog):
         # Get the plotter path
         framerate = int(self.movieFPS.currentText())
         if self.movieType.currentText() == "Orbit":
-            self.path = self.orbitWidget.generate_final_path(framerate)
+            self.path = self.orbitWidget.export_path(framerate)
         elif self.movieType.currentText() == "Flythrough":
             if not self.flythroughWidget.keyframe_check():
                 self.flythroughWidget.keyframe_warning()
                 return
-            self.path = MovProc.update_flythrough_frames(
-                self.path, self.movieFrames.value()
-            )
+            self.path = self.flythroughWidget.export_path(framerate)
 
         self.movie_settings = IC.MovieOptions(
             self.savePathEdit.text(),

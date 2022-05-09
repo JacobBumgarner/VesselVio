@@ -119,7 +119,7 @@ def post_path_plotter_update(plotter, seed_position):
 ###############################
 ### Orbital Path Processing ###
 ###############################
-def orbit_time_to_frames(framerate, movie_time):
+def time_to_frames(framerate, movie_time):
     """Given a framerate and a frame count, return the number
     of frames for the orbit
 
@@ -303,22 +303,90 @@ def prep_keyframes(key_frames):
     return key_frames
 
 
-def generate_linear_flythrough_path(plotter, key_frames, keyframe_durations, framerate):
+def generate_3D_spline_path(input_path):
+    """Given a series of keyframes, generate a quadratic b-spline curve that
+    passes through all of the original input points.
+
+    Parameters
+    ----------
+    input_path : list, tuple, np.array
+        (n,3) Shaped array
+
+    Returns
+    -------
+    path : np.array
+        (n,3) shaped array containing the
+    """
+    if not isinstance(input_path, np.ndarray):
+        input_path = np.asarray(input_path)
+    tck, u = interpolate.splprep(
+        [input_path[:, 0], input_path[:, 1], input_path[:, 2]],
+        k=int(min(2, input_path.shape[0] - 1)),
+        s=0,
+    )
+    u = np.linspace(0, 1, num=input_path.shape[0] * 100, endpoint=True)
+
+    out = interpolate.splev(u, tck)
+    path = np.asarray(out).T
+    return path
+
+
+def interpolate_linear_path(position_a, position_b, n_points, endpoint=False):
+    """Given two points, create a linearly interpolated path between them.
+
+    Parameters
+    ----------
+    position_a : PyVista.CameraPosition, np.array, list
+        (n,3,3) shape
+
+    position_b : PyVista.CameraPosition, np.array, list
+        (n,3,3) shape
+
+    n_points : int
+        The number of points to be interpolated between the two positions
+
+    endpoint : bool
+        Add the position_b to the end of the interpolation
+
+    Returns
+    -------
+    path : np.array
+        (n_points,3,3) Shaped array of the interpolated path, where each
+        n_point index represents a PyVista.CameraPosition
+
+    """
+    position_a = np.array([list(pos) for pos in position_a])
+    position_b = np.array([list(pos) for pos in position_b])
+
+    if not isinstance(n_points, int):
+        raise TypeError(
+            "n_points must be passed as an integer value for point interpolation"
+        )
+
+    # god numpy is amazing
+    path = np.linspace(position_a, position_b, num=n_points, endpoint=endpoint)
+    return path
+
+
+def generate_flythrough_path(
+    key_frames, keyframe_durations=5, framerate=30, path_type="linear"
+):
     """Generates a linear flythrough path with specified frame durations
 
     Parameters
     ----------
-    plotter : PyVista.Plotter
-
     key_frames : list
         A list of PyVista.CameraPositions
 
-    keyframe_durations : list
+    keyframe_durations : list, optional
         A (n,) shaped list containing float elements that indicate the duration
         of each key_frame transition in seconds
 
-    framerate : int
+    framerate : int, optional
         The framerate used to convert the frame_durations into frames
+
+    path_type : str
+        Options: "linear", "smoothed"
 
     Returns
     -------
@@ -326,38 +394,38 @@ def generate_linear_flythrough_path(plotter, key_frames, keyframe_durations, fra
         A (n,3,3) shaped array that represents a time-series of
         PyVista.CameraPositions. The amount of frames (n) will be determined
         by the input frame_durations and the input frame_rate
-
+        path_points = [pos[0] for pos in key_frames]
     """
-    # path_points = [pos[0] for pos in key_frames]
-    return
+    # first path frame acts as seed for appends
+    path = np.zeros((1, 3, 3), dtype=float)
 
+    # make sure the keyframe durations are prepped
+    if isinstance(keyframe_durations, int):
+        keyframe_durations = [keyframe_durations for _ in range(len(key_frames))]
 
-def generate_spline_flythrough_path(plotter, key_frames, keyframe_durations, framerate):
-    """Generates a linear flythrough path with specified frame durations
+    for i in range(len(key_frames) - 1):  # don't iterate the last frame
+        pos_a = key_frames[i]
+        pos_b = key_frames[i + 1]
+        frame_duration = time_to_frames(framerate, keyframe_durations[i])
+        frame_path = interpolate_linear_path(
+            pos_a, pos_b, frame_duration, endpoint=i == len(key_frames) - 2
+        )
+        path = np.append(path, frame_path, axis=0)
 
-    Parameters
-    ----------
-    plotter : PyVista.Plotter
+    path = path[1:]  # strip the seeded zeros
 
-    key_frames : list
-        A list of PyVista.CameraPositions
+    if not isinstance(path_type, str):
+        raise TypeError(
+            "path_type must be a string and one of the two options",
+            "'linear', 'smoothed'",
+        )
 
-    keyframe_durations : list
-        A (n,) shaped list containing float elements that indicate the duration
-        of each key_frame transition in seconds
-
-    framerate : int
-        The framerate used to convert the frame_durations into frames
-
-    Returns
-    -------
-    path : np.array
-        A (n,3,3) shaped array that represents a time-series of
-        PyVista.CameraPositions. The amount of frames (n) will be determined
-        by the input frame_durations and the input frame_rate    path_points = [pos[0] for pos in key_frames]
-    """
-
-    return
+    if path_type.lower() == "smoothed":
+        camera_path = path[:, 0]
+        for frame in key_frames:
+            frame_index = np.where(np.any(camera_path == np.asarray(frame[0]), axis=1))
+            print(frame_index)
+    return path
 
 
 def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
@@ -390,39 +458,24 @@ def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
 
     seed_point = key_frames[current_index]
 
-    # Bounds resizing factor
-    resize_factor = path_actor_scaling(seed_point)
-
-    path_points = key_frames[:, 0]
-    if path_type == "Linear":
-        line = polyline_from_points(path_points)
-    elif path_type == "Spline":
-        tck, u = interpolate.splprep(
-            [path_points[:, 0], path_points[:, 1], path_points[:, 2]],
-            k=int(min(2, path_points.shape[0] - 1)),
-            s=0,
-        )
-        u = np.linspace(0, 1, num=path_points.shape[0] * 100, endpoint=True)
-        out = interpolate.splev(u, tck)
-        out = np.asarray(out).T
-        line = pv.Spline(out)
-    else:
-        raise ValueError("The path_type must either be 'Linear' or 'Spline'")
+    path = generate_flythrough_path(key_frames, path_type=path_type)
+    path_points = path[:, 0]  # only pull the camera position
+    line = pv.Spline(path_points)
 
     # Create the path actor
-    line_path = line.tube(radius=0.5 * resize_factor, capping=True)
+    line_path = line.tube(radius=2, capping=True)
 
     actors.path = plotter.add_mesh(
         line_path, color="ff0000", smooth_shading=True, reset_camera=False
     )
 
     # add start/end spheres
-    start_sphere = pv.Sphere(radius=1 * resize_factor, center=path_points[0])
+    start_sphere = pv.Sphere(radius=3, center=path_points[0])
     actors.start_sphere = plotter.add_mesh(
         start_sphere, color="green", smooth_shading=True, reset_camera=False
     )
 
-    end_sphere = pv.Sphere(radius=1 * resize_factor, center=path_points[-1])
+    end_sphere = pv.Sphere(radius=3, center=path_points[-1])
     actors.end_sphere = plotter.add_mesh(
         end_sphere, color="orange", smooth_shading=True, reset_camera=False
     )
