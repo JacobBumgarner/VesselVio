@@ -350,10 +350,11 @@ def prep_keyframes(key_frames):
     key_frames = np.asarray(key_frames)
 
     for i in range(1, len(key_frames)):  # dumb to iterate, i know
-        pos0 = key_frames[i - 1, 0]
-        pos1 = key_frames[i, 0]
-        if np.all(pos0 == pos1):
-            key_frames[i, 0] += 0.000001
+        for j in range(3):
+            pos0 = key_frames[i - 1, j]
+            pos1 = key_frames[i, j]
+            if np.all(pos0 == pos1):
+                key_frames[i, j] += 0.000001
 
     return key_frames
 
@@ -452,23 +453,10 @@ def generate_flythrough_path(
     # convert the key_frames into a numpy array
     key_frames = prep_keyframes(key_frames)
 
-    # first path frame acts as seed for appends
-    path = np.zeros((1, 3, 3), dtype=float)
-
     # indicate how long each movie step should be
     approx_frames = time_to_frames(framerate, movie_duration)
     step_frames = int(approx_frames / (key_frames.shape[0] - 1))
     total_frames = step_frames * (key_frames.shape[0] - 1)
-
-    for i in range(len(key_frames) - 1):  # don't iterate the last frame
-        pos_a = key_frames[i]
-        pos_b = key_frames[i + 1]
-        frame_path = interpolate_linear_path(
-            pos_a, pos_b, step_frames, endpoint=i == len(key_frames) - 2
-        )
-        path = np.append(path, frame_path, axis=0)
-
-    path = path[1:]  # strip the seeded zeros
 
     if not isinstance(path_type, str):
         raise TypeError(
@@ -476,9 +464,25 @@ def generate_flythrough_path(
             "'linear', 'smoothed'",
         )
 
-    if path_type.lower() == "smoothed":
+    if path_type.lower() == "linear":
+        # first path frame acts as seed for appends
+        path = np.zeros((1, 3, 3), dtype=float)
+        for i in range(len(key_frames) - 1):  # don't iterate the last frame
+            pos_a = key_frames[i]
+            pos_b = key_frames[i + 1]
+            frame_path = interpolate_linear_path(
+                pos_a, pos_b, step_frames, endpoint=i == len(key_frames) - 2
+            )
+            path = np.append(path, frame_path, axis=0)
+        path = path[1:]  # strip the seeded zeros
+
+    elif path_type.lower() == "smoothed":
         camera_path = generate_3D_spline_path(key_frames[:, 0], total_frames)
-        path[:, 0] = camera_path
+        focal_path = generate_3D_spline_path(key_frames[:, 1], total_frames)
+        viewup_path = generate_3D_spline_path(key_frames[:, 2], total_frames)
+
+        path = np.stack([camera_path, focal_path, viewup_path], axis=1)
+
     return path
 
 
@@ -544,6 +548,14 @@ def get_resolution(resolution):
         X, Y = 2560, 1440
     elif resolution == "2160p":
         X, Y = 3840, 2160
+    if resolution == "720p Square":
+        X, Y = 720, 720
+    elif resolution == "1080p Square":
+        X, Y = 1080, 1080
+    elif resolution == "1440p Square":
+        X, Y = 1440, 1440
+    elif resolution == "2160p Square":
+        X, Y = 2160, 2160
 
     # TODO - low priority
     # Resizing of the PyVista plotter behaves different between normal and

@@ -161,18 +161,17 @@ class FlyThroughTable(QTableWidget):
         self.horizontalHeader().setDefaultSectionSize(30)
         self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.verticalHeader().setStretchLastSection(True)
-
-        # self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.setFixedSize(200, 40)
 
         # Set the column headers
         self.setRowCount(1)
         self.setHorizontalHeaderLabels(["Key Frame"])
-        # self.setMinimumColumnWidth(40)
 
         # Connect the selection changed to the plotter
         self.selectionModel().selectionChanged.connect(self.update_plotter_view)
+        self.cellClicked.connect(self.update_plotter_view)
 
     # Selection processing
     def default_selection(self):
@@ -199,12 +198,10 @@ class FlyThroughTable(QTableWidget):
             self.selected_column = 0
             return
 
-        new_selection = model.selectedColumns()[0].column()
-        if self.selected_column != new_selection:
-            self.selected_column = new_selection
-            MovProc.post_path_plotter_update(
-                self.plotter, self.key_frames[self.selected_column], orbit=False
-            )
+        self.selected_column = model.selectedColumns()[0].column()
+        MovProc.post_path_plotter_update(
+            self.plotter, self.key_frames[self.selected_column], orbit=False
+        )
 
     # column Processing
     @pyqtSlot()
@@ -218,14 +215,14 @@ class FlyThroughTable(QTableWidget):
         if "After" in self.sender().text() and self.columnCount() > 0:
             column_index += 1
         self.insertColumn(column_index)  # add a column
-        self.default_selection()  # make sure a column is selected
+        # self.default_selection()  # make sure a column is selected
         # add the keyframe index
         item = QTableWidgetItem("new_frame")
         item.setTextAlignment(Qt.AlignCenter)
         self.setItem(0, column_index, item)
 
         # update keyframes
-        self.key_frames.append(self.plotter.camera_position)
+        self.key_frames.insert(column_index, self.plotter.camera_position)
 
         # update columns - must happen after key_frames is updated
         self.rename_columns()
@@ -248,11 +245,11 @@ class FlyThroughTable(QTableWidget):
             self.removeColumn(index)
             self.rename_columns()
 
-            # update the plotter actors from the parent widget
-            self.update_path_actors()
-
             # update the key_frame list
             self.key_frames.pop(index)
+
+            # update the plotter actors from the parent widget
+            self.update_path_actors()
 
     def rename_columns(self):
         """Renames the keyframes of the table by ascending order"""
@@ -466,7 +463,6 @@ class FlythroughWidget(QWidget):
         """Creates a default setup for the widget. Resets the table"""
         self.pathTable.reset()
         self.insertFrameAfter.click()  # adds an initial frame
-        self.update_path_actors()
 
     def reset(self):
         self.remove_path_actors()
@@ -525,7 +521,17 @@ class MovieDialogue(QDialog):
 
         resolutionLabel = QLabel("Resolution:")
         self.movieResolution = QtO.new_combo(
-            ["720p", "1080p", "1440p", "2160p", "Current"], 120
+            [
+                "720p",
+                "1080p",
+                "1440p",
+                "2160p",
+                "720p Square",
+                "1080p Square",
+                "1440p Square",
+                "2160p Square" "Current",
+            ],
+            120,
         )
 
         fpsLabel = QLabel("Frame rate:")
