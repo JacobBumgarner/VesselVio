@@ -928,6 +928,7 @@ class RenderDialogue(QDialog):
         movie writer, and self."""
         self.movieRenderer.quit()
         self.plotter.mwriter.close()
+        self.plotter.reset_camera()
         self.accept()
 
 
