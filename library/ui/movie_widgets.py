@@ -11,6 +11,7 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 import sys
+from ctypes import alignment
 
 import imageio_ffmpeg  # Needed for PyInstaller
 import matplotlib  # Needed for PyInstaller
@@ -47,6 +48,8 @@ from PyQt5.QtWidgets import (
 )
 
 
+# Orbit widgets
+################################################################################
 class OrbitWidget(QWidget):
     """The dialogue used to create an orbital movie around a mesh. Allows users
     to move the plotter around the visaulized meshes and generate orbital paths
@@ -67,7 +70,6 @@ class OrbitWidget(QWidget):
         super().__init__()
         self.plotter = plotter
         self.orbitPathActors = IC.OrbitActors()
-        self.setFixedSize(260, 140)
         widgetLayout = QtO.new_layout(self, "V")
         formLayout = QtO.new_form_layout()
 
@@ -136,6 +138,8 @@ class OrbitWidget(QWidget):
         self.update_orbit()
 
 
+# Flythrough widgets
+################################################################################
 class FlyThroughTable(QTableWidget):
     """The table widget used to keep track of and modifiy the keyframes for the
     flythrough movie. As long as there is at least one column in the table, it will
@@ -168,16 +172,17 @@ class FlyThroughTable(QTableWidget):
         self.setSelectionBehavior(QTableWidget.SelectColumns)
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setEditTriggers(QTableWidget.NoEditTriggers)
-        # self.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        # self.horizontalHeader().setStretchLastSection(True)
-        self.verticalHeader().hide()
-        self.horizontalHeader().hide()
+
+        # Header boiler
         self.horizontalHeader().setDefaultSectionSize(30)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.horizontalHeader().hide()
         self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.verticalHeader().setStretchLastSection(True)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.verticalHeader().hide()
 
-        self.setFixedSize(200, 40)
+        self.setFixedSize(240, 40)
 
         # Set the column headers
         self.setRowCount(1)
@@ -291,8 +296,8 @@ class FlyThroughTable(QTableWidget):
 
     # Force constant selection
     def mousePressEvent(self, event):
-        """Tracks mousepress events to ensure that a column is always selected, so
-        long as there is at least one column in the table"""
+        """Tracks mousepress events to ensure that a column is
+        always selected, so long as there is at least one column in the table"""
         if self.indexAt(event.pos()).isValid():
             QTableWidget.mousePressEvent(self, event)
 
@@ -314,74 +319,89 @@ class FlythroughWidget(QWidget):
         self.plotter = plotter
         self.flyThroughPathActors = IC.FlyThroughActors()
 
-        # Horizontal layout, two components
-        layout = QtO.new_layout(self, "H", no_spacing=True)
+        # Vertical layout: keyframe widget, form layout
+        widgetLayout = QtO.new_layout(self, "V", margins=(0, 0, 0, 0))
 
-        # Left layout, two components: table, step buttons
-        leftLayout = QtO.new_layout(orient="V", no_spacing=True)
+        # Top widget: keyframe table, step buttons, and add/delete widget
+        keyframeWidget = QtO.new_widget()
+        keyframeWidgetLayout = QtO.new_layout(
+            keyframeWidget, orient="V", no_spacing=True
+        )
+
+        keyframeLabel = QLabel("<b><cemter>Keyframes:")
 
         # table
         self.pathTable = FlyThroughTable(self.plotter, self.update_path_actors)
 
         # step buttons
         stepWidget = QtO.new_widget()
-        stepLayout = QtO.new_layout(stepWidget, margins=(0, 0, 0, 0), spacing=5)
+        stepWidgetLayout = QtO.new_layout(
+            stepWidget, margins=(0, 0, 0, 0), spacing=5
+        )
         pathStepStart = QtO.new_button("<<", self.step_start, 50)
         pathStepBack = QtO.new_button("<", self.step_backward, 50)
         pathStepForward = QtO.new_button(">", self.step_forward, 50)
         pathStepEnd = QtO.new_button(">>", self.step_end, 50)
         QtO.add_widgets(
-            stepLayout, [pathStepStart, pathStepBack, pathStepForward, pathStepEnd]
+            stepWidgetLayout,
+            [pathStepStart, pathStepBack, pathStepForward, pathStepEnd],
         )
 
-        lengthLayout = QtO.new_layout()
-        lengthLabel = QLabel("Movie Duration")
-        self.movieLength = QtO.new_doublespin(
-            1, 1000, 10, 100, alignment="Center", suffix="s"
-        )
-        QtO.add_widgets(lengthLayout, [lengthLabel, self.movieLength])
-
-        QtO.add_widgets(leftLayout, [self.pathTable, 5, stepWidget, lengthLayout])
-
-        # right widget, horizontal layout, two widgets:
-        # keyframes management, path type
-        rightLayout = QtO.new_layout(orient="V", spacing=5)
-
-        # keyframe management
-        framesLabel = QLabel("<b><center>Keyframes:")
+        # add/delete widget: two rows
+        addRowLayout = QtO.new_layout()
         self.insertFrameBefore = QtO.new_button(
-            "Add Before", self.pathTable.add_column, 120
+            "Add Before", self.pathTable.add_column, 100
         )
         self.insertFrameAfter = QtO.new_button(
-            "Add After", self.pathTable.add_column, 120
+            "Add After", self.pathTable.add_column, 100
         )
+        QtO.add_widgets(
+            addRowLayout, 
+            [self.insertFrameBefore, self.insertFrameAfter]
+        )
+
         self.deleteCurrentFrame = QtO.new_button(
             "Delete Current", self.pathTable.remove_column, 120
         )
 
-        # path type
+        QtO.add_widgets(
+            keyframeWidgetLayout,
+            [
+                keyframeLabel,
+                self.pathTable,
+                stepWidget,
+                addRowLayout,
+                self.deleteCurrentFrame,
+            ],
+            alignment="center",
+        )
+
+        # Path options form
+        pathOptionsForm = QtO.new_form_layout()
+
+        # Path type
         pathTypeLabel = QLabel("<b><center>Path Type:")
         self.pathTypeDropdown = QtO.new_combo(
             ["Linear", "Smoothed"], 120, connect=self.update_path_actors
         )
 
-        QtO.add_widgets(
-            rightLayout,
-            [
-                0,
-                framesLabel,
-                self.insertFrameBefore,
-                self.insertFrameAfter,
-                self.deleteCurrentFrame,
-                10,
-                pathTypeLabel,
-                self.pathTypeDropdown,
-                0,
-            ],
-            alignment="center",
+        # Movie Length
+        movieLengthLabel = QLabel("Movie Length")
+        self.movieLength = QtO.new_doublespin(
+            1, 1000, 10, 100, alignment="Center", suffix="s"
         )
 
-        QtO.add_widgets(layout, [leftLayout, 5, rightLayout])
+        QtO.add_form_rows(
+            pathOptionsForm,
+            [
+                [pathTypeLabel, self.pathTypeDropdown],
+                [movieLengthLabel, self.movieLength],
+            ],
+        )
+
+        QtO.add_widgets(
+            widgetLayout, [keyframeWidget, pathOptionsForm], alignment="center"
+        )
 
     # Frame movement
     def check_columns(self, columns_needed=1):
@@ -461,7 +481,8 @@ class FlythroughWidget(QWidget):
         warning = QMessageBox()
         warning.setWindowTitle("Keyframe Error")
         warning.setText(
-            "At least <b>two</b> keyframes are needed to create a Flythrough movie!"
+            "At least <b>two</b> keyframes are ",
+            "needed to create a Flythrough movie!"
         )
         warning.exec_()
 
@@ -486,6 +507,8 @@ class FlythroughWidget(QWidget):
         self.pathTable.reset()
 
 
+# Movie generation
+################################################################################
 class MovieDialogue(QDialog):
     """A dialogue widget used to create movies. Movie rendering settings are
     selected, a save path is selected, and the movie path is created.
@@ -502,29 +525,27 @@ class MovieDialogue(QDialog):
 
     """
 
-    def __init__(self, plotter, mainWindow):
+    def __init__(self, plotter: pv.Plotter, mainWindow: QMainWindow):
         super().__init__(mainWindow)
         self.plotter = plotter
         self.movie_dir = helpers.load_movie_dir()
 
         self.setWindowTitle("Movie Options")
 
-        ## Layout, two rows
+        # Vertical Layout, two options boxes, bottom for path updates
         dialogueLayout = QtO.new_layout(self, "V", spacing=5)
         dialogueLayout.setSizeConstraint(QLayout.SetFixedSize)
 
-        ## Top row
-        topRow = QtO.new_widget()
-        topRowLayout = QtO.new_layout(topRow, margins=0)
+        # Top options box
+        generalOptionsWidget = QtO.new_widget(260)
+        generalOptionsLayout = QtO.new_layout(
+            generalOptionsWidget, orient="V", no_spacing=True
+        )
+        generalOptionsHeader = QLabel("<b>Movie options")
 
-        # Top left
-        optionsColumn = QtO.new_widget(260)
-        optionsColumnLayout = QtO.new_layout(optionsColumn, orient="V", no_spacing=True)
-        optionsHeader = QLabel("<b>Movie options")
-
-        optionsBox = QGroupBox()
-        optionsLayout = QtO.new_layout(optionsBox, "V")
-        optionsForm = QtO.new_form_layout()
+        generalOptionsBox = QGroupBox()
+        generalOptionsBoxLayout = QtO.new_layout(generalOptionsBox, "V")
+        generalOptionsFormLayout = QtO.new_form_layout()
 
         typeLabel = QLabel("Movie Type:")
         self.movieType = QtO.new_combo(
@@ -556,7 +577,7 @@ class MovieDialogue(QDialog):
         self.movieFPS.setCurrentIndex(1)
 
         QtO.add_form_rows(
-            optionsForm,
+            generalOptionsFormLayout,
             [
                 [typeLabel, self.movieType],
                 [formatLabel, self.movieFormat],
@@ -565,63 +586,87 @@ class MovieDialogue(QDialog):
             ],
         )
 
-        QtO.add_widgets(optionsLayout, [0, optionsForm, 0])
+        QtO.add_widgets(
+            generalOptionsBoxLayout, 
+            [0, generalOptionsFormLayout, 0]
+        )
 
-        QtO.add_widgets(optionsColumnLayout, [optionsHeader, optionsBox])
+        QtO.add_widgets(
+            generalOptionsLayout,
+            [generalOptionsHeader, generalOptionsBox]
+        )
 
-        # Top right
-        pathColumn = QtO.new_widget()
-        pathColumnLayout = QtO.new_layout(pathColumn, orient="V", no_spacing=True)
-        self.pathColumnHeader = QLabel("<b>Path Options")
+        # Path options widget
+        pathOptionsWidget = QtO.new_widget(260)
+        pathOptionsLayout = QtO.new_layout(
+            pathOptionsWidget, orient="V", no_spacing=True
+        )
+        self.pathOptionsHeader = QLabel("<b>Orbit Options")
 
-        pathBox = QGroupBox()
-        boxLayout = QtO.new_layout(pathBox, "V")
+        pathOptionsBox = QGroupBox()
+        pathOptionsBoxLayout = QtO.new_layout(pathOptionsBox, "V")
 
         self.orbitWidget = OrbitWidget(self.plotter)
         self.flythroughWidget = FlythroughWidget(self.plotter)
         self.flythroughWidget.setVisible(False)
 
         # Tried to use a stacked widget here, but it was fucking with widget
-        # resizing. abandoned it for a simpler hide/show approach.
-        # self.pathStack = QtO.new_stacked([self.orbitWidget, self.flythroughWidget])
-        # # Connect the movieType button to the pathStack
-        # self.movieType.currentIndexChanged.connect(self.pathStack.setCurrentIndex)
-        # QtO.add_widgets(boxLayout, [self.pathStack])
+        # resizing. abandoned it for a hide/show approach.
 
-        QtO.add_widgets(boxLayout, [self.orbitWidget, self.flythroughWidget])
+        QtO.add_widgets(
+            pathOptionsBoxLayout, 
+            [self.orbitWidget, self.flythroughWidget]
+        )
 
-        QtO.add_widgets(pathColumnLayout, [self.pathColumnHeader, pathBox])
+        QtO.add_widgets(
+            pathOptionsLayout,
+            [self.pathOptionsHeader, pathOptionsBox]
+        )
 
-        QtO.add_widgets(topRowLayout, [optionsColumn, pathColumn])
+        # Path IO
+        pathIOWidget = QtO.new_widget(260)
+        pathIOLayout = QtO.new_layout(pathIOWidget)
 
-        ## Bottom layout
-        filePathWidget = QtO.new_widget()
-        filePathLayout = QtO.new_layout(filePathWidget, no_spacing=True)
-        titleLabel = QLabel("Save path:")
+        loadPathbutton = QtO.new_button("Load Path", self.load_options)
+        savePathButton = QtO.new_button("Save Path", self.save_options)
+
+        QtO.add_widgets(pathIOLayout, [0, loadPathbutton, savePathButton, 0])
+
+        # Filepath widget
+        filePathWidget = QtO.new_widget(260)
+        filePathWidgetLayout = QtO.new_layout(filePathWidget, no_spacing=True)
+        titleLabel = QLabel("File Path:")
         self.savePathEdit = QtO.new_line_edit("None", 150, locked=True)
         self.pathDefaultStyle = self.savePathEdit.styleSheet()
         self.changePathButton = QtO.new_button("Change...", self.get_movie_save_path)
         QtO.add_widgets(
-            filePathLayout, [titleLabel, 5, self.savePathEdit, 5, self.changePathButton]
+            filePathWidgetLayout,
+            [titleLabel, self.savePathEdit, self.changePathButton],
         )
 
-        # add bottom row buttons to initia.
-        buttons = QtO.new_layout(None)
-        saveLabel = QLabel("<b>Movie Options:")
-        loadButton = QtO.new_button("Load", self.load_options)
-        saveButton = QtO.new_button("Save", self.save_options)
+        # Rendering buttons.
+        renderingButtonsWidget = QtO.new_widget(260)
+        renderingButtonsWidgetLayout = QtO.new_layout(renderingButtonsWidget)
         cancelButton = QtO.new_button("Cancel", self.closeEvent)
         renderButton = QtO.new_button("Render", self.return_movie_path)
-        renderButton.setAutoDefault(True)
         QtO.add_widgets(
-            buttons, [saveLabel, loadButton, saveButton, 0, cancelButton, renderButton]
+            renderingButtonsWidgetLayout, [0, cancelButton, renderButton, 0]
         )
 
-        QtO.button_defaulting(cancelButton, False)
+        QtO.add_widgets(
+            dialogueLayout,
+            [
+                generalOptionsWidget,
+                filePathWidget,
+                pathOptionsWidget,
+                pathIOWidget,
+                QtO.new_line(),
+                filePathWidget,
+                renderingButtonsWidget,
+            ],
+        )
+
         QtO.button_defaulting(renderButton, True)
-
-        QtO.add_widgets(dialogueLayout, [topRow, filePathWidget, buttons])
-
         self.setWindowFlags(self.windowFlags() ^ Qt.WindowStaysOnTopHint)
 
     # Movie path processing
@@ -630,8 +675,9 @@ class MovieDialogue(QDialog):
         show_orbit = True if self.movieType.currentText() == "Orbit" else False
 
         # Update the path options header
-        options_text = "<b>Orbit Options" if show_orbit else "<b>Flythrough Options"
-        self.pathColumnHeader.setText(options_text)
+        self.pathOptionsHeader.setText(
+            "<b>Orbit Options" if show_orbit else "<b>Flythrough Options"
+        )
 
         # Reset the widgets
         self.orbitWidget.reset()
@@ -756,15 +802,17 @@ class MovieDialogue(QDialog):
         self.reject()
 
 
+# Rendering
+################################################################################
 class RenderDialogue(QDialog):
     """The popup widget used to visualize the progress of the movie rendering.
     Allows users to terminate the rendering.
-    
+
     Because VTK on Windows does not like when the renderer tries to capture
-    the images of the scene outside of the main thread, all plotter screen 
-    captures are conducted within this widget, whereas all plotter movements 
-    are outsourced to a qt_threading.MovieThread. 
-    
+    the images of the scene outside of the main thread, all plotter screen
+    captures are conducted within this widget, whereas all plotter movements
+    are outsourced to a qt_threading.MovieThread.
+
     The movie creation workflow of this widget follows the workflow below:
     1. RenderDialog writes the current frame to the movie_writer
     2. RenderDialog += the current frame and sends this frame info to the
@@ -772,19 +820,21 @@ class RenderDialogue(QDialog):
     3. MovieThread updates the position of the plotter and then enters a wait
     loop
     4. MovieThread calls the RenderDialog to write a new frame
-    
+
     Parameters
     ----------
     plotter : PyVista.Plotter
-    
+
     movie_options : input_classes.MovieOptions
-    
+
     """
+
     def __init__(self, plotter: pv.Plotter, movie_options: IC.MovieOptions):
         super().__init__()
         self.movie_options = movie_options
         self.plotter = plotter
-        
+        self.current_frame = 0
+
         self.setFixedSize(350, 130)
         self.setWindowTitle("Rendering Movie...")
 
@@ -808,11 +858,13 @@ class RenderDialogue(QDialog):
         QtO.add_widgets(pageLayout, [progressLayout, buttonLayout])
 
         # Movie thread construction
+        # Resize the plotter
         if self.movie_options.resolution != "Current":
             X, Y = MovProc.get_resolution(self.movie_options.resolution)
             self.plotter.resize(X, Y)
             self.plotter.render()
 
+        # Create the MovieThread
         self.movieRenderer = QtTh.MovieThread(
             self.plotter, self.movie_options.camera_path
         )
@@ -825,7 +877,7 @@ class RenderDialogue(QDialog):
             self.movie_options.filepath, fps=self.movie_options.fps, quality=7
         )
 
-        self.current_frame = 0
+        # Start the MovieThread
         self.movieRenderer.start()
 
     def advance_frame(self):
@@ -872,7 +924,7 @@ class RenderDialogue(QDialog):
         self.movieRenderer.rendering = False
 
     def rendering_complete(self):
-        """Upon the completion of the rendering, closes the MovieThread, the 
+        """Upon the completion of the rendering, closes the MovieThread, the
         movie writer, and self."""
         self.movieRenderer.quit()
         self.plotter.mwriter.close()
