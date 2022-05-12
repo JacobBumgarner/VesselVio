@@ -22,7 +22,9 @@ def test_generate_flythrough_path():
     assert path.shape == (300, 3, 3)
     return
 
+
 test_generate_flythrough_path()
+
 
 def test_import():
     save_path = "/Users/jacobbumgarner/Desktop/Movie Options.json"

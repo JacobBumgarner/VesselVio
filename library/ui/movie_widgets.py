@@ -1,3 +1,15 @@
+"""
+The movie widgets related to movie generation in VesselVio. Currently users can
+generate orbital and path-based (flythrough) movies of the rendered vasculature
+meshes.
+"""
+
+__author__ = "Jacob Bumgarner <jrbumgarner@mix.wvu.edu>"
+__license__ = "GPLv3 - GNU General Pulic License v3 (see LICENSE)"
+__copyright__ = "Copyright 2022 by Jacob Bumgarner"
+__webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
+__download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
+
 import sys
 
 import imageio_ffmpeg  # Needed for PyInstaller
@@ -36,7 +48,9 @@ from PyQt5.QtWidgets import (
 
 
 class OrbitWidget(QWidget):
-    """The dialogue used to create an orbital movie around a mesh.
+    """The dialogue used to create an orbital movie around a mesh. Allows users
+    to move the plotter around the visaulized meshes and generate orbital paths
+    in the plane orthogonal to the viewup angle.
 
     Parameters
     ----------
@@ -284,7 +298,10 @@ class FlyThroughTable(QTableWidget):
 
 
 class FlythroughWidget(QWidget):
-    """The dialogue used to create a path-based movie of a mesh.
+    """The dialogue used to create a path-based movie of a mesh. Allows you to
+    add plotter keyframes to a managable list, and lets you generate camera
+    paths from those keyframes. Linear or interpolated paths can be generated
+    to create flythrough videos of the rendered meshes.
 
     Parameters
     ----------
@@ -740,18 +757,41 @@ class MovieDialogue(QDialog):
 
 
 class RenderDialogue(QDialog):
-    def __init__(self, plotter, movie_options):
+    """The popup widget used to visualize the progress of the movie rendering.
+    Allows users to terminate the rendering.
+    
+    Because VTK on Windows does not like when the renderer tries to capture
+    the images of the scene outside of the main thread, all plotter screen 
+    captures are conducted within this widget, whereas all plotter movements 
+    are outsourced to a qt_threading.MovieThread. 
+    
+    The movie creation workflow of this widget follows the workflow below:
+    1. RenderDialog writes the current frame to the movie_writer
+    2. RenderDialog += the current frame and sends this frame info to the
+    looping MovieThread
+    3. MovieThread updates the position of the plotter and then enters a wait
+    loop
+    4. MovieThread calls the RenderDialog to write a new frame
+    
+    Parameters
+    ----------
+    plotter : PyVista.Plotter
+    
+    movie_options : input_classes.MovieOptions
+    
+    """
+    def __init__(self, plotter: pv.Plotter, movie_options: IC.MovieOptions):
         super().__init__()
-
-        ### GUI Layout
         self.movie_options = movie_options
         self.plotter = plotter
-
+        
         self.setFixedSize(350, 130)
         self.setWindowTitle("Rendering Movie...")
 
+        # GUI Layout: top progress bar, bottom cancel button
         pageLayout = QtO.new_layout(self, "V")
 
+        # Progress bar
         progressLayout = QtO.new_layout(orient="V", margins=0)
         self.progressBar = QProgressBar()
         self.progressBar.setRange(0, self.movie_options.frame_count)
@@ -760,13 +800,14 @@ class RenderDialogue(QDialog):
         )
         QtO.add_widgets(progressLayout, [self.progressBar, self.progressBarText])
 
+        # Cancel button
         buttonLayout = QtO.new_layout(margins=0)
         cancelButton = QtO.new_button("Stop", self.cancel, 100)
         QtO.add_widgets(buttonLayout, [0, cancelButton])
 
         QtO.add_widgets(pageLayout, [progressLayout, buttonLayout])
 
-        ## Movie thread construction
+        # Movie thread construction
         if self.movie_options.resolution != "Current":
             X, Y = MovProc.get_resolution(self.movie_options.resolution)
             self.plotter.resize(X, Y)
@@ -788,6 +829,7 @@ class RenderDialogue(QDialog):
         self.movieRenderer.start()
 
     def advance_frame(self):
+        """Advances the current frame of the movie"""
         self.current_frame += 1
         if self.current_frame < self.movie_options.frame_count:
             self.movieRenderer.update_frame(self.current_frame)
@@ -795,6 +837,7 @@ class RenderDialogue(QDialog):
             self.movieRenderer.rendering = False
 
     def write_frame(self):
+        """Captures a single frame adds it to the movie writer"""
         self.plotter.mwriter.append_data(self.plotter.image)
         self.current_frame += 1
         if self.current_frame < self.movie_options.frame_count:
@@ -804,6 +847,7 @@ class RenderDialogue(QDialog):
             self.movieRenderer.rendering = False
 
     def update_progress(self, progress):
+        """Updates the value shown on the progress bar"""
         if progress != self.movie_options.frame_count:
             message = (
                 f"<center>Writing frame {progress}/{self.movie_options.frame_count}..."
@@ -815,16 +859,21 @@ class RenderDialogue(QDialog):
         self.progressBar.setValue(progress)
 
     def keyPressEvent(self, event):
+        """Monitors keypress events to cancel the rendering if the 'escape' key
+        is pressed"""
         if event.key() == Qt.Key_Escape:
             self.cancel()
         else:
             event.accept()
 
     def cancel(self):
+        """Stops the movie rendering."""
         # Don't delete movie, just end it.
         self.movieRenderer.rendering = False
 
     def rendering_complete(self):
+        """Upon the completion of the rendering, closes the MovieThread, the 
+        movie writer, and self."""
         self.movieRenderer.quit()
         self.plotter.mwriter.close()
         self.accept()
