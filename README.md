@@ -35,9 +35,9 @@ VesselVio reconstructs vascular networks to extract whole-network and individual
 Visualization with VesselVio is made possible with [PyVista](https://github.com/pyvista/pyvista), an intuitive and high-level VTK package. Thanks to PyVista, users can easily visualize and examine their vasculature datasets with numerous options to create for accompanying figure images.
 
 
-Inferior Colliculus | Human Brain 
+Mouse Retinal Vasculature | Human Brain 
 :--: | :--:
-<video src="https://user-images.githubusercontent.com/70919881/121599185-b337d400-ca10-11eb-8d66-1b1bb1e0040c.mp4" /> | <video src="https://user-images.githubusercontent.com/70919881/121599523-28a3a480-ca11-11eb-8340-c29350998f02.mp4" />
+<video src="https://user-images.githubusercontent.com/70919881/167666769-50043a25-3ef2-45d2-ba35-bba110bf6a44.mp4" /> | <video src="https://user-images.githubusercontent.com/70919881/121599523-28a3a480-ca11-11eb-8340-c29350998f02.mp4" />
 
 ## Segmentation Tips
 If you are looking for help with segmenting your vasculature, there are numerous packages available for this process<sup>[1](https://github.com/ChristophKirst/ClearMap2)[2](https://github.com/vessap/vessap)[3](https://github.com/giesekow/deepvesselnet)</sup>.
