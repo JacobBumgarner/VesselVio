@@ -19,3 +19,14 @@ body:
       value: "I found a bug!"
     validations:
       required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      options:
+        - macOS
+        - Windows
+        - Linux
+    validations:
+      required: true
