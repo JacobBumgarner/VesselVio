@@ -10,4 +10,12 @@ body:
       value: |
         Thanks for exploring VesselVio and taking the time to file a bug report!
   
-
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also, please tell us how to replicate this bug.
+      placeholder: Tell us what you see!
+      value: "I found a bug!"
+    validations:
+      required: true
