@@ -31,6 +31,7 @@ def seg_interpolate(point_coords, vis_radius):
     # https://web.mit.edu/hyperbook/Patrikalakis-Maekawa-Cho/node17.html
     # http://learnwebgl.brown37.net/07_cameras/points_along_a_path.html
     # http://www.independent-software.com/determining-coordinates-on-a-html-canvas-bezier-curve.html
+    # https://github.com/kawache/Python-B-spline-examples
 
     # Set appropriate degree of our BSpline
     num_verts = point_coords.shape[0]
@@ -39,13 +40,6 @@ def seg_interpolate(point_coords, vis_radius):
     else:
         spline_degree = max(1, num_verts - 1)
 
-    # The optimal number of interpolated segment points for visualization was determined emperically as a trade-off value between ground-truth length and computational costs.
-    delta = delta_calc(num_verts, vis_radius)
-
-    # Find the segment length based on our cubic BSpline.
-    # https://github.com/kawache/Python-B-spline-examples
-    u = np.linspace(0, 1, delta, endpoint=True)  # U
-
     # Scipy knot vector format
     knots = knotvector.generate(spline_degree, num_verts)  # Knotvector
     tck = [
@@ -53,6 +47,11 @@ def seg_interpolate(point_coords, vis_radius):
         [point_coords[:, 0], point_coords[:, 1], point_coords[:, 2]],
         spline_degree,
     ]
+
+    # The optimal number of interpolated segment points
+    # was determined emperically
+    delta = delta_calc(num_verts, vis_radius)
+    u = np.linspace(0, 1, delta, endpoint=True)  # U
 
     coords_list = np.array(interpolate.splev(u, tck)).T
     return coords_list
@@ -119,7 +118,7 @@ def feature_extraction(
     delta = np.array([coords[0], coords[-1]])
     cord_length = length_calc(delta, resolution)
 
-    # See gobal variable min_res in feature_input.
+    # See global variable min_res in feature_input.
     # Had some issues with loop start/ends being altered by minute fractions, causing issues.
     if cord_length >= ImProc.min_resolution:
         tortuosity = segment_length / cord_length
@@ -704,7 +703,7 @@ def feature_input(
     # Surface area
     network_SA = np.sum(surface_areas)
 
-    # Brach points and end points
+    # Branch points and end points
     bs = g.vs.select(_degree_gt=2)
     branchpoints = len(bs)
     es = g.vs.select(_degree=1)

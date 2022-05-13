@@ -314,7 +314,7 @@ def new_stacked(widgets):
 
 def add_form_rows(form, rows: list):
     for row in rows:
-        if type(row) == list:
+        if isinstance(row, list):
             form.addRow(row[0], row[1])
         else:
             form.addRow(row)
@@ -331,8 +331,8 @@ def add_widgets(parent, widgets: list, alignment=None):
 
         elif isinstance(widget, list):  # Deprecated
             if type(widget[1]) == str:
-                alignment = find_alignment(widget[1])
-                parent.addWidget(widget[0], alignment=alignment)
+                sub_alignment = find_alignment(widget[1])
+                parent.addWidget(widget[0], alignment=sub_alignment)
             else:
                 parent.addWidget(widget[0], widget[1])
 
@@ -340,7 +340,7 @@ def add_widgets(parent, widgets: list, alignment=None):
             type(widget) == QHBoxLayout
             or type(widget) == QVBoxLayout
             or type(widget) == QFormLayout
-        ):
+        ):  # No isinstance intentionally
             parent.addLayout(widget)
         else:
             parent.addWidget(widget, alignment=alignment)
@@ -414,13 +414,15 @@ def set_margins(layout, m):
 
 
 def find_alignment(alignment):
-    if alignment == "Right":
+    if isinstance(alignment, str):
+        alignment = alignment.lower()
+    if alignment == "right":
         alignment = Qt.AlignRight
-    elif alignment == "Left":
+    elif alignment == "left":
         alignment = Qt.AlignLeft
-    elif alignment == "Center":
+    elif alignment == "center":
         alignment = Qt.AlignCenter
-    elif alignment == "VCenter":
+    elif alignment == "vcenter":
         alignment = Qt.AlignVCenter
     else:
         alignment = Qt.Alignment()

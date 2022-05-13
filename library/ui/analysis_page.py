@@ -65,7 +65,8 @@ class AnalysisPage(QWidget):
         self.Loading = LoadingWidget()
         self.Loading.loadButton.clicked.connect(self.load_files)
 
-        ### Botom section - analysis and graph loading options # three column horizontal
+        ### Botom section - analysis and graph loading options
+        # three column horizontal
         self.bottomWidget = QtO.new_widget()
         self.bottomWidget.setFixedHeight(250)
         bottomLayout = QtO.new_layout(self.bottomWidget, no_spacing=True)
