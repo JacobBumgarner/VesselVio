@@ -30,3 +30,29 @@ body:
         - Linux
     validations:
       required: true
+  - type: dropdown
+    id: app-build
+    attributes:
+      label: App Build
+      description: How are you using VesselVio?
+      options:
+        - Built app
+        - Downloaded App
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. 
+      validations:
+        required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/JacobBumgarner/VesselVio/blob/main/CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+      validations:
+          required: true
