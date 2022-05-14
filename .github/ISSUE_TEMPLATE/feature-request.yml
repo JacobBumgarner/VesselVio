@@ -20,11 +20,6 @@ body:
     validations:
       required: true
   - type: textarea
-    id: VTK-Links
-    attributes:
-      label: Links to VTK Documentation, Examples, or Class Definitions.
-      description: If you are requesting that a feature from VTK be wrapped or exposed, please include the relevant links below.
-  - type: textarea
     id: pseudocode-and-screenshots
     attributes:
       label: Pseudocode or Screenshots
