@@ -9,7 +9,6 @@ body:
     attributes: 
       value: |
         Thanks for exploring VesselVio and taking the time to file a bug report!
-  
   - type: textarea
     id: what-happened
     attributes:
@@ -19,6 +18,17 @@ body:
       value: "I found a bug!"
     validations:
       required: true
+  - type: textarea
+    id: pseudocode-and-screenshots
+    attributes:
+      label: Pseudocode or Screenshots
+      description: Feel free to include pseudocode or screenshots of the requested outcome
+      placeholder: Provide some code for us to reproduce the bug!
+      value: "```python \n
+      Insert code here \n
+      ```\n
+      Or drag your screenshot here!
+      "
   - type: dropdown
     id: os
     attributes:
