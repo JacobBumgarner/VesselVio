@@ -18,17 +18,6 @@ body:
       value: "I found a bug!"
     validations:
       required: true
-  - type: textarea
-    id: pseudocode-and-screenshots
-    attributes:
-      label: Pseudocode or Screenshots
-      description: Feel free to include pseudocode or screenshots of the requested outcome
-      placeholder: Provide some code for us to reproduce the bug!
-      value: "```python \n
-      Insert code here \n
-      ```\n
-      Or drag your screenshot here!
-      "
   - type: dropdown
     id: os
     attributes:
@@ -50,6 +39,17 @@ body:
         - Downloaded App
     validations:
       required: true
+  - type: textarea
+    id: pseudocode-and-screenshots
+    attributes:
+      label: Pseudocode or Screenshots
+      description: Feel free to include pseudocode or screenshots that led to the bug.
+      placeholder: Provide some code for us to reproduce the bug!
+      value: "```python \n
+      Insert code here \n
+      ```\n
+      Or drag your screenshot here!
+      "
   - type: textarea
     id: logs
     attributes:
