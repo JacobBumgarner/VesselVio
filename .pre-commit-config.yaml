@@ -14,9 +14,9 @@ repos:
       "flake8-quotes==3.3.1",
     ]
 
-# - repo: https://github.com/codespell-project/codespell
-#   rev: v2.1.0
-#   hooks:
-#   - id: codespell
-#     name: codespell
-#     description: Checks for typos and mispellings in text files
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.1.0
+  hooks:
+  - id: codespell
+    name: codespell
+    description: Checks for typos and mispellings in text files

@@ -215,7 +215,8 @@ def process_volume(
             verbose=verbose,
         )
 
-        # Now, we can treat 2D arrays as 3D arrays for compatability with the rest of our pipeline.
+        # Now, we can treat 2D arrays as 3D arrays for compatibility
+        # with the rest of our pipeline.
         if volume.ndim == 2:
             points, volume, volume_shape = ImProc.reshape_2D(
                 points, volume, verbose=verbose

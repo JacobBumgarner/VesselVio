@@ -137,7 +137,7 @@ class OrbitWidget(QWidget):
 # Flythrough widgets
 ################################################################################
 class FlyThroughTable(QTableWidget):
-    """The table widget used to keep track of and modifiy the keyframes for the
+    """The table widget used to keep track of and modify the keyframes for the
     flythrough movie. As long as there is at least one column in the table, it will
     be selected. Also contains a key_frame list that keeps track of the keyframe
     plotter.camera_positions
@@ -300,7 +300,7 @@ class FlyThroughTable(QTableWidget):
 
 class FlythroughWidget(QWidget):
     """The dialogue used to create a path-based movie of a mesh. Allows you to
-    add plotter keyframes to a managable list, and lets you generate camera
+    add plotter keyframes to a manageable list, and lets you generate camera
     paths from those keyframes. Linear or interpolated paths can be generated
     to create flythrough videos of the rendered meshes.
 
@@ -439,7 +439,7 @@ class FlythroughWidget(QWidget):
         # make sure there are enough keyframes to update the path actors
         if self.pathTable.columnCount() > 1:
 
-            # add the udpated actors
+            # add the updated actors
             self.flyThroughPathActors = MovProc.generate_flythrough_actors(
                 self.plotter,
                 self.pathTable.key_frames,
