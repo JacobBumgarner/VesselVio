@@ -14,7 +14,7 @@ import re
 import urllib.request
 
 from library import helpers
-from library.ui import qt_objects as QtO
+from library.gui import qt_objects as QtO
 
 from PyQt5.QtWidgets import QDialog, QLabel
 

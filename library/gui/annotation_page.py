@@ -13,7 +13,7 @@ import json
 import os
 
 from library import annotation_processing as AnProc, helpers
-from library.ui import qt_objects as QtO
+from library.gui import qt_objects as QtO
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (

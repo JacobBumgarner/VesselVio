@@ -26,7 +26,7 @@ from library import (
     movie_processing as MovProc,
     qt_threading as QtTh,
 )
-from library.ui import qt_objects as QtO
+from library.gui import qt_objects as QtO
 
 from PyQt5.Qt import pyqtSlot
 from PyQt5.QtCore import Qt

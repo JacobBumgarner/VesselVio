@@ -19,7 +19,7 @@ import pyvista as pv
 
 from library import image_processing as ImProc, qt_threading as QtTh
 from library.helpers import load_icon
-from library.ui import (
+from library.gui import (
     analysis_page,
     annotation_page,
     left_menu,

@@ -26,10 +26,10 @@ from library import (
 )
 from library.annotation_processing import RGB_check
 
-from library.ui import qt_objects as QtO
-from library.ui.analysis_page import AnalysisOptions, GraphOptions
-from library.ui.annotation_page import RGB_Warning
-from library.ui.movie_widgets import MovieDialogue, RenderDialogue
+from library.gui import qt_objects as QtO
+from library.gui.analysis_page import AnalysisOptions, GraphOptions
+from library.gui.annotation_page import RGB_Warning
+from library.gui.movie_widgets import MovieDialogue, RenderDialogue
 from PyQt5.Qt import pyqtSlot
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import (

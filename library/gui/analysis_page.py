@@ -16,8 +16,8 @@ import sys
 from library import helpers, input_classes as IC, qt_threading as QtTh
 
 from library.annotation_processing import RGB_check
-from library.ui import qt_objects as QtO
-from library.ui.annotation_page import RGB_Warning
+from library.gui import qt_objects as QtO
+from library.gui.annotation_page import RGB_Warning
 
 from PyQt5.QtWidgets import (
     QAbstractItemView,
