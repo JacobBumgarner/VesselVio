@@ -22,7 +22,6 @@ from time import perf_counter as pf
 import numpy as np
 import pyvista as pv
 
-from library import input_classes as IC
 from matplotlib.cm import get_cmap
 from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QFileDialog

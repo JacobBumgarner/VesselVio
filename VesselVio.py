@@ -18,7 +18,6 @@ from multiprocessing import freeze_support
 import pyvista as pv
 
 from library import image_processing as ImProc, qt_threading as QtTh
-from library.helpers import load_icon
 from library.gui import (
     analysis_page,
     annotation_page,
@@ -27,6 +26,7 @@ from library.gui import (
     update_alert,
     visualization_page,
 )
+from library.helpers import load_icon
 
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QIcon

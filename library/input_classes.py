@@ -312,13 +312,15 @@ class PyVistaActors:
             if actor:
                 helpers.remove_legend(plotter, actor)
                 plotter.remove_actor(actor, reset_camera=False)
-                self.__dict__[actor] = None
+                del self.__dict__[key]
+                self.__dict__[key] = None
 
     def destroy_volume_actors(self, plotter):
         if self.volume:
-            self.volume = None
             helpers.remove_legend(plotter, self.volume)
             plotter.remove_actor(self.volume, reset_camera=False)
+            del self.volume
+            self.volume = None
 
     def reset(self):
         items = list(self.__dict__.keys())

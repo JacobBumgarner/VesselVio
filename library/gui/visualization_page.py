@@ -13,10 +13,8 @@ import json
 import os
 import sys
 
-import imageio_ffmpeg  # Needed for PyInstaller  # Needed for PyInstaller
 import numpy as np
 import pyvista as pv
-from imageio import get_writer
 
 from library import (
     helpers,
@@ -871,7 +869,9 @@ class LoadingDialog(QDialog):
 
 
 class TopWidget(QWidget):
-    def __init__(self, splitter, plotter, mainWindow):
+    def __init__(
+        self, splitter: QSplitter, plotter: pv.Plotter, mainWindow: QMainWindow
+    ):
         super().__init__()
         self.splitter = splitter
         self.plotter = plotter
@@ -897,6 +897,8 @@ class TopWidget(QWidget):
             "Save an orbit or fly-through movie of the visualized dataset."
         )
 
+        # self.saveMeshButton = QtO.new_button("Save Mesh", self.save_mesh, 120)
+
         QtO.add_widgets(
             boxLayout,
             [
@@ -907,6 +909,7 @@ class TopWidget(QWidget):
                 self.visualizeButton,
                 self.screenshotButton,
                 self.movieButton,
+                # self.saveMeshButton,
             ],
             "Center",
         )
@@ -949,6 +952,10 @@ class TopWidget(QWidget):
         self.renderDialog.exec_()
         self.delete_movie_dialogue()
         return
+
+    def save_mesh(self):
+        filename = "/Users/jacobbumgarner/Desktop/Synthetic Vasculature.obj"
+        self.plotter.export_obj(filename)
 
     def delete_movie_dialogue(self):
         try:

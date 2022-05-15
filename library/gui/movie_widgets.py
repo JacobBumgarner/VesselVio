@@ -11,11 +11,8 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 import sys
-from ctypes import alignment
 
 import imageio_ffmpeg  # Needed for PyInstaller
-import matplotlib  # Needed for PyInstaller
-import numpy as np
 
 import pyvista as pv
 from imageio import get_writer
@@ -41,7 +38,6 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QProgressBar,
-    QSpinBox,
     QTableWidget,
     QTableWidgetItem,
     QWidget,
@@ -335,9 +331,7 @@ class FlythroughWidget(QWidget):
 
         # step buttons
         stepWidget = QtO.new_widget()
-        stepWidgetLayout = QtO.new_layout(
-            stepWidget, margins=(0, 0, 0, 0), spacing=5
-        )
+        stepWidgetLayout = QtO.new_layout(stepWidget, margins=(0, 0, 0, 0), spacing=5)
         pathStepStart = QtO.new_button("<<", self.step_start, 50)
         pathStepBack = QtO.new_button("<", self.step_backward, 50)
         pathStepForward = QtO.new_button(">", self.step_forward, 50)
@@ -355,10 +349,7 @@ class FlythroughWidget(QWidget):
         self.insertFrameAfter = QtO.new_button(
             "Add After", self.pathTable.add_column, 100
         )
-        QtO.add_widgets(
-            addRowLayout, 
-            [self.insertFrameBefore, self.insertFrameAfter]
-        )
+        QtO.add_widgets(addRowLayout, [self.insertFrameBefore, self.insertFrameAfter])
 
         self.deleteCurrentFrame = QtO.new_button(
             "Delete Current", self.pathTable.remove_column, 120
@@ -481,8 +472,7 @@ class FlythroughWidget(QWidget):
         warning = QMessageBox()
         warning.setWindowTitle("Keyframe Error")
         warning.setText(
-            "At least <b>two</b> keyframes are ",
-            "needed to create a Flythrough movie!"
+            "At least <b>two</b> keyframes are ", "needed to create a Flythrough movie!"
         )
         warning.exec_()
 
@@ -586,15 +576,9 @@ class MovieDialogue(QDialog):
             ],
         )
 
-        QtO.add_widgets(
-            generalOptionsBoxLayout, 
-            [0, generalOptionsFormLayout, 0]
-        )
+        QtO.add_widgets(generalOptionsBoxLayout, [0, generalOptionsFormLayout, 0])
 
-        QtO.add_widgets(
-            generalOptionsLayout,
-            [generalOptionsHeader, generalOptionsBox]
-        )
+        QtO.add_widgets(generalOptionsLayout, [generalOptionsHeader, generalOptionsBox])
 
         # Path options widget
         pathOptionsWidget = QtO.new_widget(260)
@@ -613,15 +597,9 @@ class MovieDialogue(QDialog):
         # Tried to use a stacked widget here, but it was fucking with widget
         # resizing. abandoned it for a hide/show approach.
 
-        QtO.add_widgets(
-            pathOptionsBoxLayout, 
-            [self.orbitWidget, self.flythroughWidget]
-        )
+        QtO.add_widgets(pathOptionsBoxLayout, [self.orbitWidget, self.flythroughWidget])
 
-        QtO.add_widgets(
-            pathOptionsLayout,
-            [self.pathOptionsHeader, pathOptionsBox]
-        )
+        QtO.add_widgets(pathOptionsLayout, [self.pathOptionsHeader, pathOptionsBox])
 
         # Path IO
         pathIOWidget = QtO.new_widget(260)
