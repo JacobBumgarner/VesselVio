@@ -37,6 +37,8 @@ from PyQt5.QtWidgets import (
 
 
 class mainWindow(QMainWindow):
+    """A main window for development and testing of the analysis page only"""
+
     def __init__(self):
         super().__init__()
 
@@ -54,6 +56,9 @@ class mainWindow(QMainWindow):
 
 
 class AnalysisPage(QWidget):
+    """The page used for batch processing and analysis of segmented vasculature
+    datasets."""
+
     def __init__(self):
         super().__init__()
         self.analyzed = False
@@ -82,11 +87,11 @@ class AnalysisPage(QWidget):
         self.optionsTab.addTab(self.graphOptions, "Graph File Options")
         # Connect the loading filetype to the second options tab
         self.optionsTab.setTabEnabled(1, False)
-        self.Loading.datasetType.currentIndexChanged.connect(self.udpate_graph_view)
+        self.Loading.datasetType.currentIndexChanged.connect(self.update_table_view)
 
         # Bottom right column
         rightColumn = QtO.new_layout(orient="V", spacing=13)
-        self.analyzeButton = QtO.new_button("Analyze", self.init_analysis)
+        self.analyzeButton = QtO.new_button("Analyze", self.run_analysis)
         self.cancelButton = QtO.new_button("Cancel", self.cancel_analysis)
         self.cancelButton.setDisabled(True)
         QtO.add_widgets(rightColumn, [0, self.analyzeButton, self.cancelButton, 0])
@@ -98,6 +103,8 @@ class AnalysisPage(QWidget):
 
     ## File loading
     def load_files(self):
+        """File loading. Manages loading segmented files, annotation files,
+        and graph files for batch analysis."""
         dataset_type = self.Loading.datasetType.currentText()
         annotation = self.Loading.annotationType.currentText()
         graph_format = self.graphOptions.graphFormat.currentText()
@@ -128,38 +135,47 @@ class AnalysisPage(QWidget):
 
         return
 
-    ## Analysis Processing
-    def init_analysis(self):
-        if self.Loading.column1_files and not self.analyzed:
+    # Analysis Processing
+    def run_analysis(self):
+        """Prepares and initiates the analysis of the loaded files, if there
+        are any.
 
-            if self.Loading.datasetType.currentText() == "Volume":
-                if self.Loading.annotationType.currentText() != "None":
-                    if (
-                        len(self.Loading.column1_files)
-                        != len(self.Loading.column2_files)
-                        or not self.Loading.annotation_data
-                    ):
-                        self.analysis_warning()
-                        return
+        Workflow:
+        1. Check to ensure that the appropriate files have been loaded for the
+        analysis.
 
-                self.cancelButton.setEnabled(True)  # Enable cancellation.
-                self.init_volume_analysis()
+        2. Connects the appropriate QThread to the appropriate buttons and
+        selection signals.
 
-            # Graph analysis
-            else:
-                self.init_graph_analysis()
-
-            self.a_thread.button_lock.connect(self.button_locking)
-            self.a_thread.selection_signal.connect(self.Loading.update_row_selection)
-            self.a_thread.analysis_status.connect(self.Loading.update_status)
-            self.a_thread.start()
-            self.analyzed = True
-        else:
+        3. Starts the QThread
+        """
+        # If an analysis has already been run, make sure new files are loaded.
+        if self.analyzed:
             self.analysis_warning()
+            return
+
+        # Make sure the appropriate files are loaded
+        if not self.file_check():
+            self.analysis_warning()
+            return
+
+        # Check for the loaded files and initialize the appropriate QThread
+        if self.Loading.datasetType.currentText() == "Volume":
+            self.initialize_volume_analysis()
+        elif self.Loading.datasetType.currentText() == "Graph ":
+            self.initialize_graph_analysis()
+
+        self.a_thread.button_lock.connect(self.button_locking)
+        self.a_thread.selection_signal.connect(self.Loading.update_row_selection)
+        self.a_thread.analysis_status.connect(self.Loading.update_status)
+        self.a_thread.start()
+        self.analyzed = True
         return
 
     # Volume analysis
-    def init_volume_analysis(self):
+    def initialize_volume_analysis(self):
+        """Creates an analysis thread for volume-based analysis. Loads and
+        prepares the relevant volume analysis options."""
         analysis_options = self.analysisOptions.prepare_options(
             self.Loading.results_folder
         )
@@ -172,7 +188,9 @@ class AnalysisPage(QWidget):
         )
         return
 
-    def init_graph_analysis(self):
+    def initialize_graph_analysis(self):
+        """Creates an analysis thread for graph-based analysis. Loads and
+        prepares the relevant graph analysis options."""
         analysis_options = self.analysisOptions.prepare_options(
             self.Loading.results_folder
         )
@@ -186,33 +204,94 @@ class AnalysisPage(QWidget):
         return
 
     def cancel_analysis(self):
-        self.cancelButton.setDisabled(True)  # disable after first request is sent.
+        """Once called, triggers the analysis thread to stop the analysis at the
+        next breakpoint."""
+        # Disable the cancel button after the request is sent.
+        self.cancelButton.setDisabled(True)
         self.a_thread.stop()
         return
 
     def button_locking(self, lock_state):
+        """Toggles button disables for any relevant buttons or options during
+        the analysis. Also serves to trigger any relevant log
+
+        Parameters:
+        lock_state : bool
+            Enables/Disables the relevant buttons based on the lock state.
+            Some buttons will be disabled, some will be enabled.
+            The lock_state bool status is relevant for the 'setEnabled' or
+            'setDisabled' call.
+        """
+        self.cancelButton.setEnabled(lock_state)
         self.Loading.loadingColumn.setDisabled(lock_state)
         self.Loading.changeFolder.setDisabled(lock_state)
         self.analyzeButton.setDisabled(lock_state)
-        if self.a_thread.disk_space_error:
-            needed_space = self.a_thread.disk_space_error
-            msgBox = QMessageBox()
-            msgBox.setWindowTitle("Disk Space Error")
-            message = f"""
-            <center>During the analysis, one or more files were unable to be analyzed because of insufficient free disk memory.<br><br>
-            To analyze annotated volume datasets, VesselVio will need at least <u>{needed_space:.1f} GB</u> of free space."""
-            msgBox.setText(message)
-            msgBox.exec_()
         return
 
+    def file_check(self):
+        """Checks to ensure that the appropriate files have been loaded for
+        the current analysis.
+
+        Returns
+        -------
+        bool
+            True if loaded correctly, False if incorrectly or incompletely
+            loaded
+        """
+        if not self.Loading.column1_files:  # General file check
+            return False
+
+        if self.Loading.datasetType.currentText() == "Volume":  # Specific check
+            if self.Loading.annotationType.currentText() != "None":
+                if not self.column_file_check() or self.Loading.annotation_data:
+                    return False
+        if self.Loading.datasetType.currentText() == "Graph":
+            if self.graphOptions.graphFormat.currentText() == "CSV":
+                if not self.column_file_check():
+                    return False
+        return True
+
+    def column_file_check(self):
+        """Ensures that the column1_files and column2_files have the same number
+        of loaded files.
+
+        Returns
+        -------
+        bool
+            True if the number of files match, False if they are different
+        """
+        file_check = len(self.Loading.column1_files) == len(self.Loading.column2_files)
+        return file_check
+
+    # Warnings
     def analysis_warning(self):
+        """Creates a message box to indicate that the appropriate files have not
+        been loaded."""
         msgBox = QMessageBox()
         message = "Load all files to run analysis."
         msgBox.setText(message)
         msgBox.exec_()
 
-    ## Tab viewing
-    def udpate_graph_view(self):
+    def disk_space_warning(self, needed_space: float):
+        """Creates a message box to indicate that at some point during the
+        analysis, there was not enough disk space to conduct an annotation
+        analysis."""
+        msgBox = QMessageBox()
+        msgBox.setWindowTitle("Disk Space Error")
+        message = (
+            "<center>During the analysis, one or more files were unable to be",
+            "analyzed because of insufficient free disk memory.<br><br>",
+            "<center>To analyze annotated volume datasets, VesselVio will need",
+            f"at least <u>{needed_space:.1f} GB</u> of free space.",
+        )
+        msgBox.setText(message)
+        msgBox.exec_()
+
+    # Tab viewing
+    def update_table_view(self):
+        """Updates the view of the file loading table. If an annotation-based
+        analysis or a CSV graph-based analysis are selected, an additional
+        column is added for the relevant files."""
         active = False
         if self.Loading.datasetType.currentText() == "Graph":
             active = True
