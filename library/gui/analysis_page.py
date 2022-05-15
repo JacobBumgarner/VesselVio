@@ -185,6 +185,7 @@ class AnalysisPage(QWidget):
             self.Loading.column1_files,
             self.Loading.column2_files,
             self.Loading.annotation_data,
+            self.disk_space_warning,
         )
         return
 
