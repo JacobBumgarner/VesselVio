@@ -7,3 +7,11 @@ on:
   pull_request:
     branches:
       - main
+
+jobs:
+  macOS:
+    runs-on: macos-latest
+    name: macOS Unit Testing
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9]
