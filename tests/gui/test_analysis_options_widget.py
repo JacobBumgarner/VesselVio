@@ -8,7 +8,7 @@ from library.gui.analysis_options_widget import AnalysisOptions
 from PyQt5.QtWidgets import QApplication
 
 
-def creation_test():
+def test_widget_creation():
     _ = QApplication(sys.argv)
     widget = AnalysisOptions(visualizing=False)
     assert hasattr(widget, "saveGraph")
@@ -20,7 +20,7 @@ def creation_test():
     return
 
 
-def default_value_test():
+def test_default_value():
     _ = QApplication(sys.argv)
     widget = AnalysisOptions(visualizing=False)
 
@@ -36,7 +36,7 @@ def default_value_test():
     return
 
 
-def dimensions_test():
+def test_dimensions():
     _ = QApplication(sys.argv)
     widget = AnalysisOptions(visualizing=False)
 
@@ -46,11 +46,9 @@ def dimensions_test():
     widget.imageDimension.setCurrentIndex(1)
     assert widget.imageDimension.currentText() == "2D"
     assert widget.isoResolution.suffix() == " µm\u00B2"
-    print(widget.anisoZ.suffix())
-    assert widget.anisoZ.suffix() == " µm\u00B3"
 
 
-def options_export():
+def test_options_export():
     _ = QApplication(sys.argv)
     widget = AnalysisOptions(visualizing=False)
 
