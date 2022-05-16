@@ -85,7 +85,6 @@ def reshape_2D(points, volume, verbose=False):
 def volume_check(volume, loading=False, verbose=False):
     if volume is None:
         return False
-
     elif not loading and not np.any(volume):
         return False
     else:

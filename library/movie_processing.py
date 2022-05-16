@@ -81,16 +81,6 @@ def load_path_basis(seed_point):
     return b1, b2, b3
 
 
-# Taken directly from https://docs.pyvista.org/examples/00-load/create-spline.html
-def polyline_from_points(points):
-    poly = pv.PolyData()
-    poly.points = points
-    the_cell = np.arange(0, len(points), dtype=np.int_)
-    the_cell = np.insert(the_cell, 0, len(points))
-    poly.lines = the_cell
-    return poly
-
-
 def post_path_plotter_update(plotter, seed_position, orbit=True):
     """Given the plotter and a seed point, update the plotter's view to be
     shifted slightly up and back from that view. This function is useful to
@@ -212,12 +202,10 @@ def generate_orbital_path(camera_position, n_points=100):
     """
 
     if not isinstance(camera_position, (pv.CameraPosition)):
-        raise TypeError("A PyVista.Plotter.camera_position should be passed into the ")
-    camera_position = np.asarray([p for p in camera_position])
-    if camera_position.shape != (3, 3):
-        raise ValueError(
-            "A (3,3) array containing the camera position, focal point, and viewup should be passed."
+        raise TypeError(
+            "Please pass a PyVista.Plotter.camera_position should be passed into this function."
         )
+    camera_position = np.asarray([p for p in camera_position])
 
     radius = np.linalg.norm(camera_position[0] - camera_position[1])
     path = pv.Polygon(
@@ -301,7 +289,7 @@ def generate_orbit_path_actors(plotter, path):
     )
 
     # Create the line
-    line_path = polyline_from_points(path[1:-1, 0])
+    line_path = pv.Spline(path[1:-1, 0])
     line_path = line_path.tube(radius=0.5 * resize_factor, capping=True)
     actors.path = plotter.add_mesh(
         line_path, color="ff0000", smooth_shading=True, reset_camera=False
@@ -539,7 +527,7 @@ def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
 
 
 # Pyvista movie resolution processing
-def get_resolution(resolution):
+def get_resolution(resolution, test_DPI=True):
     if resolution == "720p":
         X, Y = 1280, 720
     elif resolution == "1080p":
@@ -563,7 +551,7 @@ def get_resolution(resolution):
     # high DPI screens yet. There is a potential solution by calling the widget,
     # getting the window.QScreen and getting the pixels per inch, but I'm not
     # sure if there is a universal 'high' vs. 'low' DPI.
-    if helpers.unix_check():
+    if test_DPI and helpers.unix_check():
         X /= 2
         Y /= 2
     return X, Y
