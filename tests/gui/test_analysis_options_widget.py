@@ -64,6 +64,3 @@ def options_export():
     assert options.save_graph is False
     assert options.save_seg_results is False
     assert options.resolution == 1
-
-
-options_export()
