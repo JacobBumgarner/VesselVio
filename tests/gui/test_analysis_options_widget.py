@@ -22,7 +22,7 @@ def test_widget_creation():
 
 def test_default_value():
     _ = QApplication(sys.argv)
-    widget = AnalysisOptions(visualizing=False)
+    widget = AnalysisOptions()
 
     # Resolution default values
     assert widget.isoResolution.value() == 1
@@ -38,7 +38,7 @@ def test_default_value():
 
 def test_dimensions():
     _ = QApplication(sys.argv)
-    widget = AnalysisOptions(visualizing=False)
+    widget = AnalysisOptions()
 
     assert widget.imageDimension.currentText() == "3D"
     assert widget.isoResolution.suffix() == " µm\u00B3"
@@ -48,9 +48,19 @@ def test_dimensions():
     assert widget.isoResolution.suffix() == " µm\u00B2"
 
 
+def test_isotropy():
+    _ = QApplication(sys.argv)
+    widget = AnalysisOptions()
+
+    assert widget.resolutionType.currentText() == "Isotropic"
+
+    widget.resolutionType.setCurrentIndex(1)
+    assert widget.resolutionType.currentText() == "Anisotropic"
+
+
 def test_options_export():
     _ = QApplication(sys.argv)
-    widget = AnalysisOptions(visualizing=False)
+    widget = AnalysisOptions()
 
     options = widget.prepare_options()
     assert isinstance(options, IC.AnalysisOptions)
@@ -62,3 +72,19 @@ def test_options_export():
     assert options.save_graph is False
     assert options.save_seg_results is False
     assert options.resolution == 1
+
+    # Adjust the options
+    widget.resolutionType.setCurrentIndex(1)
+    widget.pruneCheckBox.setChecked(False)
+    widget.filterCheckBox.setChecked(False)
+
+    options = widget.prepare_options()
+    assert isinstance(options, IC.AnalysisOptions)
+    assert options.filter_length == 0
+    assert options.prune_length == 0
+    assert options.image_dimensions == 3
+    assert options.max_radius == 150
+    assert options.results_folder is None
+    assert options.save_graph is False
+    assert options.save_seg_results is False
+    assert options.resolution == [1, 1, 1]
