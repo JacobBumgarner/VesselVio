@@ -18,10 +18,9 @@ pip-delete-this-directory.txt
 
 
 .DS_Store
-VesselVio Build and Distribution Instructions.rtf
-entitlements.plist
-fix_app.py
 
+
+# VesselVio Specific 
 Segmented/
 VesselVio Log/
 VesselVio.code-workspace
@@ -30,3 +29,6 @@ tmp/VesselVio.zip
 build_app.sh
 library/cache/results_cache.csv
 a.py
+VesselVio Build and Distribution Instructions.rtf
+entitlements.plist
+fix_app.py
