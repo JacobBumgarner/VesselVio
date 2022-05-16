@@ -23,9 +23,6 @@ def test_generate_flythrough_path():
     return
 
 
-test_generate_flythrough_path()
-
-
 def test_import():
     save_path = "/Users/jacobbumgarner/Desktop/Movie Options.json"
     movie_options = MovProc.load_options(save_path)

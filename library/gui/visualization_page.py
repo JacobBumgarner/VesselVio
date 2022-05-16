@@ -288,7 +288,7 @@ class VisualizationDialog(QDialog):
 
         analysisBox = QGroupBox()
         analysisLayout = QtO.new_layout(analysisBox, no_spacing=True)
-        self.analysisOptions = AnalysisOptions(vis_page=True)
+        self.analysisOptions = AnalysisOptions(visualizing=True)
 
         # If a centerline graph was loaded, add centerline smoothing buttons
         if self.files.dataset_type == "Graph":
@@ -387,9 +387,7 @@ class VisualizationDialog(QDialog):
             return
 
         self.prepare_visualization_options()
-        self.analysis_options = self.analysisOptions.prepare_options(
-            None, visualization=True
-        )
+        self.analysis_options = self.analysisOptions.prepare_options(visualization=True)
         if self.files.dataset_type == "Volume":
             self.init_volume_visualization()
 
