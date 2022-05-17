@@ -7,16 +7,28 @@ __pycache__/
 bin/
 build/
 dist/
+tmp/
+VesselVio.spec
+build_app.sh
+entitlements.plist
+fix_app.py
 
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
 
+# General
+.DS_Store
+
 # Unit test / coverage reports
 .tox/
 .coverage
+htmlcov/
 
+# VSCode
+*.code-workspace
 
+<<<<<<< HEAD
 .DS_Store
 
 
@@ -32,3 +44,7 @@ a.py
 VesselVio Build and Distribution Instructions.rtf
 entitlements.plist
 fix_app.py
+=======
+# VesselVio Specific
+library/cache/results_cache.csv
+>>>>>>> f581f59bbadac7f3ad5039149b14c0f11bd1e3c1
