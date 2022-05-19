@@ -1,9 +1,5 @@
-import os
-import sys
-
-sys.path.insert(1, "/Users/jacobbumgarner/Documents/GitHub/VesselVio")
-
 import json
+import os
 
 import numpy as np
 import pyvista as pv

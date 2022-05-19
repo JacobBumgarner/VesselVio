@@ -1,8 +1,5 @@
 import sys
 
-
-sys.path.insert(1, "/Users/jacobbumgarner/Documents/GitHub/VesselVio")
-
 from library import input_classes as IC
 from library.gui.analysis_options_widget import AnalysisOptions
 from PyQt5.QtWidgets import QApplication
