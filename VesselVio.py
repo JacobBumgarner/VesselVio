@@ -11,6 +11,8 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 import os
 import sys
 
+from library.gui import analysis_page
+
 os.environ["QT_MAC_WANTS_LAYER"] = "1"
 
 from multiprocessing import freeze_support
@@ -19,7 +21,6 @@ import pyvista as pv
 
 from library import image_processing as ImProc, qt_threading as QtTh
 from library.gui import (
-    analysis_page,
     annotation_page,
     left_menu,
     qt_objects as QtO,

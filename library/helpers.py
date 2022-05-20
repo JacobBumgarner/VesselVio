@@ -133,8 +133,14 @@ def set_results_dir():
     return results_dir
 
 
-def load_volumes():
-    message = "Load volume files"
+def load_volume_files(message="Load volume files"):
+    """Return selected image files
+
+    Parameters:
+    message : str, optional
+        Message for the loading dialog. Default ``"Load volume files"``
+
+    """
     file_filter = "Images (*.nii *.png *.bmp *.tif *.tiff *.jpg *.jpeg)"
     files = QFileDialog.getOpenFileNames(
         QFileDialog(), message, get_dir("Desktop"), file_filter
@@ -144,7 +150,35 @@ def load_volumes():
     return files
 
 
-def load_graphs(graph_format):
+def load_volume_file(message="Load volume file"):
+    """Return a single selected image file.
+
+    Parameters:
+    message : str, optional
+        Message for the loading dialog. Default ``"Load volume file"``
+
+    Returns:
+    list
+    """
+    file_filter = "Images (*.nii *.png *.bmp *.tif *.tiff *.jpg *.jpeg)"
+    file = QFileDialog.getOpenFileName(
+        QFileDialog(), message, get_dir("Desktop"), file_filter
+    )[0]
+    if file:
+        file = std_path(file)
+    return file
+
+
+def load_graph_file(graph_format):
+    message = f"Load {graph_format} file"
+    file_filter = f"{graph_format} (*.{graph_format})"
+    files = QFileDialog.getOpenFileName(
+        QFileDialog(), message, get_dir("Desktop"), file_filter
+    )
+    return files[0]
+
+
+def load_graph_files(graph_format):
     message = f"Load {graph_format} files"
     file_filter = f"{graph_format} (*.{graph_format})"
     files = QFileDialog.getOpenFileNames(
@@ -155,39 +189,59 @@ def load_graphs(graph_format):
     return files
 
 
-def load_volume():
-    message = "Load volume file"
-    file_filter = "Images (*.nii *.png *.bmp *.tif *.tiff *.jpg *.jpeg)"
-    file = QFileDialog.getOpenFileName(
+def load_nii_annotation_files(message="Load .nii annotation files"):
+    """Return all selected .nii files.
+
+    Parameters:
+    message : str, optional
+        Message for the loading dialog. Default ``"Load .nii annotation files"``
+
+    Returns:
+    str
+
+    """
+    file_filter = "nii (*.nii)"
+    files = QFileDialog.getOpenFileNames(
         QFileDialog(), message, get_dir("Desktop"), file_filter
     )[0]
-    if file:
-        file = std_path(file)
-    return file
+    if files:
+        files = [std_path(file) for file in files]
+    return files
 
 
-def load_graph(graph_format):
-    message = f"Load {graph_format} file"
-    file_filter = f"{graph_format} (*.{graph_format})"
-    files = QFileDialog.getOpenFileName(
-        QFileDialog(), message, get_dir("Desktop"), file_filter
-    )
-    return files[0]
+def load_nii_annotation_file(message="Load .nii annotation file"):
+    """Return a single selected .nii file.
 
+    Parameters:
+    message : str, optional
+        Message for the loading dialog. Default ``"Load .nii annotation file"``
 
-def load_nii_annotation():
-    message = "Load '.nii' file"
+    Returns:
+    str
+
+    """
     file_filter = "nii (*.nii)"
     file = QFileDialog.getOpenFileName(
         QFileDialog(), message, get_dir("Desktop"), file_filter
     )[0]
     if file:
-        file = std_path(file)
+        file = std_path(file[0])
     return file
 
 
-def load_RGB_folder():
-    message = "Select RGB annotation folder"
+def load_RGB_folder(message="Select RGB annotation folder"):
+    """Return a selected folder from a QFileDialog.
+
+    Parameters
+    ----------
+    message : str, optional
+        Default: ``"Select RGB annotation folder"``
+
+    Returns
+    -------
+    folder : str
+
+    """
     folder = QFileDialog.getExistingDirectory(
         QFileDialog(), message, get_dir("Desktop")
     )

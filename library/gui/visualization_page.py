@@ -739,10 +739,10 @@ class LoadingDialog(QDialog):
     ## File selection
     def select_file1(self):
         if self.datasetType.currentText() == "Volume":
-            file = helpers.load_volume()
+            file = helpers.load_volume_file()
         else:
-            format = self.graphOptions.graphFormat.currentText()
-            file = helpers.load_graph(format)
+            graph_type = self.graphOptions.graphFormat.currentText()
+            file = helpers.load_graph_file(graph_type)
 
         if file:
             self.files.file1 = file
@@ -752,12 +752,12 @@ class LoadingDialog(QDialog):
     def select_file2(self):
         if self.datasetType.currentText() == "Volume":
             if self.annotationType.currentText() == "ID":
-                file = helpers.load_nii_annotation()
+                file = helpers.load_nii_annotation_file()
             else:
                 file = helpers.load_RGB_folder()
         else:
-            format = self.graphOptions.graphFormat.currentText()
-            file = helpers.load_graph(format)
+            graph_type = self.graphOptions.graphFormat.currentText()
+            file = helpers.load_graph_file(graph_type)
 
         if file:
             self.files.file2 = file

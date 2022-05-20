@@ -18,18 +18,19 @@ from library import helpers, qt_threading as QtTh
 from library.annotation_processing import RGB_check
 
 from library.gui import qt_objects as QtO
-from library.gui.analysis_options_widget import AnalysisOptions
 from library.gui.annotation_page import RGB_Warning
-from library.gui.graph_options_widget import GraphOptions
+from library.gui.file_loading_widgets.analysis_file_loaders import (
+    AnnotationFileLoader,
+    CSVGraphFileLoader,
+)
+from library.gui.options_widgets.analysis_options_widget import AnalysisOptions
+from library.gui.options_widgets.graph_options_widget import GraphOptions
 
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QApplication,
-    QDialog,
-    QFileDialog,
     QHeaderView,
     QLabel,
-    QLayout,
     QMainWindow,
     QMessageBox,
     QTableWidget,
@@ -109,48 +110,56 @@ class AnalysisPage(QWidget):
         """File loading. Manages loading segmented files, annotation files,
         and graph files for batch analysis."""
         dataset_type = self.Loading.datasetType.currentText()
-        annotation = self.Loading.annotationType.currentText()
+        annotation_type = self.Loading.annotationType.currentText()
         graph_format = self.graphOptions.graphFormat.currentText()
 
-        c1files, c2files = None, None
-        if annotation == "None" and dataset_type == "Volume":
-            c1files = helpers.load_volumes()
-        elif dataset_type == "Graph" and graph_format != "CSV":
-            c1files = helpers.load_graphs(graph_format)
-        else:
-            self.loader = FileLoader(dataset_type, annotation, graph_format)
-            if self.loader.exec_():
-                if self.loader.column1_files:
-                    c1files = self.loader.column1_files
-                if self.loader.column2_files:
-                    c2files = self.loader.column2_files
-            del self.loader
+        column1_files, column2_files = None, None
+        self.file_loader = None
+        if dataset_type == "Volume":
+            if annotation_type == "None":
+                column1_files = helpers.load_volume_files()
+            else:
+                self.file_loader = AnnotationFileLoader(annotation_type)
+
+        elif dataset_type == "Graph":
+            if graph_format == "CSV":
+                self.file_loader = CSVGraphFileLoader()
+            else:
+                column1_files = helpers.load_graph_files(graph_format)
+
+        # If dual file loading is necessary, exec the file loader.
+        if self.file_loader and self.file_loader.exec_():
+            if self.file_loader.column1_files:
+                column1_files = self.file_loader.column1_files
+            if self.file_loader.column2_files:
+                column2_files = self.file_loader.column2_files
+            del self.file_loader
 
         if self.analyzed:
             self.Loading.clear_files()
             self.analyzed = False
-        if c1files:
-            self.Loading.column1_files += c1files
+        if column1_files:
+            self.Loading.column1_files += column1_files
             self.Loading.add_column1_files()
-        if c2files:
-            self.Loading.column2_files += c2files
+        if column2_files:
+            self.Loading.column2_files += column2_files
             self.Loading.add_column2_files()
 
         return
 
     # Analysis Processing
     def run_analysis(self):
-        """Prepares and initiates the analysis of the loaded files, if there
-        are any.
+        """Initiate the analysis of the loaded files.
 
         Workflow:
         1. Check to ensure that the appropriate files have been loaded for the
         analysis.
 
-        2. Connects the appropriate QThread to the appropriate buttons and
+        2. Connect the appropriate QThread to the appropriate buttons and
         selection signals.
 
-        3. Starts the QThread
+        3. Start the QThread
+
         """
         # If an analysis has already been run, make sure new files are loaded.
         if self.analyzed:
@@ -165,7 +174,7 @@ class AnalysisPage(QWidget):
         # Check for the loaded files and initialize the appropriate QThread
         if self.Loading.datasetType.currentText() == "Volume":
             self.initialize_volume_analysis()
-        elif self.Loading.datasetType.currentText() == "Graph ":
+        elif self.Loading.datasetType.currentText() == "Graph":
             self.initialize_graph_analysis()
 
         self.a_thread.button_lock.connect(self.button_locking)
@@ -233,11 +242,9 @@ class AnalysisPage(QWidget):
         return
 
     def file_check(self):
-        """Checks to ensure that the appropriate files have been loaded for
-        the current analysis.
+        """Ensure that the appropriate files have been loaded for the analysis.
 
-        Returns
-        -------
+        Returns:
         bool
             True if loaded correctly, False if incorrectly or incompletely
             loaded
@@ -247,7 +254,7 @@ class AnalysisPage(QWidget):
 
         if self.Loading.datasetType.currentText() == "Volume":  # Specific check
             if self.Loading.annotationType.currentText() != "None":
-                if not self.column_file_check() or self.Loading.annotation_data:
+                if not self.column_file_check() or not self.Loading.annotation_data:
                     return False
         if self.Loading.datasetType.currentText() == "Graph":
             if self.graphOptions.graphFormat.currentText() == "CSV":
@@ -503,27 +510,29 @@ class LoadingWidget(QWidget):
     def load_annotation_file(self):
         loaded_file = helpers.load_JSON(helpers.get_dir("Desktop"))
 
-        if loaded_file:
-            with open(loaded_file) as f:
-                annotation_data = json.load(f)
-                if (
-                    len(annotation_data) != 1
-                    or "VesselVio Annotations" not in annotation_data.keys()
-                ):
-                    self.JSON_error("Incorrect filetype!")
-                else:
-                    # If loading an RGB filetype, make sure there's no duplicate colors.
-                    if self.annotationType.currentText() == "RGB" and RGB_check(
-                        annotation_data["VesselVio Annotations"]
-                    ):
-                        if RGB_Warning().exec_() == QMessageBox.No:
-                            return
+        if not loaded_file:
+            return
 
-                    self.loadedJSON.setStyleSheet(self.JSONdefault)
-                    filename = os.path.basename(loaded_file)
-                    self.loadedJSON.setText(filename)
-                    self.annotation_data = annotation_data["VesselVio Annotations"]
-                    self.update_queue()
+        with open(loaded_file) as f:
+            annotation_data = json.load(f)
+            if (
+                len(annotation_data) != 1
+                or "VesselVio Annotations" not in annotation_data.keys()
+            ):
+                self.JSON_error("Incorrect filetype!")
+            else:
+                # If loading an RGB filetype, make sure there's no duplicate colors.
+                if self.annotationType.currentText() == "RGB" and RGB_check(
+                    annotation_data["VesselVio Annotations"]
+                ):
+                    if RGB_Warning().exec_() == QMessageBox.No:
+                        return
+
+                self.loadedJSON.setStyleSheet(self.JSONdefault)
+                filename = os.path.basename(loaded_file)
+                self.loadedJSON.setText(filename)
+                self.annotation_data = annotation_data["VesselVio Annotations"]
+                self.update_queue()
         return
 
     def JSON_error(self, warning):
@@ -612,123 +621,6 @@ class FileSheet(QTableWidget):
             self.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
 
         return
-
-
-## File loading
-class FileLoader(QDialog):
-    """The widget used to load datasets during batch analyses."""
-
-    def __init__(self, dataset_type, annotation, graph_format):
-        super().__init__()
-        self.column1_files = []
-        self.column2_files = []
-        self.graph_format = graph_format
-        self.annotation = annotation
-
-        # Sizing
-
-        windowLayout = QtO.new_layout(orient="V")
-        self.setLayout(windowLayout)
-        self.setWindowTitle("Dataset Loading")
-
-        # Create volume loading buttons
-        # Create load volume buttons
-        loadingLayout = QtO.new_form_layout()
-        if dataset_type == "Volume":
-            volumeLabel = QLabel("Load binarized volumes:")
-            loadButton = QtO.new_button("Load...", self.load_volumes)
-            QtO.add_form_rows(loadingLayout, [[volumeLabel, loadButton]])
-            if annotation == "RGB":
-                annLabel = QLabel("Load RGB annotation parent folder:")
-            else:
-                annLabel = QLabel("Load volume annotations:")
-            annButton = QtO.new_button("Load...", self.load_annotations)
-            QtO.add_form_rows(loadingLayout, [[annLabel, annButton]])
-            QtO.button_defaulting(loadButton, False)
-            QtO.button_defaulting(annButton, False)
-
-        else:
-            vHeader = QLabel("Load CSV vertices files:")
-            vButton = QtO.new_button("Load...", self.load_csv_vertices)
-            eHeader = QLabel("Load CSV edges files:")
-            eButton = QtO.new_button("Load", self.load_csv_edges)
-            QtO.add_form_rows(loadingLayout, [[vHeader, vButton], [eHeader, eButton]])
-            QtO.button_defaulting(vButton, False)
-            QtO.button_defaulting(eButton, False)
-
-        cancel = QtO.new_button("Cancel", self.cancel_load)
-        QtO.button_defaulting(cancel, False)
-        QtO.add_widgets(windowLayout, [loadingLayout, cancel], "Center")
-
-        self.layout().setSizeConstraint(QLayout.SetFixedSize)
-
-    def load_csv_vertices(self):
-        """Load CSV files containing information about the graph vertices."""
-        files = self.init_dialog("csv (*.csv)", "Load CSV vertex files")
-        if files:
-            self.column1_files += files
-            self.accept()
-        return
-
-    def load_csv_edges(self):
-        """Load CSV files containing information about the graph edges."""
-        files = self.init_dialog("csv (*.csv)", "Load CSV edge files")
-        if files:
-            self.column2_files += files
-            self.accept()
-        return
-
-    def load_volumes(self):
-        """Load volume files for the analysis."""
-        file_filter = "Images (*.nii *.png *.bmp *.tif *.tiff *.jpg *.jpeg)"
-        files = self.init_dialog(file_filter, "Load volume files")
-        if files:
-            self.column1_files += files
-            self.accept()
-        return
-
-    # Format either is a folder or .nii files
-    def load_annotations(self):
-        """Load annotation files for the analysis."""
-        files = None
-        if self.annotation == "ID":
-            file_filter = "Images (*.nii)"
-            files = self.load_ID_annotations(
-                file_filter, "Load .nii annotation volumes"
-            )
-        else:
-            folder = self.load_RGB_annotation_parent_folder()
-            if folder:
-                files = [
-                    os.path.join(folder, path)
-                    for path in os.listdir(folder)
-                    if os.path.isdir(os.path.join(folder, path))
-                ]
-
-        if files:
-            self.column2_files += files
-            self.accept()
-        return
-
-    def cancel_file_loading(self):
-        """Close the opened file loading widget."""
-        self.reject()
-
-    def load_ID_annotations(self, file_filter, message):
-        """Return the file paths of ID annotation .nii files."""
-        files = QFileDialog.getOpenFileNames(
-            self, message, helpers.get_dir("Desktop"), file_filter
-        )
-        return files[0]
-
-    def load_RGB_annotation_parent_folder(self):
-        """Return the parent folder of RGB annotation sub-folders."""
-        results_dir = QFileDialog.getExistingDirectory(
-            self,
-            "Select parent folder of RGB annotation folders",
-            helpers.get_dir("Desktop"),
-        )
-        return results_dir
 
 
 ###############

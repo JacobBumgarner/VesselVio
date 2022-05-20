@@ -27,7 +27,6 @@ from library import (
     volume_processing as VolProc,
     volume_visualization as VolVis,
 )
-from library.gui import analysis_page
 from PyQt5.QtCore import pyqtSignal, QThread
 
 
@@ -45,7 +44,7 @@ class VolumeThread(QThread):
         volume_files,
         annotation_files,
         annotation_data,
-        disk_space_warning: analysis_page.AnalysisPage.disk_space_warning,
+        disk_space_warning,
     ):
         QThread.__init__(self)
         self.running = False
