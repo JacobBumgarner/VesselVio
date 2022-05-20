@@ -1,6 +1,6 @@
 # Contributing to VesselVio
 
-Contributions to VesselVio are absolutely welcome, and I thank you for being interested wanting to help this project!
+Contributions to VesselVio are absolutely welcome, and I thank you for being interested in expaning this project!
 
 Reading and following these guidelines will help us make the contribution process easy and effective for everyone involved. It also communicates that you agree to respect my time as a developer as I manage and develope VesselVio. In return, I will reciprocate that respect by addressing your issue, assessing changes, and helping you finalize your pull requests.
 
@@ -10,7 +10,7 @@ Reading and following these guidelines will help us make the contribution proces
 * [Getting Started](#getting-started)
     * [Issues](#issues)
     * [Pull Requests](#pull-requests)
-* [Contribution Guide](#contribution-guide]
+* [Contribution Guide](#contribution-guide)
     * [Outline](#outline)
     * [Style Checking](#style-checking)
     * [Unit Testing](#unit-testing)
@@ -60,7 +60,7 @@ If you plan to contribute a new feature to VesselVio, below is the general set o
 5. Run the `pre-commit` for style checking (see below)
 6. Run the unit tests to ensure code coverage stays consistent (see below)
 7. Push changes to your fork
-8. Open a PR in our repository and follow the PR template so that we can efficiently review the changes.
+8. Open a PR in our repository and follow the PR template so that I can efficiently review the changes.
 
 ### Style Checking
 I adhere to PEP8 as much as possible, except for line widths in GUI code, which instead of 79 characters can be a maximum of 99 characters for code. Ideally, you should strive to meet the 79 character criteria, but PyQt can be a bit of a pain in this regard.
@@ -85,7 +85,7 @@ You should always ensure that the code you're adding is being tested. This will 
 
 Unit testing can be conducted by installing required packages as below:
 ```
-pip install requirements_test.py`
+pip install requirements_test.py
 ```
 
 Then, you should test your code and examine coverage as below to determine that coverage hasn't reduced. Use the generated HTML file to view where your code is and isn't covered by the unit testing. Aim for > 90% coverage!
@@ -97,4 +97,4 @@ coverage html
 
 ## Getting Help
 
-Join us in the [VesselVio Slack Community]([https://community.auth0.com](https://communityinviter.com/apps/vesselvio/join-vesselvio-on-slack)) and post your question there in or shoot me a direct message!
+Join us in the [VesselVio Slack Community](https://communityinviter.com/apps/vesselvio/join-vesselvio-on-slack) and post your question there or shoot me a direct message!
