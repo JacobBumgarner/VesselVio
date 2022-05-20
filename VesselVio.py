@@ -81,8 +81,6 @@ class mainWindow(QMainWindow):
         update_alert.local_version = __version__[2:]
         QTimer.singleShot(500, update_alert.version_check)
 
-        # Present the application
-        self.show()
         return
 
     # Close all associated widgets if the main thread is ended.s
@@ -100,4 +98,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(load_icon()))
     main_app = mainWindow()
+
+    # Present the application
+    main_app.show()
     sys.exit(app.exec_())
