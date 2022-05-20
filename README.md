@@ -42,9 +42,31 @@ Mouse Retinal Vasculature | Human Brain
 ## Segmentation Tips
 If you are looking for help with segmenting your vasculature, there are numerous packages available for this process<sup>[1](https://github.com/ChristophKirst/ClearMap2)[2](https://github.com/vessap/vessap)[3](https://github.com/giesekow/deepvesselnet)</sup>.
 
+## Contributing
+Contributions to VesselVio are absolutely welcome! The [guide](https://github.com/JacobBumgarner/VesselVio/blob/main/CONTRIBUTING.md) to contributing should be read and followed. Briefly, [Issues](https://github.com/JacobBumgarner/VesselVio/issues) should be used for bug reports and feature requests. [Discussions](https://github.com/JacobBumgarner/VesselVio/discussions) and [Slack](https://communityinviter.com/apps/vesselvio/join-vesselvio-on-slack) should be used for general support or tutorial requests. Pull-requests should follow the guidelines described in the contributing document. Thank you!
+
 ## Other
 Any suggestions, improvements, or comments should be directed to [Jacob Bumgarner](mailto:jrbumgarner@mix.wvu.edu).
 
 Feel free to join us on [Slack](https://communityinviter.com/apps/vesselvio/join-vesselvio-on-slack) for general communication or troubleshooting purposes!
 
+## Citing VesselVio
 <b>If you use VesselVio in your research, please cite our publication in <i>[Cell Reports Methods](https://www.cell.com/cell-reports-methods/fulltext/S2667-2375(22)00044-3)</i>.
+
+>Bumgarner JR, and Nelson RJ. (2022). Open-source analysis and visualization of segmented vasculature datasets with VesselVio. Cell Rep Methods 2, 100189. https://doi.org/10.1016/j.crmeth.2022.100189
+  
+BibTex:
+```
+@article{bumgarner2022vesselvio,
+title = {Open-source analysis and visualization of segmented vasculature datasets with VesselVio},
+journal = {Cell Reports Methods},
+volume = {2},
+number = {4},
+pages = {100189},
+year = {2022},
+issn = {2667-2375},
+doi = {https://doi.org/10.1016/j.crmeth.2022.100189},
+url = {https://www.sciencedirect.com/science/article/pii/S2667237522000443},
+author = {Jacob R. Bumgarner and Randy J. Nelson},
+}
+```
