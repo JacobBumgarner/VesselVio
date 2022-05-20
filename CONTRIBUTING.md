@@ -4,7 +4,7 @@ Contributions to VesselVio are absolutely welcome, and I thank you for being int
 
 Reading and following these guidelines will help us make the contribution process easy and effective for everyone involved. It also communicates that you agree to respect my time as a developer as I manage and develope VesselVio. In return, I will reciprocate that respect by addressing your issue, assessing changes, and helping you finalize your pull requests.
 
-## Quicklinks
+## Outline
 
 * [Code of Conduct](#code-of-conduct)
 * [Getting Started](#getting-started)
