@@ -23,7 +23,7 @@ from scipy import interpolate
 ### Generate Path Processing ###
 ################################
 def path_actor_scaling(seed_point):
-    """Returns a scaling value for the movie path actors.
+    """Return a scaling value for the movie path actors.
 
     Given a camera position seed point and the current position of the
     plotter relative to the focal point, generate a scaling factor for the
@@ -48,8 +48,7 @@ def path_actor_scaling(seed_point):
 
 
 def load_path_basis(seed_point):
-    """Returns new basis vectors based on an input
-    PyVista.Plotter.camera_position
+    """Return new basis vectors for a PyVista.Plotter.camera_position.
 
     Parameters
     ----------
@@ -84,10 +83,12 @@ def load_path_basis(seed_point):
 
 
 def post_path_plotter_update(plotter, seed_position, orbit=True):
-    """Given the plotter and a seed point, update the plotter's view to be
-    shifted slightly up and back from that view. This function is useful to
-    avoid placing the plotter at the exact seed_position, which might place
-    it inside of path camera actors during movie creation.
+    """Update the position of the plotter during path creation.
+
+    Given the plotter and a seed point, this function the plotter's view to be
+    shifted slightly up and back from that view. Useful to avoid placing the
+    plotter at the exact seed_position, which might place it inside of path
+    actors during movie creation.
 
     Parameters
     ----------
@@ -167,8 +168,7 @@ def export_options(filepath, movie_options: IC.MovieExportOptions):
 ### Orbital Path Processing ###
 ###############################
 def time_to_frames(framerate, movie_time):
-    """Given a framerate and a frame count, return the number
-    of frames for the orbit
+    """Convert a movie length in seconds to frames.
 
     Parameters
     ----------
@@ -186,7 +186,7 @@ def time_to_frames(framerate, movie_time):
 
 
 def generate_orbital_path(camera_position, n_points=100):
-    """Given a seed PyVista plotter camera position, creates an orbital path
+    """Generate an orbital path from a PyVista.camera_position.
 
     Parameters
     ----------
@@ -202,7 +202,6 @@ def generate_orbital_path(camera_position, n_points=100):
     orbital_path : np.array
         An (n,3,3) array containing a time-series of camera_positions
     """
-
     if not isinstance(camera_position, (pv.CameraPosition)):
         raise TypeError(
             "Please pass a PyVista.Plotter.camera_position should be passed into this function."
@@ -223,7 +222,7 @@ def generate_orbital_path(camera_position, n_points=100):
 
 
 def generate_orbit_path_actors(plotter, path):
-    """Generate actors that help the user visualize the orbital movie path
+    """Generate actors that help the user visualize the orbital movie path.
 
     Parameters
     ----------
@@ -316,7 +315,9 @@ def generate_orbit_path_actors(plotter, path):
 ### Fly Through Processing ###
 ##############################
 def prep_keyframes(key_frames):
-    """Given a list of keyframes for a flythrough movie, this function iterates
+    """Return numpy array keyframes that aren't adjacently identical.
+
+    Given a list of keyframes for a flythrough movie, this function iterates
     through and makes sure that no pair of keyframes share the same plotter
     position. If two adjacent frames share identical positions, the position
     is altered by a minute amount.
@@ -350,8 +351,9 @@ def prep_keyframes(key_frames):
 
 
 def generate_3D_spline_path(input_path, path_points=40):
-    """Given a series of keyframes, generate a quadratic b-spline curve that
-    passes through all of the original input points.
+    """Generate a quadratic b-spline curve with input path points.
+
+    The b-spline will pass through all of the original input points.
 
     Parameters
     ----------
@@ -416,7 +418,7 @@ def interpolate_linear_path(position_a, position_b, n_points, endpoint=False):
 def generate_flythrough_path(
     key_frames, movie_duration=10, framerate=30, path_type="linear"
 ):
-    """Generates a linear flythrough path with specified frame durations
+    """Generate a linear flythrough path with specified frame durations.
 
     Parameters
     ----------
@@ -477,8 +479,10 @@ def generate_flythrough_path(
 
 
 def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
-    """Given a series of keyframes, creates a path actor tube that helps the
-    user visualize the proposed path of the movie.
+    """Return path actors for a series of plotter keyframes.
+
+    Creates a path actor tube that helps the user visualize the current
+    path of the movie.
 
     Parameters
     ----------
@@ -500,7 +504,6 @@ def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
     FlyThroughActors
 
     """
-
     actors = IC.FlyThroughActors()
 
     path = generate_flythrough_path(key_frames, path_type=path_type)
@@ -530,6 +533,18 @@ def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
 
 # Pyvista movie resolution processing
 def get_resolution(resolution, test_DPI=True):
+    """Return an X and Y resolution based on a string resolution.
+
+    Parameters
+    ----------
+    resolution : str
+        A string
+
+    Returns
+    -------
+    X, Y : int, int
+
+    """
     if resolution == "720p":
         X, Y = 1280, 720
     elif resolution == "1080p":
@@ -546,6 +561,12 @@ def get_resolution(resolution, test_DPI=True):
         X, Y = 1440, 1440
     elif resolution == "2160p Square":
         X, Y = 2160, 2160
+    else:
+        raise ValueError(
+            "resolution must be one of the following:"
+            " 720p, 1080p, 1440p, 2160p, or may include 'Square' after any"
+            " of the previous options."
+        )
 
     # TODO - low priority
     # Resizing of the PyVista plotter behaves different between normal and
