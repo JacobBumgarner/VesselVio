@@ -51,7 +51,7 @@ Any suggestions, improvements, or comments should be directed to [Jacob Bumgarne
 Feel free to join us on [Slack](https://communityinviter.com/apps/vesselvio/join-vesselvio-on-slack) for general communication or troubleshooting purposes!
 
 ## Citing VesselVio
-<b>If you use VesselVio in your research, please cite our publication in <i>[Cell Reports Methods](https://www.cell.com/cell-reports-methods/fulltext/S2667-2375(22)00044-3)</i>.
+<b>If you use VesselVio in your research, please cite our publication in <i>[Cell Reports Methods](https://www.cell.com/cell-reports-methods/fulltext/S2667-2375(22)00044-3)</i>.</b>
 
 >Bumgarner JR, and Nelson RJ. (2022). Open-source analysis and visualization of segmented vasculature datasets with VesselVio. Cell Rep Methods 2, 100189. https://doi.org/10.1016/j.crmeth.2022.100189
   
