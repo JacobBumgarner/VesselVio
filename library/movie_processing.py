@@ -23,7 +23,9 @@ from scipy import interpolate
 ### Generate Path Processing ###
 ################################
 def path_actor_scaling(seed_point):
-    """Given a camera position seed point and the current position of the
+    """Returns a scaling value for the movie path actors.
+
+    Given a camera position seed point and the current position of the
     plotter relative to the focal point, generate a scaling factor for the
     path actors.
 
