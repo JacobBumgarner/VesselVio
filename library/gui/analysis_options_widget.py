@@ -1,7 +1,4 @@
-"""
-The options widget used to configure the analysis options during batch analysis
-and visualization.
-"""
+"""Analysis options widget for batch dataset processing."""
 
 __author__ = "Jacob Bumgarner <jrbumgarner@mix.wvu.edu>"
 __license__ = "GPLv3 - GNU General Pulic License v3 (see LICENSE)"
@@ -16,8 +13,10 @@ from PyQt5.QtWidgets import QLabel, QWidget
 
 
 class AnalysisOptions(QWidget):
-    """The options widget used to define the analysis parameters and results
-    export settings during batch analysis and visualization.
+    """Options widget used to define the analysis parameters.
+
+    Also dictates the results export settings during batch analysis
+    and visualization.
 
     Parameters
     ----------
@@ -27,6 +26,7 @@ class AnalysisOptions(QWidget):
     """
 
     def __init__(self, visualizing=False):
+        """Create the analysis options widget."""
         super().__init__()
 
         # Main widget layout
@@ -141,9 +141,13 @@ class AnalysisOptions(QWidget):
         QtO.add_widgets(mainLayout, [0, leftColumn, line, rightOptions, 0])
 
     def update_dimensions(self):
-        """Updates the display of the analysis options to represent either
-        2D or 3D units. Calls self.update_units() to ensure that the degree of
-        units is appropriate."""
+        """Update the unit display of the analysis options.
+
+        Represents either 2D or 3D units.
+
+        Calls self.update_units() to ensure that the degree of units is
+        appropriate.
+        """
         if self.imageDimension.currentText() == "2D":
             self.anisoResolutionWidget.setVisible(False)
             self.isoResolutionWidget.setVisible(True)
@@ -152,8 +156,7 @@ class AnalysisOptions(QWidget):
         return
 
     def update_isotropy(self):
-        """Ensures that the resolution input options match the selected
-        resolution type, i.e., either 'Isotropic' or 'Anisotropic'.
+        """Ensure that the resolution input matches resolution type.
 
         If 'Anisotropic' is selected, disables the '2D' image dimension option.
         """
@@ -167,8 +170,7 @@ class AnalysisOptions(QWidget):
         return
 
     def update_units(self):
-        """Updates the exponent of the shown parameters. This is purely
-        aesthetic."""
+        """Update the exponent of the shown parameters."""
         unit = " " + self.unit.currentText()
         exponent = "\u00B3"
         if self.imageDimension.currentText() == "2D":
@@ -181,8 +183,7 @@ class AnalysisOptions(QWidget):
         return
 
     def prepare_options(self, results_folder=None, visualization=False):
-        """Prepares the input options for an upcoming anlaysis or visualization
-        run.
+        """Prepare the input options for an anlaysis or visualization.
 
         Parameters
         ----------
@@ -198,7 +199,6 @@ class AnalysisOptions(QWidget):
         Returns
         -------
         input_classes.AnalysisOptions
-
 
         """
         # resolution

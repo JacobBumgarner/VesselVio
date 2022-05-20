@@ -40,7 +40,7 @@ from PyQt5.QtWidgets import (
 
 
 class mainWindow(QMainWindow):
-    """A main window for development and testing of the analysis page only"""
+    """A main window for development and testing of the analysis page only."""
 
     def __init__(self):
         super().__init__()
@@ -616,6 +616,8 @@ class FileSheet(QTableWidget):
 
 ## File loading
 class FileLoader(QDialog):
+    """The widget used to load datasets during batch analyses."""
+
     def __init__(self, dataset_type, annotation, graph_format):
         super().__init__()
         self.column1_files = []
@@ -661,6 +663,7 @@ class FileLoader(QDialog):
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
 
     def load_csv_vertices(self):
+        """Load CSV files containing information about the graph vertices."""
         files = self.init_dialog("csv (*.csv)", "Load CSV vertex files")
         if files:
             self.column1_files += files
@@ -668,6 +671,7 @@ class FileLoader(QDialog):
         return
 
     def load_csv_edges(self):
+        """Load CSV files containing information about the graph edges."""
         files = self.init_dialog("csv (*.csv)", "Load CSV edge files")
         if files:
             self.column2_files += files
@@ -675,6 +679,7 @@ class FileLoader(QDialog):
         return
 
     def load_volumes(self):
+        """Load volume files for the analysis."""
         file_filter = "Images (*.nii *.png *.bmp *.tif *.tiff *.jpg *.jpeg)"
         files = self.init_dialog(file_filter, "Load volume files")
         if files:
@@ -684,12 +689,15 @@ class FileLoader(QDialog):
 
     # Format either is a folder or .nii files
     def load_annotations(self):
+        """Load annotation files for the analysis."""
         files = None
         if self.annotation == "ID":
             file_filter = "Images (*.nii)"
-            files = self.init_dialog(file_filter, "Load .nii annotation volumes")
+            files = self.load_ID_annotations(
+                file_filter, "Load .nii annotation volumes"
+            )
         else:
-            folder = self.init_dir_dialog()
+            folder = self.load_RGB_annotation_parent_folder()
             if folder:
                 files = [
                     os.path.join(folder, path)
@@ -700,20 +708,21 @@ class FileLoader(QDialog):
         if files:
             self.column2_files += files
             self.accept()
-
         return
 
-    def cancel_load(self):
-
+    def cancel_file_loading(self):
+        """Close the opened file loading widget."""
         self.reject()
 
-    def init_dialog(self, file_filter, message):
+    def load_ID_annotations(self, file_filter, message):
+        """Return the file paths of ID annotation .nii files."""
         files = QFileDialog.getOpenFileNames(
             self, message, helpers.get_dir("Desktop"), file_filter
         )
         return files[0]
 
-    def init_dir_dialog(self):
+    def load_RGB_annotation_parent_folder(self):
+        """Return the parent folder of RGB annotation sub-folders."""
         results_dir = QFileDialog.getExistingDirectory(
             self,
             "Select parent folder of RGB annotation folders",
