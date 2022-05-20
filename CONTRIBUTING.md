@@ -1,8 +1,8 @@
 # Contributing to VesselVio
 
-Contributions to VesselVio are absolutely welcome, and I thank you for being interested in expaning this project!
+Contributions to VesselVio are absolutely welcome, and I thank you for being interested in expanding this project!
 
-Reading and following these guidelines will help us make the contribution process easy and effective for everyone involved. It also communicates that you agree to respect my time as a developer as I manage and develope VesselVio. In return, I will reciprocate that respect by addressing your issue, assessing changes, and helping you finalize your pull requests.
+Reading and following these guidelines will help us make the contribution process easy and effective for everyone involved. It also communicates that you agree to respect my time as a developer as I manage and develop VesselVio. In return, I will reciprocate that respect by addressing your issue, assessing changes, and helping you finalize your pull requests.
 
 ## Outline
 

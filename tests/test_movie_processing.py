@@ -169,13 +169,8 @@ def test_get_resolution():
     for i, resolution in enumerate(resolution_keys):
         X, Y = MovProc.get_resolution(resolution, test_DPI=False)
         assert [X, Y] == values[i]
-        X, Y = MovProc.get_resolution(resolution, test_DPI=False)
-        assert [X, Y] == values[i]
 
     with raises(ValueError, match="resolution must"):
         MovProc.get_resolution("potato")
 
     return
-
-
-test_get_resolution()

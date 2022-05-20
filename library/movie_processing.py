@@ -545,6 +545,7 @@ def get_resolution(resolution, test_DPI=True):
     X, Y : int, int
 
     """
+    print(resolution)
     if resolution == "720p":
         X, Y = 1280, 720
     elif resolution == "1080p":
@@ -553,7 +554,7 @@ def get_resolution(resolution, test_DPI=True):
         X, Y = 2560, 1440
     elif resolution == "2160p":
         X, Y = 3840, 2160
-    if resolution == "720p Square":
+    elif resolution == "720p Square":
         X, Y = 720, 720
     elif resolution == "1080p Square":
         X, Y = 1080, 1080
