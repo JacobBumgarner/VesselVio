@@ -18,8 +18,7 @@ class AnalysisOptions(QWidget):
     Also dictates the results export settings during batch analysis
     and visualization.
 
-    Parameters
-    ----------
+    Parameters:
     visualizing : bool
         Determines whether to add the Segment Results Export and Save Graph
         options to the analysis page.
@@ -185,8 +184,7 @@ class AnalysisOptions(QWidget):
     def prepare_options(self, results_folder=None, visualization=False):
         """Prepare the input options for an anlaysis or visualization.
 
-        Parameters
-        ----------
+        Parameters:
         results_folder : str, optional
             Default: None
             The folder where the results will be exported.
@@ -196,8 +194,7 @@ class AnalysisOptions(QWidget):
             Indicates whether the results will be used for an analysis or
             visualization
 
-        Returns
-        -------
+        Returns:
         input_classes.AnalysisOptions
 
         """

@@ -51,12 +51,10 @@ class OrbitWidget(QWidget):
     to move the plotter around the visaulized meshes and generate orbital paths
     in the plane orthogonal to the viewup angle.
 
-    Parameters
-    ----------
-    plotter: PyVista.Plotter
+    Parameters:
+    plotter : PyVista.Plotter
 
-    Returns
-    -------
+    Returns:
     QWidget
         The widget used to update the orbit options for the movie
 
@@ -109,13 +107,11 @@ class OrbitWidget(QWidget):
     def export_path(self, framerate):
         """Generates an orbital path with with the requested frame count
 
-        Parameters
-        ----------
-        framerate: int
+        Parameters:
+        framerate : int
             framerate used to generate the output frames
 
-        Returns
-        -------
+        Returns:
         list
             (n,3,3) shaped list where each n index contains a
             plotter.camera_position
@@ -142,15 +138,13 @@ class FlyThroughTable(QTableWidget):
     be selected. Also contains a key_frame list that keeps track of the keyframe
     plotter.camera_positions
 
-    Parameters
-    ----------
-    plotter: PyVista.Plotter
+    Parameters:
+    plotter : PyVista.Plotter
 
-    update_path_actors: Callable
+    update_path_actors : Callable
         The update_path_actors of the parent FlyThroughWidget should be passed
 
-    Returns
-    -------
+    Returns:
     QTableWidget
 
     """
@@ -304,9 +298,8 @@ class FlythroughWidget(QWidget):
     paths from those keyframes. Linear or interpolated paths can be generated
     to create flythrough videos of the rendered meshes.
 
-    Parameters
-    ----------
-    plotter: PyVista.Plotter
+    Parameters:
+    plotter : PyVista.Plotter
 
     """
 
@@ -503,13 +496,12 @@ class MovieDialogue(QDialog):
     """A dialogue widget used to create movies. Movie rendering settings are
     selected, a save path is selected, and the movie path is created.
 
-    Parameters
-    ----------
-    plotter: PyVista.Plotter
+    Parameters:
+    plotter : PyVista.Plotter
 
-    movie_dir: The output directory that the movie will be saved to.
+    movie_dir : The output directory that the movie will be saved to.
 
-    mainWindow: QMainWindow
+    mainWindow : QMainWindow
         Needed to make sure that the rendering dialogue always remains in front
         of all of the other windows.
 
@@ -799,8 +791,7 @@ class RenderDialogue(QDialog):
     loop
     4. MovieThread calls the RenderDialog to write a new frame
 
-    Parameters
-    ----------
+    Parameters:
     plotter : PyVista.Plotter
 
     movie_options : input_classes.MovieOptions

@@ -29,16 +29,14 @@ def path_actor_scaling(seed_point):
     plotter relative to the focal point, generate a scaling factor for the
     path actors.
 
-    Parameters
-    ----------
+    Parameters:
     seed_point: PyVista.CameraPosition, list, tuple, np.array
         An (n,3,3) shaped iterable containing:
             - The plotter camera position
             - The plotter focal poin
             - The plotter view 'up' vector
 
-    Returns
-    -------
+    Returns:
     resize_factor : float
     """
     # focal_pos - camera_pos
@@ -50,16 +48,14 @@ def path_actor_scaling(seed_point):
 def load_path_basis(seed_point):
     """Return new basis vectors for a PyVista.Plotter.camera_position.
 
-    Parameters
-    ----------
+    Parameters:
     seed_point: PyVista.CameraPosition, list, tuple, np.array
         An (n,3,3) shaped iterable containing:
             - The plotter camera position
             - The plotter focal poin
             - The plotter view 'up' vector
 
-    Returns
-    -------
+    Returns:
     b1 : list
 
     b2 : list
@@ -90,8 +86,7 @@ def post_path_plotter_update(plotter, seed_position, orbit=True):
     plotter at the exact seed_position, which might place it inside of path
     actors during movie creation.
 
-    Parameters
-    ----------
+    Parameters:
     plotter : PyVista.Plotter
 
     seed_position : PyVista.Plotter.camera_position
@@ -117,8 +112,7 @@ def post_path_plotter_update(plotter, seed_position, orbit=True):
 def load_options(filepath):
     """Given a save path, load a movie options file.
 
-    Parameters
-    ----------
+    Parameters:
     filepath : str
 
 
@@ -142,8 +136,7 @@ def load_options(filepath):
 def export_options(filepath, movie_options: IC.MovieExportOptions):
     """Given a save path and a set of keyframes, save the movie options.
 
-    Parameters
-    ----------
+    Parameters:
     filepath : str
 
     movie_options : MovieOptions
@@ -170,14 +163,12 @@ def export_options(filepath, movie_options: IC.MovieExportOptions):
 def time_to_frames(framerate, movie_time):
     """Convert a movie length in seconds to frames.
 
-    Parameters
-    ----------
+    Parameters:
     framerate: int
 
     movie_time: float
 
-    Returns
-    -------
+    Returns:
     frames : int
 
     """
@@ -188,8 +179,7 @@ def time_to_frames(framerate, movie_time):
 def generate_orbital_path(camera_position, n_points=100):
     """Generate an orbital path from a PyVista.camera_position.
 
-    Parameters
-    ----------
+    Parameters:
     camera_position: PyVista.CameraPosition or tuple
         (3,3) tuple containing the plotter camera: position, focal point, and
         viewup. Should be passed directly from PyVista.camera_position
@@ -197,8 +187,7 @@ def generate_orbital_path(camera_position, n_points=100):
     n_points: int
         The number of points that the orbit will contain
 
-    Returns
-    -------
+    Returns:
     orbital_path : np.array
         An (n,3,3) array containing a time-series of camera_positions
     """
@@ -224,16 +213,14 @@ def generate_orbital_path(camera_position, n_points=100):
 def generate_orbit_path_actors(plotter, path):
     """Generate actors that help the user visualize the orbital movie path.
 
-    Parameters
-    ----------
+    Parameters:
     plotter : PyVista.Plotter
 
     path : list
         An (n,3,3) list where each n index represents a
         pyvista.plotter.camera_position
 
-    Returns
-    -------
+    Returns:
     OrbitPathActors
 
     """
@@ -322,14 +309,12 @@ def prep_keyframes(key_frames):
     position. If two adjacent frames share identical positions, the position
     is altered by a minute amount.
 
-    Parameters
-    ----------
+    Parameters:
     key_frames : list
         (n,3,3) list where each n index contains a
         PyVista.Plotter.camera_position
 
-    Returns
-    -------
+    Returns:
     key_frames : np.array
         An (n,3,3) shaped array with updated keyframes without any sequentially
         duplicated frames
@@ -355,13 +340,11 @@ def generate_3D_spline_path(input_path, path_points=40):
 
     The b-spline will pass through all of the original input points.
 
-    Parameters
-    ----------
+    Parameters:
     input_path : list, tuple, np.array
         (n,3) Shaped array
 
-    Returns
-    -------
+    Returns:
     path : np.array
         (n,3) shaped array containing the
     """
@@ -381,8 +364,7 @@ def generate_3D_spline_path(input_path, path_points=40):
 def interpolate_linear_path(position_a, position_b, n_points, endpoint=False):
     """Given two points, create a linearly interpolated path between them.
 
-    Parameters
-    ----------
+    Parameters:
     position_a : PyVista.CameraPosition, np.array, list
         (n,3,3) shape
 
@@ -395,8 +377,7 @@ def interpolate_linear_path(position_a, position_b, n_points, endpoint=False):
     endpoint : bool
         Add the position_b to the end of the interpolation
 
-    Returns
-    -------
+    Returns:
     path : np.array
         (n_points,3,3) Shaped array of the interpolated path, where each
         n_point index represents a PyVista.CameraPosition
@@ -420,8 +401,7 @@ def generate_flythrough_path(
 ):
     """Generate a linear flythrough path with specified frame durations.
 
-    Parameters
-    ----------
+    Parameters:
     key_frames : list
         A list of PyVista.CameraPositions
 
@@ -434,8 +414,7 @@ def generate_flythrough_path(
     path_type : str
         Options: "linear", "smoothed"
 
-    Returns
-    -------
+    Returns:
     path : np.array
         A (n,3,3) shaped array that represents a time-series of
         PyVista.CameraPositions. The amount of frames (n) will be determined
@@ -484,8 +463,7 @@ def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
     Creates a path actor tube that helps the user visualize the current
     path of the movie.
 
-    Parameters
-    ----------
+    Parameters:
     plotter : PyVista.Plotter
 
     key_frames : list
@@ -499,8 +477,7 @@ def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
         An optional argument that is used to update the plotter position to
         the specified index of the key_frames
 
-    Returns
-    -------
+    Returns:
     FlyThroughActors
 
     """
@@ -535,13 +512,11 @@ def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
 def get_resolution(resolution, test_DPI=True):
     """Return an X and Y resolution based on a string resolution.
 
-    Parameters
-    ----------
+    Parameters:
     resolution : str
         A string
 
-    Returns
-    -------
+    Returns:
     X, Y : int, int
 
     """

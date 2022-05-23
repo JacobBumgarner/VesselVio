@@ -107,14 +107,12 @@ def absolute_points(points, minima):
     in the original volume space, we must add the bounding minima back to
     the point values. This function achieves that.
 
-    Parameters
-    ----------
+    Parameters:
     points : np.array with shape (n, 3)
 
     minima : np.array with shape (3,)
 
-    Returns
-    -------
+    Returns:
     (n, 3) np.array
         Updated array that converts the bounded volume points back to
         the original image space.

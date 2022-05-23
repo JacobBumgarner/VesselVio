@@ -60,7 +60,11 @@ class mainWindow(QMainWindow):
 
 
 class AnalysisPage(QWidget):
-    """The page used for batch processing and analysis of segmented vasculature
+    """The page for batch analysis of volumes and graphs.
+
+    Parameters:
+
+    The page used for batch processing and analysis of segmented vasculature
     datasets."""
 
     def __init__(self):

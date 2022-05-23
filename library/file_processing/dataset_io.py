@@ -148,13 +148,11 @@ def load_nii_annotation_file(message="Load .nii annotation file"):
 def load_RGB_folder(message="Select RGB annotation folder"):
     """Return a selected folder from a QFileDialog.
 
-    Parameters
-    ----------
+    Parameters:
     message : str, optional
         Default: ``"Select RGB annotation folder"``
 
-    Returns
-    -------
+    Returns:
     folder : str
 
     """

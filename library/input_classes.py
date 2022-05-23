@@ -358,11 +358,11 @@ class FlyThroughActors:
     """An object class used to hold the PyVista actors that help the user
     visualize the path that their flythrough movie will follow.
 
-    Parameters
-    ----------
-    path_glyph: PyVista.UnstructuredGrid, optional
+    Parameters:
+    path_glyph : PyVista.UnstructuredGrid, optional
 
-    returns: FlyThroughActors
+    Returns:
+    FlyThroughActors
     """
 
     def __init__(self, path_direction=None, start_sphere=None, end_sphere=None):
