@@ -26,6 +26,7 @@ from library import (
     volume_processing as VolProc,
     volume_visualization as VolVis,
 )
+from library.annotation import tree_processing
 
 
 #######################
@@ -129,8 +130,8 @@ def process_volume(
     # Make sure the resolution is in the proper format
     resolution = ImProc.prep_resolution(gen_options.resolution)
 
-    annotation_data = AnnProc.tree_processing(
-        ann_options.annotation_atlas, ann_options.annotation_regions
+    annotation_data = tree_processing.convert_annotation_data(
+        ann_options.annotation_regions, ann_options.annotation_atlas
     )
 
     if ann_options.annotation_type == "None":
@@ -365,7 +366,7 @@ if __name__ == "__main__":
     # Filepath to the annotation. RGB series folder OR .nii Allen brain atlas file
     annotation_file = ""
 
-    atlas = "library/annotation_trees/p56 Mouse Brain.json"
+    atlas = "library/annotations/annotation_trees/p56 Mouse Brain.json"
     annotation_type = "ID"  # 'RGB' or 'ID'
 
     annotation_regions = ["Dentate gyrus, molecular layer"]

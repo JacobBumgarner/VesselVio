@@ -1,5 +1,7 @@
 """
-Annotation volume processing backend. Used for ID (int or float) or RGB based annotations.
+Annotation volume processing backend.
+
+Used for ID (int or float) or RGB based annotations.
 """
 
 __author__ = "Jacob Bumgarner <jrbumgarner@mix.wvu.edu>"
@@ -9,93 +11,14 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
-import json
-import os
 import typing
 from time import perf_counter as pf
 
 import cv2
 import numpy as np
+from library import image_processing as ImProc
 
-from library import helpers
 from numba import njit, prange
-
-
-#######################
-### Tree Processing ###
-#######################
-class JSON_Options:
-    def __init__(
-        self, name="name", children="children", color="color_hex_triplet", id="id"
-    ):
-        self.name = name
-        self.children = children
-        self.id = id
-        self.color = color
-
-
-# Find Colors and IDs of children structures
-def find_children(tree, colors, ids, tree_info):
-    for child in tree:
-        ids.append(child[tree_info.id])
-        colors.append(child[tree_info.color])
-        if child[tree_info.children]:
-            find_children(child[tree_info.children], colors, ids, tree_info)
-    return
-
-
-# Identify the parent structure and return its family.
-def find_family(tree, name, tree_info):
-    for child in tree:
-        if child[tree_info.name] == name:
-            # Grab the id and colors of the parent
-            colors = [child[tree_info.color]]
-            ids = [child[tree_info.id]]
-            find_children(child[tree_info.children], colors, ids, tree_info)
-            colors = list(set(colors))  # Get set of unique colors
-            return {"colors": colors, "ids": ids}
-        elif child[tree_info.children]:
-            family = find_family(child[tree_info.children], name, tree_info)
-            if family:
-                return family
-    return None
-
-
-# Tree ids is a list of string names for each region
-def tree_processing(file=None, names=None, tree_info=None):
-    # Load the default file if there isn't one
-    if not file:
-        wd = get_cwd()
-        file = helpers.std_path(
-            os.path.join(wd, "library", "annotation_trees", "p56 Mouse Brain.json")
-        )
-
-    # Set up the JSON_Options object to know how to read the JSON file
-    if not tree_info:
-        tree_info = JSON_Options()
-
-    # Load the annotation tree
-    with open(file) as f:
-        file = json.load(f)
-        tree = file[tree_info.children]  # Load all children of the root
-
-    # Populate the annotation_info dict with the id/color information for each child
-    # Assumes that tree has
-    annotation_info = {}
-    if names:
-        for name in names:
-            annotation_info[name] = find_family(tree, name, tree_info)
-    else:
-        annotation_info[None] = None
-
-    return annotation_info
-
-
-# Load a VesselVio annotation JSON file
-def load_annotation_file(file):
-    with open(file) as f:
-        annotation_data = json.load(f)["VesselVio Annotations"]
-    return annotation_data
 
 
 ########################
@@ -198,8 +121,8 @@ def build_ROI_array(ROI_dict, annotation_type: str = "ID") -> np.ndarray:
 
     # Convert into array, fill with ROI ids, leaving 0's behind rest
     ROI_array = np.zeros(
-        [len(ROIs), max_len + 1], dtype=np.uint32
-    )  # Make sure a zero is in every set
+        (len(ROIs), max_len + 1), dtype=np.uint32
+    )  # Make sure a zero is in every set ---
     for i, ROI in enumerate(ROIs):
         ROI_array[i, : len(ROI)] = ROI
     return ROI_array
@@ -407,11 +330,11 @@ def RGB_labeling_input(volume, annotation_folder, ROI_array, verbose=False):
         return None, None, None, None
 
     # Prepare all of the necessary items
-    RGB_dict, RGB_keys, ROI_volumes, volume_updates = prep_ROI_array(ROI_array)
+    id_dict, id_keys, ROI_volumes, volume_updates = prep_ROI_array(ROI_array)
     slice_volumes = ROI_volumes.copy()
 
     # Convert RGB_keys back into np.array
-    RGB_keys = np.asarray(list(RGB_keys))
+    id_keys = np.asarray(list(id_keys))
 
     minima, maxima = build_minima_maxima_arrays(volume, ROI_array)
 
@@ -424,20 +347,20 @@ def RGB_labeling_input(volume, annotation_folder, ROI_array, verbose=False):
             RGB_hash,
             slice_volumes,
             volume_updates,
-            RGB_dict,
-            RGB_keys,
-            mins,
-            maxes,
+            id_dict,
+            id_keys,
+            minima,
+            maxima,
             i,
         )
         ROI_volumes += slice_volumes
         slice_volumes *= 0
 
         if verbose:
+            print("\r", end="")  # clear previous output
             print(
                 f"Slice {i+1}/{volume.shape[0]} segmented in {pf() - t:0.2f} seconds.",
                 end="\r",
-                flush=True,
             )
 
     return volume, ROI_volumes, minima, maxima
@@ -489,7 +412,7 @@ def nn_id_labeling(volume, a_memmap, ROI_array, verbose=False):
 def numba_id_labeling(vprox, a_volume, ROI_array):
     id_dict, id_keys, ROI_volumes, volume_updates = prep_ROI_array(ROI_array)
 
-    minima, maxima = build_minima_maxima_arrays(ROI_array, volume)
+    minima, maxima = build_minima_maxima_arrays(ROI_array, vprox)
 
     for z in prange(a_volume.shape[0]):
         for y in range(a_volume.shape[1]):
@@ -557,36 +480,3 @@ def volume_labeling_input(
         ImProc.cache_labeled_volume(labeled_volume, verbose=verbose)
 
     return ROI_volumes, mins, maxes
-
-
-###############
-### Testing ###
-###############
-if __name__ == "__main__":
-    # !!! #
-    # If labeling from __main__, this file needs to be copied to
-    # Parent dir of /Library folder, i.e., with the VesselVio.py file.
-    from os import getcwd as get_cwd
-
-    from library import image_processing as ImProc
-
-    annotation_data = load_annotation_file("")
-    print("Regions:", len(annotation_data.keys()))
-
-    ### NII Testing
-    # volume = ImProc.load_nii_volume('')
-    # annotation = ""
-    # id_array = prep_id_array(annotation_data)
-    # volume, ROI_volumes, mins, maxes = id_segmentation_input(volume, annotation, id_array, verbose=True)
-
-    ### RGB Testing
-    volume = ImProc.load_nii_volume("")
-    annotation_folder = ""
-    RGB_array = annotation_data
-    volume, ROI_volumes, mins, maxes = RGB_labeling_input(
-        volume, annotation_folder, RGB_array, verbose=True
-    )
-
-else:
-    from library import image_processing as ImProc
-    from library.helpers import get_cwd

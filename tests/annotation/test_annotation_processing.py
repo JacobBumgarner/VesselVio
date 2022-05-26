@@ -8,6 +8,7 @@ sys.path.insert(1, "/Users/jacobbumgarner/Documents/GitHub/VesselVio")
 import numpy as np
 
 from library import annotation_processing as AnnProc
+from library.annotation import tree_processing
 
 # from skimage.io import imread
 
@@ -18,7 +19,7 @@ ANNOTATION_DIR = os.path.join(FIXTURE_DIR, "annotation_data")
 
 @pytest.mark.datafiles(ANNOTATION_DIR)
 def test_convert_hex_to_int_tree(datafiles):
-    annotation_dict = AnnProc.load_annotation_file(
+    annotation_dict = tree_processing.load_annotation_file(
         os.path.join(datafiles, "Cortex Unique.json")
     )
     hex_ROIs = [annotation_dict[key]["colors"] for key in annotation_dict.keys()]
@@ -30,7 +31,7 @@ def test_convert_hex_to_int_tree(datafiles):
 
 @pytest.mark.datafiles(ANNOTATION_DIR)
 def test_build_ROI_array(datafiles):
-    annotation_dict = AnnProc.load_annotation_file(
+    annotation_dict = tree_processing.load_annotation_file(
         os.path.join(datafiles, "Cortex Unique.json")
     )
 
@@ -41,9 +42,9 @@ def test_build_ROI_array(datafiles):
 
     # RGB Check
     ROI_array = AnnProc.build_ROI_array(annotation_dict, annotation_type="RGB")
-    # assert ROI_array.shape == (6, 78)
-    # assert np.issubdtype(ROI_array.dtype, np.uint32)
-    print(ROI_array.shape, type(ROI_array), ROI_array.dtype)
+    assert ROI_array.shape == (6, 2)
+    assert np.issubdtype(ROI_array.dtype, np.uint32)
+    print(ROI_array)
     return
 
 
@@ -63,12 +64,12 @@ def test_build_minima_maxima_arrays():
 
 @pytest.mark.datafiles(ANNOTATION_DIR)
 def test_RGB_duplicates_check(datafiles):
-    unique_annotation_data = AnnProc.load_annotation_file(
+    unique_annotation_data = tree_processing.load_annotation_file(
         os.path.join(datafiles, "Cortex Unique.json")
     )
     assert AnnProc.RGB_duplicates_check(unique_annotation_data) is False
 
-    duplicate_annotation_data = AnnProc.load_annotation_file(
+    duplicate_annotation_data = tree_processing.load_annotation_file(
         os.path.join(datafiles, "HPF Duplicates.json")
     )
     assert AnnProc.RGB_duplicates_check(duplicate_annotation_data) is True

@@ -12,7 +12,9 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 import json
 import os
 
-from library import annotation_processing as AnProc, helpers
+from library import helpers
+
+from library.annotation import tree_processing
 from library.gui import qt_objects as QtO
 
 from PyQt5.QtCore import Qt
@@ -62,7 +64,11 @@ class AnnotationPage(QWidget):
         ## Default annotation file setup
         self.tree_file = helpers.std_path(
             os.path.join(
-                helpers.get_cwd(), "library", "annotation_trees", "p56 Mouse Brain.json"
+                helpers.get_cwd(),
+                "library",
+                "annotation",
+                "annotation_trees",
+                "p56 Mouse Brain.json",
             )
         )
 
@@ -188,8 +194,8 @@ class AnnotationPage(QWidget):
         self.aTree.identify_checked()
         ROIs = self.aTree.checked
         if ROIs:
-            ROI_info = AnProc.tree_processing(
-                self.tree_file, ROIs, self.aTree.tree_info
+            ROI_info = tree_processing.convert_annotation_data(
+                ROIs, self.tree_file, self.aTree.tree_info
             )
             for key in ROI_info.keys():
                 # This is the most convoluted way to deal with this, but whatever.
@@ -285,7 +291,7 @@ class AnnotationTree(QTreeWidget):
         self.search_index = []  # For search functionality
         self.checked = []
 
-        self.tree_info = AnProc.JSON_Options()
+        self.tree_info = tree_processing.JSON_Options()
 
         self.setHeaderLabel("Annotation Selection")
         self.setCurrentItem(self.invisibleRootItem().child(0))
@@ -537,7 +543,11 @@ class LoadTreeFile(QDialog):
     def load_default(self):
         selection = self.defaultList.currentItem().text()
         self.file_name = os.path.join(
-            helpers.get_cwd(), f"library/annotation_trees/{selection}.json"
+            helpers.get_cwd(),
+            "library",
+            "annotation",
+            "annotation_trees",
+            f"{selection}.json",
         )
         self.accept()
         return
