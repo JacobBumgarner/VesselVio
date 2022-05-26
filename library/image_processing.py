@@ -208,7 +208,7 @@ def dir_files(directory):
 
 
 def image_resizing(directory, output_size, ext):
-    files = dir_files(directory, ext)
+    files = dir_files(directory)
 
     for file in files:
         image = cv2.imread(file)

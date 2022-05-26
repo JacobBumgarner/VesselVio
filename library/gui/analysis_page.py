@@ -62,42 +62,62 @@ class mainWindow(QMainWindow):
 class AnalysisPage(QWidget):
     """The page for batch analysis of volumes and graphs.
 
-    Parameters:
+    Provides a GUI for users to load multiple datasets, including binary
+    volumes, annotated volumes, and graphs. Analysis and result export
+    options can be set, and batch analyses on the loaded datasets can be run.
 
-    The page used for batch processing and analysis of segmented vasculature
-    datasets."""
+    """
 
     def __init__(self):
+        """Build the analysis page."""
         super().__init__()
         self.analyzed = False
-        ## This page is organized into to vertical sections.
 
+        ### This page is organized into two vertical sections.
         pageLayout = QtO.new_layout(self, "V", spacing=5, margins=20)
 
-        ## Top section - file loading and processing
-        self.Loading = LoadingWidget()
-        self.Loading.loadButton.clicked.connect(self.load_files)
+        ## Top section - two widgets: file loading and file table
+        topWidget = QtO.new_widget()
+        topLayout = QtO.new_layout(topWidget, margins=(0, 0, 0, 0))
 
-        ### Botom section - analysis and graph loading options
+        # Top right - file table widget, results export widget
+        topRightWidget = QtO.new_widget()
+        topRightLayout = QtO.new_layout(topRightWidget, "V", no_spacing=True)
+        self.fileTable = FileTableWidget()
+
+        # Result path manager
+        self.resultsPathManager = ResultsPathManagerWidget()
+
+        QtO.add_widgets(topRightLayout, [self.fileTable, self.resultsPathManager])
+
+        # Top left - file manager
+        self.fileManager = FileManagerWidget(self.fileTable)
+        self.fileManager.loadButton.clicked.connect(self.load_files)
+
+        # Add widgets to the top layout
+        QtO.add_widgets(topLayout, [self.fileManager, topRightWidget])
+
+        ## Bottom section - three widgets: spacer, options, analyze/cancel
         # three column horizontal
-        self.bottomWidget = QtO.new_widget()
-        self.bottomWidget.setFixedHeight(250)
-        bottomLayout = QtO.new_layout(self.bottomWidget, no_spacing=True)
+        bottomWidget = QtO.new_widget()
+        bottomWidget.setFixedHeight(250)
+        bottomLayout = QtO.new_layout(bottomWidget, no_spacing=True)
 
-        # Left column is a spacer
+        # Left column is a spacer to match the top loading widget.
         spacer = QtO.new_widget(150)
 
         # Middle column is a tab widget
         self.analysisOptions = AnalysisOptions()
-        self.graphOptions = GraphOptions(self.Loading.fileSheet)
+        self.graphOptions = GraphOptions(self.fileTable)
         self.optionsTab = QTabWidget()
         self.optionsTab.addTab(self.analysisOptions, "Analysis Options")
         self.optionsTab.addTab(self.graphOptions, "Graph File Options")
+
         # Connect the loading filetype to the second options tab
         self.optionsTab.setTabEnabled(1, False)
-        self.Loading.datasetType.currentIndexChanged.connect(self.update_table_view)
+        self.fileManager.datasetType.currentIndexChanged.connect(self.update_table_view)
 
-        # Bottom right column
+        # Right column
         rightColumn = QtO.new_layout(orient="V", spacing=13)
         self.analyzeButton = QtO.new_button("Analyze", self.run_analysis)
         self.cancelButton = QtO.new_button("Cancel", self.cancel_analysis)
@@ -107,14 +127,17 @@ class AnalysisPage(QWidget):
         QtO.add_widgets(bottomLayout, [spacer, 0, self.optionsTab, rightColumn, 0])
 
         ## Add it all together
-        QtO.add_widgets(pageLayout, [self.Loading, self.bottomWidget])
+        QtO.add_widgets(pageLayout, [topWidget, bottomWidget])
 
     ## File loading
     def load_files(self):
-        """File loading. Manages loading segmented files, annotation files,
-        and graph files for batch analysis."""
-        dataset_type = self.Loading.datasetType.currentText()
-        annotation_type = self.Loading.annotationType.currentText()
+        """Load files based on the selected filetypes.
+
+        Dispatches loading for segmented files, annotation files,
+        and graph files.
+        """
+        dataset_type = self.fileManager.datasetType.currentText()
+        annotation_type = self.fileManager.annotationType.currentText()
         graph_format = self.graphOptions.graphFormat.currentText()
 
         column1_files, column2_files = None, None
@@ -140,14 +163,12 @@ class AnalysisPage(QWidget):
             del self.file_loader
 
         if self.analyzed:
-            self.Loading.clear_files()
+            self.fileTable.clear_files()
             self.analyzed = False
         if column1_files:
-            self.Loading.column1_files += column1_files
-            self.Loading.add_column1_files()
+            self.fileTable.add_column1_files(column1_files)
         if column2_files:
-            self.Loading.column2_files += column2_files
-            self.Loading.add_column2_files()
+            self.fileTable.add_column2_files(column2_files)
 
         return
 
@@ -176,61 +197,67 @@ class AnalysisPage(QWidget):
             return
 
         # Check for the loaded files and initialize the appropriate QThread
-        if self.Loading.datasetType.currentText() == "Volume":
+        if self.fileManager.datasetType.currentText() == "Volume":
             self.initialize_volume_analysis()
-        elif self.Loading.datasetType.currentText() == "Graph":
+        elif self.fileManager.datasetType.currentText() == "Graph":
             self.initialize_graph_analysis()
 
         self.a_thread.button_lock.connect(self.button_locking)
-        self.a_thread.selection_signal.connect(self.Loading.update_row_selection)
-        self.a_thread.analysis_status.connect(self.Loading.update_status)
+        self.a_thread.selection_signal.connect(self.fileTable.update_row_selection)
+        self.a_thread.analysis_status.connect(
+            self.fileTable.update_file_analysis_status
+        )
         self.a_thread.start()
         self.analyzed = True
         return
 
     # Volume analysis
     def initialize_volume_analysis(self):
-        """Creates an analysis thread for volume-based analysis. Loads and
-        prepares the relevant volume analysis options."""
+        """Initialize an analysis thread for volume-based analysis.
+
+        Loads and prepares the relevant volume analysis options.
+        """
         analysis_options = self.analysisOptions.prepare_options(
-            self.Loading.results_folder
+            self.resultsPathManager.results_folder
         )
-        analysis_options.annotation_type = self.Loading.annotationType.currentText()
+        analysis_options.annotation_type = self.fileManager.annotationType.currentText()
         self.a_thread = QtTh.VolumeThread(
             analysis_options,
-            self.Loading.column1_files,
-            self.Loading.column2_files,
-            self.Loading.annotation_data,
+            self.fileManager.column1_files,
+            self.fileManager.column2_files,
+            self.fileManager.annotation_data,
             self.disk_space_warning,
         )
         return
 
     def initialize_graph_analysis(self):
-        """Creates an analysis thread for graph-based analysis. Loads and
-        prepares the relevant graph analysis options."""
+        """Initialize an analysis thread for graph-based analysis.
+
+        Loads and prepares the relevant graph analysis options.
+        """
         analysis_options = self.analysisOptions.prepare_options(
-            self.Loading.results_folder
+            self.resultsPathManager.results_folder
         )
         graph_options = self.graphOptions.prepare_options()
         self.a_thread = QtTh.GraphThread(
             analysis_options,
             graph_options,
-            self.Loading.column1_files,
-            self.Loading.column2_files,
+            self.fileManager.column1_files,
+            self.fileManager.column2_files,
         )
         return
 
     def cancel_analysis(self):
-        """Once called, triggers the analysis thread to stop the analysis at the
-        next breakpoint."""
+        """Trigger the analysis thread to stop at the next breakpoint."""
         # Disable the cancel button after the request is sent.
         self.cancelButton.setDisabled(True)
         self.a_thread.stop()
         return
 
     def button_locking(self, lock_state):
-        """Toggles button disables for any relevant buttons or options during
-        the analysis. Also serves to trigger any relevant log
+        """Toggle button locking during the analysis.
+
+        Also serves to trigger any relevant log.
 
         Parameters:
         lock_state : bool
@@ -240,8 +267,8 @@ class AnalysisPage(QWidget):
             'setDisabled' call.
         """
         self.cancelButton.setEnabled(lock_state)
-        self.Loading.loadingColumn.setDisabled(lock_state)
-        self.Loading.changeFolder.setDisabled(lock_state)
+        self.fileManager.setDisabled(lock_state)
+        self.resultsPathManager.changeFolder.setDisabled(lock_state)
         self.analyzeButton.setDisabled(lock_state)
         return
 
@@ -253,44 +280,42 @@ class AnalysisPage(QWidget):
             True if loaded correctly, False if incorrectly or incompletely
             loaded
         """
-        if not self.Loading.column1_files:  # General file check
+        if not self.fileManager.column1_files:  # General file check
             return False
 
-        if self.Loading.datasetType.currentText() == "Volume":  # Specific check
-            if self.Loading.annotationType.currentText() != "None":
-                if not self.column_file_check() or not self.Loading.annotation_data:
+        if self.fileManager.datasetType.currentText() == "Volume":  # Specific check
+            if self.fileManager.annotationType.currentText() != "None":
+                if not self.column_file_check() or not self.fileManager.annotation_data:
                     return False
-        if self.Loading.datasetType.currentText() == "Graph":
+        if self.fileManager.datasetType.currentText() == "Graph":
             if self.graphOptions.graphFormat.currentText() == "CSV":
                 if not self.column_file_check():
                     return False
         return True
 
     def column_file_check(self):
-        """Ensures that the column1_files and column2_files have the same number
-        of loaded files.
+        """Ensures that two columns have equal file counts.
 
         Returns
         -------
         bool
             True if the number of files match, False if they are different
         """
-        file_check = len(self.Loading.column1_files) == len(self.Loading.column2_files)
+        file_check = len(self.fileManager.column1_files) == len(
+            self.fileManager.column2_files
+        )
         return file_check
 
     # Warnings
     def analysis_warning(self):
-        """Creates a message box to indicate that the appropriate files have not
-        been loaded."""
+        """Create an incomplete file loading error."""
         msgBox = QMessageBox()
         message = "Load all files to run analysis."
         msgBox.setText(message)
         msgBox.exec_()
 
     def disk_space_warning(self, needed_space: float):
-        """Creates a message box to indicate that at some point during the
-        analysis, there was not enough disk space to conduct an annotation
-        analysis."""
+        """Create a disk space warning error."""
         msgBox = QMessageBox()
         msgBox.setWindowTitle("Disk Space Error")
         message = (
@@ -304,41 +329,260 @@ class AnalysisPage(QWidget):
 
     # Tab viewing
     def update_table_view(self):
-        """Updates the view of the file loading table. If an annotation-based
-        analysis or a CSV graph-based analysis are selected, an additional
-        column is added for the relevant files."""
+        """Update the view of the file loading table.
+
+        If an annotation-based analysis or a CSV graph-based analysis are
+        selected, an additional column is added for the relevant files.
+        """
         active = False
-        if self.Loading.datasetType.currentText() == "Graph":
+        if self.fileManager.datasetType.currentText() == "Graph":
             active = True
             if self.graphOptions.graphFormat.currentText() != "CSV":
-                self.Loading.fileSheet.init_default()
+                self.fileTable.apply_default_layout()
             else:
-                self.Loading.fileSheet.init_csv()
-        elif self.Loading.annotationType.currentText() != "None":
-            self.Loading.fileSheet.init_annotation()
+                self.fileTable.apply_csv_layout()
+        elif self.fileManager.annotationType.currentText() != "None":
+            self.fileTable.apply_annotation_layout()
         self.optionsTab.setTabEnabled(1, active)
         return
 
 
-class LoadingWidget(QWidget):
-    def __init__(self):
-        super().__init__()
+class ResultsPathManagerWidget(QWidget):
+    """Widget used to manage the results export directory.
 
+    Attributes:
+    results_folder : string
+        The user-selected path to export the results to.
+    """
+
+    def __init__(self):
+        """Build the path processing widget."""
+        super().__init__()
         self.results_folder = helpers.load_results_dir()
+
+        layout = QtO.new_layout(self, margins=(0, 0, 0, 0))
+        folderHeader = QLabel("Result Folder:")
+        self.resultPath = QtO.new_line_edit(self.results_folder, locked=True)
+        self.changeFolder = QtO.new_button("Change...", self.set_results_folder)
+        QtO.add_widgets(layout, [folderHeader, self.resultPath, self.changeFolder])
+        return
+
+    def set_results_folder(self):
+        """Update the results folder export directory."""
+        folder = helpers.set_results_dir()
+        if folder:
+            self.results_folder = folder
+            self.resultPath.setText(folder)
+        return
+
+
+class FileTableWidget(QTableWidget):
+    """
+    QTableWidget used to view the loaded datasets and their analysis status.
+
+    Attributes:
+    column1_files : list
+
+    column2_files : list
+    """
+
+    def __init__(self):
+        """Build the table widget."""
+        super().__init__()
+        self.column1_files = []
+        self.column2_files = []
+
+        self.setShowGrid(False)
+
+        self.setSelectionBehavior(QTableWidget.SelectRows)
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setEditTriggers(QTableWidget.NoEditTriggers)
+
+        self.verticalHeader().hide()
+        self.horizontalHeader().setMinimumSectionSize(100)
+
+        self.setMinimumWidth(400)
+
+        self.apply_default_layout()
+
+        self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.verticalHeader().setDefaultSectionSize(20)
+
+    # File management
+    def add_column1_files(self, files: list):
+        """Add files to the first column of the table.
+
+        Parameters:
+        files : list
+            A list of str file paths. Updates the self.column1_files attribute.
+        """
+        self.setRowCount()
+        for i, file in enumerate(self.column1_files):
+            if i + 1 > self.rowCount():
+                self.insertRow(self.rowCount())
+            filename = os.path.basename(file)
+            self.setItem(i, 0, QTableWidgetItem(filename))
+
+    def add_column2_files(self, files: list):
+        """Add files to the second column of the table.
+
+        Parameters:
+        files : list
+            A list of str file paths. Updates the self.column1_files attribute.
+        """
+
+        for i, file in enumerate(self.column1_files):
+            if i + 1 > self.rowCount():
+                self.insertRow(self.rowCount())
+            filename = os.path.basename(file)
+            self.setItem(i, 0, QTableWidgetItem(filename))
+
+    def clear_files(self):
+        """Clear the files from the table."""
+        self.setRowCount(0)
+        self.column1_files = []
+        self.column2_files = []
+
+    def update_file_analysis_status(self, status):
+        """Update the analysis status of a file.
+
+        Parameters:
+        status : list
+
+        """
+        column = self.columnCount() - 1
+        self.selectRow(status[0])
+        self.setItem(status[0], column, QTableWidgetItem(status[1]))
+
+        if column == 3 and len(status) == 3:
+            self.setItem(status[0], column - 1, QTableWidgetItem(status[2]))
+        return
+
+    # Layout management
+    def apply_default_layout(self):
+        """Apply the default single file layout.
+
+        Implements a two column layout:
+        Column 1 shows file names.
+        Column 2 shows the analysis status of the file.
+        """
+        header = ["File Name", "File Status"]
+        self.set_table_layout(2, [300, 200], header)
+        return
+
+    def apply_annotation_layout(self):
+        """Update the table for loaded annotation files.
+
+        Implements a four column layout:
+        Column 1 shows the volume file names.
+        Column 2 shows the annotation file names.
+        Column 3 shows the number of annotation regions.
+        Column 4 shows the analysis status of the file.
+        """
+        header = [
+            "File Name",
+            "Annotation File Name",
+            "Regions Processed",
+            "File Status",
+        ]
+        self.set_table_layout(4, [200, 200, 150, 200], header)
+        return
+
+    def apply_csv_layout(self):
+        """Update the table for loaded CSV files.
+
+        Implements a three column layout:
+        Column 1 shows the vertex file names.
+        Column 2 shows the edge file names.
+        Column 3 shows the analysis status of the file.
+        """
+        header = ["File Name - Vertices", "File Name - Edges", "File Status"]
+        self.set_table_layout(3, [200] * 3, header)
+        return
+
+    def set_fixed_column_format(self, column_index):
+        """Apply the fixed layout to the specified column.
+
+        This format incluces a centered alignment with a fixed column width.
+
+        Parameters:
+        column_index : int
+        """
+        delegate = QtO.AlignCenterDelegate(self)  # center alignment
+        self.setItemDelegateForColumn(column_index, delegate)
+        self.horizontalHeader().setSectionResizeMode(column_index, QHeaderView.Fixed)
+        return
+
+    def set_table_layout(self, column_count, widths, header):
+        """Update the layout of the file table.
+
+        Parameters:
+        column_count : int
+            Indicates how many many columns should be placed into the table.
+
+        widths : list
+            A list of integers indicating how wide each column should be in
+            pixels.
+
+        header : list
+            A list of strings used for the headers of each column.
+
+        """
+        # Add columns and update column size
+        self.setColumnCount(0)
+        self.setColumnCount(column_count)
+        for i in range(column_count):
+            self.setColumnWidth(i, widths[i])
+
+        # Add column headers, adjust the sizing of the final column.
+        self.setHorizontalHeaderLabels(header)
+
+        # Update format of the status column
+        last_column_index = self.columnCount() - 1
+        self.set_fixed_column_format(last_column_index)
+
+        # If an annotation file is present, apply the
+        # fixed formatting to the annotatino column..
+        if last_column_index == 3:
+            last_column_index -= 1
+            self.set_fixed_column_format(last_column_index - 1)
+
+        # Left align text for the file names
+        delegate = QtO.AlignLeftDelegate(self)
+        for i in range(last_column_index):
+            self.setItemDelegateForColumn(i, delegate)
+            self.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
+
+        return
+
+    # Selection management
+    def update_row_selection(self, row):
+        """ "Update the selected row of the table.
+
+        Parameters:
+        row : int
+        """
+        self.selectRow(row)
+        return
+
+
+class FileManagerWidget(QWidget):
+    def __init__(self, fileTable: FileTableWidget):
+        super().__init__()
         self.column1_files = []
         self.column2_files = []
         self.annotation_data = None
+        self.fileTable = fileTable
 
         self.setMinimumHeight(400)
-        topLayout = QtO.new_layout(self, no_spacing=True)
+        self.setFixedWidth(150)
 
         ## Loading column
-        self.loadingColumn = QtO.new_widget(150)
-        loadingLayout = QtO.new_layout(self.loadingColumn, orient="V")
+        layout = QtO.new_layout(self, orient="V", margins=(0, 0, 0, 0))
 
         self.loadButton = QtO.new_button("Load Files", None)
         clearFile = QtO.new_button("Remove File", self.remove_file)
-        clearAll = QtO.new_button("Clear Files", self.clear_files)
+        clearAll = QtO.new_button("Clear Files", self.fileTable.clear_files)
 
         # Line
         line = QtO.new_line("H", 100)
@@ -371,7 +615,7 @@ class LoadingWidget(QWidget):
         QtO.add_widgets(aFileLayout, [loadJSON, loaded, self.loadedJSON], "Center")
 
         QtO.add_widgets(
-            loadingLayout,
+            layout,
             [
                 40,
                 self.loadButton,
@@ -388,36 +632,14 @@ class LoadingWidget(QWidget):
             "Center",
         )
 
-        ## Top right - file list information
-        # region
-        topRight = QtO.new_widget()
-        topRightLayout = QtO.new_layout(topRight, "V", no_spacing=True)
-        self.fileSheet = FileSheet()
-        self.fileSheet.setMinimumWidth(400)
-
-        # Result export location
-        folderLine = QtO.new_widget()
-        folderLayout = QtO.new_layout(folderLine, margins=(0, 0, 0, 0))
-        folderHeader = QLabel("Result Folder:")
-        self.resultPath = QtO.new_line_edit(self.results_folder, locked=True)
-        self.changeFolder = QtO.new_button("Change...", self.set_results_folder)
-        QtO.add_widgets(
-            folderLayout, [folderHeader, self.resultPath, self.changeFolder]
-        )
-
-        QtO.add_widgets(topRightLayout, [self.fileSheet, folderLine])
-        # endregion
-
-        QtO.add_widgets(topLayout, [self.loadingColumn, topRight])
-
     ## File management
     def add_column1_files(self):
         files = self.column1_files
         for i, file in enumerate(files):
-            if i + 1 > self.fileSheet.rowCount():
-                self.fileSheet.insertRow(self.fileSheet.rowCount())
+            if i + 1 > self.fileTable.rowCount():
+                self.fileTable.insertRow(self.fileTable.rowCount())
             filename = os.path.basename(file)
-            self.fileSheet.setItem(i, 0, QTableWidgetItem(filename))
+            self.fileTable.setItem(i, 0, QTableWidgetItem(filename))
 
         self.update_queue()
         return
@@ -425,19 +647,19 @@ class LoadingWidget(QWidget):
     def add_column2_files(self):
         files = self.column2_files
         for i, file in enumerate(files):
-            if i + 1 > self.fileSheet.rowCount():
-                self.fileSheet.insertRow(self.fileSheet.rowCount())
+            if i + 1 > self.fileTable.rowCount():
+                self.fileTable.insertRow(self.fileTable.rowCount())
             filename = os.path.basename(file)
-            self.fileSheet.setItem(i, 1, QTableWidgetItem(filename))
+            self.fileTable.setItem(i, 1, QTableWidgetItem(filename))
 
         self.update_queue()
         return
 
     def remove_file(self):
-        columns = self.fileSheet.columnCount()
-        if self.fileSheet.selectionModel().hasSelection():
-            index = self.fileSheet.currentRow()
-            self.fileSheet.removeRow(index)
+        columns = self.fileTable.columnCount()
+        if self.fileTable.selectionModel().hasSelection():
+            index = self.fileTable.currentRow()
+            self.fileTable.removeRow(index)
             if index < len(self.column1_files):
                 del self.column1_files[index]
             if columns == 3:
@@ -445,42 +667,24 @@ class LoadingWidget(QWidget):
                     del self.column2_files[index]
         return
 
-    def clear_files(self):
-        self.fileSheet.setRowCount(0)
-        self.column1_files = []
-        self.column2_files = []
-        return
-
     ## Status management
     # Status is sent as a len(2) list with [0] as index
     # and [1] as status
-    def update_status(self, status):
-        column = self.fileSheet.columnCount() - 1
-        self.fileSheet.setItem(status[0], column, QTableWidgetItem(status[1]))
-        self.fileSheet.selectRow(status[0])
-
-        if column == 3 and len(status) == 3:
-            self.fileSheet.setItem(status[0], column - 1, QTableWidgetItem(status[2]))
-        return
-
-    def update_row_selection(self, row):
-        self.fileSheet.selectRow(row)
-        return
 
     def update_queue(self):
-        last_column = self.fileSheet.columnCount() - 1
-        for i in range(self.fileSheet.rowCount()):
-            self.fileSheet.setItem(i, last_column, QTableWidgetItem("Queued..."))
+        last_column = self.fileTable.columnCount() - 1
+        for i in range(self.fileTable.rowCount()):
+            self.fileTable.setItem(i, last_column, QTableWidgetItem("Queued..."))
 
-        if self.fileSheet.columnCount() == 4:
+        if self.fileTable.columnCount() == 4:
             if self.annotation_data:
                 count = len(self.annotation_data.keys())
                 status = f"0/{count}"
             else:
                 status = "Load JSON!"
             last_column -= 1
-            for i in range(self.fileSheet.rowCount()):
-                self.fileSheet.setItem(i, last_column, QTableWidgetItem(status))
+            for i in range(self.fileTable.rowCount()):
+                self.fileTable.setItem(i, last_column, QTableWidgetItem(status))
 
         return
 
@@ -490,7 +694,7 @@ class LoadingWidget(QWidget):
         if self.datasetType.currentText() == "Graph":
             visible = True
         else:
-            self.fileSheet.init_default()
+            self.fileTable.apply_default_layout()
 
         if self.annotationType.currentIndex():
             self.loadAnnotationFile.setVisible(not visible)
@@ -500,14 +704,12 @@ class LoadingWidget(QWidget):
         return
 
     def annotation_options(self):
-        visible = False
         if self.annotationType.currentIndex():
-            visible = True
-            self.fileSheet.init_annotation()
+            self.fileTable.apply_annotation_layout()
         else:
-            self.fileSheet.init_default()
+            self.fileTable.apply_default_layout()
             self.column2_files = []
-        self.loadAnnotationFile.setVisible(visible)
+        self.loadAnnotationFile.setVisible(self.annotationType.currentIndex() > 0)
         self.add_column1_files()
         return
 
@@ -548,82 +750,6 @@ class LoadingWidget(QWidget):
         if self.annotationType.currentText() == "None":
             self.annotation_data = None
             self.loadedJSON.setText("None")
-        return
-
-    ## Results folder processing
-    def set_results_folder(self):
-        folder = helpers.set_results_dir()
-        if folder:
-            self.results_folder = folder
-            self.resultPath.setText(folder)
-        return
-
-
-class FileSheet(QTableWidget):
-    def __init__(self):
-        super().__init__()
-        self.setShowGrid(False)
-
-        self.setSelectionBehavior(QTableWidget.SelectRows)
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.setEditTriggers(QTableWidget.NoEditTriggers)
-
-        self.verticalHeader().hide()
-        self.horizontalHeader().setMinimumSectionSize(100)
-
-        self.setMinimumWidth(400)
-
-        self.init_default()
-
-        self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.verticalHeader().setDefaultSectionSize(20)
-
-    def init_default(self):
-        header = ["File Name", "File Status"]
-        self.set_format(2, [300, 200], header)
-        return
-
-    def init_annotation(self):
-        header = [
-            "File Name",
-            "Annotation File Name",
-            "Regions Processed",
-            "File Status",
-        ]
-        self.set_format(4, [200, 200, 150, 200], header)
-        return
-
-    def init_csv(self):
-        header = ["File Name - Vertices", "File Name - Edges", "File Status"]
-        self.set_format(3, [200] * 3, header)
-        return
-
-    def set_format(self, column_count, widths, header):
-        # Add columns, column info, and column size
-        self.setColumnCount(0)
-        self.setColumnCount(column_count)
-        for i in range(column_count):
-            self.setColumnWidth(i, widths[i])
-
-        self.setHorizontalHeaderLabels(header)
-
-        # Make sure status column is fixed size
-        last = self.columnCount() - 1
-        delegate = QtO.AlignCenterDelegate(self)
-        self.setItemDelegateForColumn(last, delegate)
-
-        self.horizontalHeader().setSectionResizeMode(last, QHeaderView.Fixed)
-        if last == 3:
-            last -= 1
-            self.horizontalHeader().setSectionResizeMode(last, QHeaderView.Fixed)
-            self.setItemDelegateForColumn(last, delegate)
-
-        # Left align text for the file names
-        delegate = QtO.AlignLeftDelegate(self)
-        for i in range(last):
-            self.setItemDelegateForColumn(i, delegate)
-            self.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
-
         return
 
 

@@ -227,19 +227,16 @@ def RGB_check(annotation_data):
 
 
 @njit(fastmath=True, cache=True)
-def hash_RGB_array(RGB, image=True):
+def hash_RGB_array(RGB, flip_rgb=False):
     """Hash an (3, n, n) dimensional RGB np.array"""
     RGB = RGB.astype(np.float64)
-    hash_1 = np.array((321.2, 143.4, 245.4))
-    hash_2 = np.array((56.3, 33.2, 91.9))
+    hash_1 = np.array((321, 143, 245))
+    hash_2 = np.array((56, 33, 91))
 
-    if not image:
+    if flip_rgb:
         hash_1 = np.flip(hash_1)  # cv2.imread loads GRB
         hash_2 = np.flip(hash_2)
         RGB *= 255
-    else:
-        RGB = RGB  # cv2.imread loads as 255 RGB
-
     RGB = RGB * hash_1
     RGB = RGB / hash_2
     hashed = np.sum(RGB, axis=-1)
@@ -251,17 +248,24 @@ def prep_RGB_array(ROI_dict):
     hash the RGB values to create an array that contains the hashed_RGB labels for each region.
     The array contains zeros, but these will be removed during set creation.
     """
+    # Get all of the hexes
     hexes = [ROI_dict[key]["colors"] for key in ROI_dict.keys()]
+
+    # some regions will have more than one color. Find largest color count
     max_len = 0
     for hex_ids in hexes:
         max_len = len(hex_ids) if len(hex_ids) > max_len else max_len
 
+    # Create an empty array where each row represents a region,
+    # and each column represents a child color. Not all rows will have values.
     RGB_hashes = np.zeros([len(hexes), max_len + 1], dtype=np.float64)
     for i, hex_ids in enumerate(hexes):
-        hashed_RGBs = np.zeros(max_len + 1)
+        hashed_RGBs = np.zeros(max_len + 1)  # create empty row
+
         for j, hex_id in enumerate(hex_ids):
-            RGB = np.asarray(helpers.hex_to_rgb(hex_id))
-            hashed_RGBs[j] = hash_RGB_array(RGB, image=False)
+            RGB = np.asarray(helpers.hex_to_rgb(hex_id))  # convert hex to RGB
+            hashed_RGBs[j] = hash_RGB_array(RGB, flip_rgb=True)  # hash each hex
+
         RGB_hashes[i] = hashed_RGBs
     return RGB_hashes
 
@@ -276,6 +280,9 @@ def prep_RGB_annotation(RGB_hashes):
         for RGB_id in range(RGB_hashes.shape[1]):
             if not RGB_hashes[n, RGB_id]:
                 break  # End of the hashes
+
+            # add object to the dict where the key is the hashed RGB value,
+            # and the item is the index of the parent region is belongs to.
             RGB_dict[RGB_hashes[n, RGB_id]] = n
 
     RGB_keys = set(RGB_hashes.flatten())
@@ -352,7 +359,7 @@ def RGB_labeling_input(volume, annotation_folder, RGB_array, verbose=False):
     for i, file in enumerate(annotation_images):
         t = pf()
         image = cv2.imread(file)
-        RGB_hash = hash_RGB_array(image)
+        RGB_hash = hash_RGB_array(image)  # convert the RGB
         slice_labeling(
             volume,
             RGB_hash,

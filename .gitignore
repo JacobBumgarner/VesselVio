@@ -27,6 +27,7 @@ htmlcov/
 
 # VSCode
 *.code-workspace
+.vscode/
 
 <<<<<<< HEAD
 .DS_Store

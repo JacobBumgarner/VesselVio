@@ -18,9 +18,9 @@ from PyQt5.QtWidgets import QLabel, QWidget
 class GraphOptions(QWidget):
     """The widget"""
 
-    def __init__(self, fileSheet=None):
+    def __init__(self, fileTable=None):
         super().__init__()
-        self.fileSheet = fileSheet
+        self.fileTable = fileTable
 
         self.setFixedWidth(800)
         boxLayout = QtO.new_layout(self, margins=10)
@@ -156,12 +156,12 @@ class GraphOptions(QWidget):
     def update_graph_options(self):
         enable_csv_info = False
         if self.graphFormat.currentText() == "CSV":
-            if self.fileSheet:
-                self.fileSheet.init_csv()
+            if self.fileTable:
+                self.fileTable.apply_csv_layout()
             enable_csv_info = True
         else:
-            if self.fileSheet:
-                self.fileSheet.init_default()
+            if self.fileTable:
+                self.fileTable.apply_default_layout()
 
         self.delimiterCombo.setEnabled(enable_csv_info)
         self.vertexRadiusEdit.setEnabled(enable_csv_info)
