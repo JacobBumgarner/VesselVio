@@ -135,10 +135,11 @@ def process_volume(
 
     if ann_options.annotation_type == "None":
         annotation_data = {None: None}
-    elif ann_options.annotation_type == "RGB":
-        ROI_array = AnnProc.prep_RGB_array(annotation_data)
-    elif ann_options.annotation_type == "ID":
-        ROI_array = AnnProc.prep_id_array(annotation_data)
+    else:
+        ROI_array = AnnProc.build_ROI_array(
+            annotation_data, annotation_type=ann_options.annotation_type
+        )
+
     g_main = ig.Graph()
 
     for i, ROI_name in enumerate(annotation_data.keys()):

@@ -63,10 +63,10 @@ class VolumeThread(QThread):
 
         if gen_options.annotation_type == "None":
             annotation_data = {None: None}
-        elif gen_options.annotation_type == "RGB":
-            ROI_array = AnnProc.prep_RGB_array(annotation_data)
-        elif gen_options.annotation_type == "ID":
-            ROI_array = AnnProc.prep_id_array(annotation_data)
+        else:
+            ROI_array = AnnProc.build_ROI_array(
+                annotation_data, annotation_type=gen_options.annotation_type
+            )
 
         # Iterate through files
         for i, volume_file in enumerate(volume_files):
@@ -414,10 +414,10 @@ class VolumeVisualizationThread(QThread):
 
         if annotation_type == "None":
             annotation_data = {None: None}
-        elif annotation_type == "RGB":
-            ROI_array = AnnProc.prep_RGB_array(annotation_data)
-        elif annotation_type == "ID":
-            ROI_array = AnnProc.prep_id_array(annotation_data)
+        else:
+            ROI_array = AnnProc.build_ROI_array(
+                annotation_data, annotation_type=annotation_type
+            )
 
         # Single file generation
         main_graph = ig.Graph()  # main graph for final visualization

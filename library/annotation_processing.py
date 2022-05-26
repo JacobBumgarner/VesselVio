@@ -11,13 +11,13 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 import json
 import os
+import typing
 from time import perf_counter as pf
 
 import cv2
 import numpy as np
 
 from library import helpers
-
 from numba import njit, prange
 
 
@@ -32,16 +32,6 @@ class JSON_Options:
         self.children = children
         self.id = id
         self.color = color
-
-
-# Convert lists of hexes to list of RGB values for annotation visualization
-def hex_to_rgb(hexes):
-    rgb = []
-    for hex_value in hexes:
-        rgb.append(
-            list(int(hex_value[i : i + 2], 16) for i in (0, 2, 4))
-        )  # Convert hex to RGB 255
-    return rgb
 
 
 # Find Colors and IDs of children structures
@@ -114,12 +104,22 @@ def load_annotation_file(file):
 @njit(parallel=True, nogil=True, cache=True)
 def segment_volume(labeled_volume, mins, maxes, segmentation_id):
     """Given a labeled volume and ROI bounds, segment the loaded id.
-    labeled_volume: np.uint8 volume containing labeled regions
-    mins: 3 element array containing ZYX bound minima
-    maxes: 3 element array containing ZYX bound maxima
-    segmentation_id: integer-id of the volume to segment
 
-    returns: bounded and segmented volume
+    Parameters:
+    labeled_volume : np.ndarray
+        An ndim=3 array containing labeled regions
+
+    mins : np.ndarray
+        An (3,) array containing the lower bounds of the ROI.
+
+    mins : np.ndarray
+        An (3,) array containing the upper bounds of the ROI.
+
+    segmentation_id: int
+        An int id of the volume to segment
+
+    Returns:
+    np.ndarray : An ndim=3 array where the region of interest is segmented.
     """
     # Isolate the segmented region from the main volume
     volume = labeled_volume[
@@ -153,18 +153,39 @@ def segmentation_input(mins, maxes, segmentation_id, verbose=False):
     return volume
 
 
-#####################
-### ID Processing ###
-#####################
-# Convert the Annotation Processing JSON ids into an array of ids
-# This is mainly because numba can't take lists or sets as input variables,
-# and sending in tuples was throwing too many errors during set creation.
-def prep_id_array(ROI_dict):
-    """Given an ROI_dict (Annotation Processing export) containing ROI information,
-    export an array containing the id information for each region in the order of appearance.
-    The array contains zeros, but these will be removed during set creation.
+######################
+### ROI Processing ###
+######################
+def build_ROI_array(ROI_dict, annotation_type: str = "ID") -> np.ndarray:
+    """Convert a list of parent and child annotations into into an ROI_array.
+
+    Given an ROI_dict (Annotation Processing export), this function converts the
+    parent structure list into
+
+    Parameters:
+    ROI_dict : dict
+        An ROI_dict created from the Annotation Processing page. Must be pre-
+        loaded using the `load_annotation_file` function.
+
+    annotation_type : str
+        The type of annotation. Options [`"ID"`, `"RGB"`]. Default `"ID"`.
+
+    Returns:
+    np.array : An ROI_Array
+        An array of (n,m) shape, where `n` is the number of parents, and `m` is
+        the largest number of children that an individual parent has.
     """
-    ROIs = [ROI_dict[key]["ids"] for key in ROI_dict.keys()]
+    # isolate the ROIs
+    if not isinstance(annotation_type, str):
+        raise TypeError("annotation_type must be a string.")
+    if not annotation_type.lower() in {"id", "rgb"}:
+        raise ValueError("annotation_type must be one of the follow: 'ID', 'RGB'.")
+
+    dict_key = "ids" if annotation_type.lower() == "id" else "colors"
+    ROIs = [ROI_dict[key][dict_key] for key in ROI_dict.keys()]
+
+    if annotation_type == "RGB":
+        ROIs = convert_hex_list_to_int(ROIs)
 
     ### REMOVE BEFORE FLIGHT ###
     ### REMOVE BEFORE FLIGHT ###
@@ -173,19 +194,57 @@ def prep_id_array(ROI_dict):
     ### REMOVE BEFORE FLIGHT ###
     ### REMOVE BEFORE FLIGHT ###
 
-    max_len = 0
-    for ROI in ROIs:  # Find maximum length of ROI ids
-        max_len = len(ROI) if len(ROI) > max_len else max_len
+    max_len = find_max_children_count(ROIs)  # find depth of upcoming array
 
     # Convert into array, fill with ROI ids, leaving 0's behind rest
-    id_array = np.zeros([len(ROIs), max_len + 1])  # Make sure a zero is in every set
+    ROI_array = np.zeros(
+        [len(ROIs), max_len + 1], dtype=np.uint32
+    )  # Make sure a zero is in every set
     for i, ROI in enumerate(ROIs):
-        id_array[i, : len(ROI)] = ROI
-    return id_array
+        ROI_array[i, : len(ROI)] = ROI
+    return ROI_array
+
+
+def convert_hex_list_to_int(hex_family_tree: list) -> list:
+    """Convert a list of hex colors into a list of int values.
+
+    Given an (n,m) list of hex-based annotation representations, return an
+    (n,m) shaped list of integer-RGB representations.
+
+    Parameters:
+    hex_list : list
+
+    Returns:
+    list
+    """
+    int_family_tree = [
+        [int(hex_child, base=16) for hex_child in parent_tree]
+        for parent_tree in hex_family_tree
+    ]
+    return int_family_tree
+
+
+def find_max_children_count(parent_tree: list) -> int:
+    """Return the size of the largest annotation family.
+
+    Parameters:
+    parent_tree : list
+        An (n,m) list, where `n` represents the parents, and `m` represents
+        their children.
+
+    Returns:
+    int
+        Returns the largest identified `m` in the parent_tree.
+    """
+    max_children = 0
+    for children in parent_tree:  # Find maximum length of ROI ids
+        if len(children) > max_children:
+            max_children = len(children)
+    return max_children
 
 
 @njit(cache=True)
-def prep_id_annotation(id_array):
+def prep_ROI_array(id_array):
     """Given an id_array, create a key set,
     dict with hash keys that point to items that contain corresponding index,
     and ROI_volume/volume_update arrays"""
@@ -205,112 +264,113 @@ def prep_id_annotation(id_array):
     return id_dict, id_keys, ROI_volumes, volume_updates
 
 
+@njit()
+def build_minima_maxima_arrays(
+    volume: np.ndarray, ROI_array: np.ndarray
+) -> typing.Tuple[np.ndarray, np.ndarray]:
+    """Return minima and maxima arrays for segmentation bounding.
+
+    The maxima array starts with 0 values, and the minima array starts with the
+
+
+    Parameters:
+    volume : np.ndarray
+
+    ROI_array : np.ndarray
+
+    Returns:
+    np.ndarray : minima
+
+    np.ndarray : maxima
+    """
+    minima = np.ones((ROI_array.shape[0], 3), dtype=np.int_) * np.array(volume.shape)
+    maxima = np.zeros((ROI_array.shape[0], 3), dtype=np.int_)
+    return minima, maxima
+
+
 ######################
 ### RGB Processing ###
 ######################
-def RGB_check(annotation_data):
-    """Given an annotation_data dict (Annotation Processing export),
-    check to see whether there are duplicate colors among the regions.
+def RGB_duplicates_check(annotation_data) -> bool:
+    """Determine whether duplicate colors exist among annotation regions.
+
+    For RGB processing, it is important to determine whether individual regions
+    share the same color coded values. For example, in the hippocampal formation
+    of mice, the Allen Brain Atlas color coding scheme uses both ``"7ED04B"``
+    and ``"66A83D"`` for the Ammon's Horn and Dentate Gyrus regions. If both
+    regions were selected for separate analyses, the results would include
+    vessels from both regions.
+
+    Parameters:
+    annotation_data : dict
+        A dict output of the `Annotation Processing` export that has been pre-
+        processed using `prep_RGB_annotation`.
+
+    Returns:
+    bool : True if duplicates present, False otherwise
     """
-    hexes = [annotation_data[key]["colors"] for key in annotation_data.keys()]
-    hex_set = []
-    duplicates = False
-    for ROI_hexes in hexes:
-        for ROI_hex in ROI_hexes:
-            if ROI_hex not in hex_set:
-                hex_set.extend(ROI_hex)
-            else:
-                duplicates = True
-        if duplicates:
-            break
+    nested_hexes = [annotation_data[key]["colors"] for key in annotation_data.keys()]
+    hexes = [color for nested_colors in nested_hexes for color in nested_colors]
+
+    duplicates = len(hexes) != len(set(hexes))
     return duplicates
 
 
-@njit(fastmath=True, cache=True)
-def hash_RGB_array(RGB, flip_rgb=False):
-    """Hash an (3, n, n) dimensional RGB np.array"""
-    RGB = RGB.astype(np.float64)
-    hash_1 = np.array((321, 143, 245))
-    hash_2 = np.array((56, 33, 91))
-
-    if flip_rgb:
-        hash_1 = np.flip(hash_1)  # cv2.imread loads GRB
-        hash_2 = np.flip(hash_2)
-        RGB *= 255
-    RGB = RGB * hash_1
-    RGB = RGB / hash_2
-    hashed = np.sum(RGB, axis=-1)
-    return hashed
-
-
-def prep_RGB_array(ROI_dict):
-    """Given an ROI_dict (Annotation Processing export),
-    hash the RGB values to create an array that contains the hashed_RGB labels for each region.
-    The array contains zeros, but these will be removed during set creation.
-    """
-    # Get all of the hexes
-    hexes = [ROI_dict[key]["colors"] for key in ROI_dict.keys()]
-
-    # some regions will have more than one color. Find largest color count
-    max_len = 0
-    for hex_ids in hexes:
-        max_len = len(hex_ids) if len(hex_ids) > max_len else max_len
-
-    # Create an empty array where each row represents a region,
-    # and each column represents a child color. Not all rows will have values.
-    RGB_hashes = np.zeros([len(hexes), max_len + 1], dtype=np.float64)
-    for i, hex_ids in enumerate(hexes):
-        hashed_RGBs = np.zeros(max_len + 1)  # create empty row
-
-        for j, hex_id in enumerate(hex_ids):
-            RGB = np.asarray(helpers.hex_to_rgb(hex_id))  # convert hex to RGB
-            hashed_RGBs[j] = hash_RGB_array(RGB, flip_rgb=True)  # hash each hex
-
-        RGB_hashes[i] = hashed_RGBs
-    return RGB_hashes
-
-
 @njit(cache=True)
-def prep_RGB_annotation(RGB_hashes):
-    """Given an RGB_hash array, create a key set,
-    dict with hash keys that point to items that contain corresponding index,
-    and ROI_volume/volume update arrays"""
-    RGB_dict = dict()
-    for n in range(RGB_hashes.shape[0]):
-        for RGB_id in range(RGB_hashes.shape[1]):
-            if not RGB_hashes[n, RGB_id]:
-                break  # End of the hashes
+def convert_bgr_to_int(rgb_array) -> np.ndarray:
+    """Collapse an RGB array into a single value along the RGB dimension.
 
-            # add object to the dict where the key is the hashed RGB value,
-            # and the item is the index of the parent region is belongs to.
-            RGB_dict[RGB_hashes[n, RGB_id]] = n
+    This function conducts bitwise shifts of the RGB values to identify the
+    unique integer value associated with each color. This serves to consolidate
+    the RGB and ID-based annotation analysis pipelines.
 
-    RGB_keys = set(RGB_hashes.flatten())
-    RGB_keys.remove(0)
+    Parameters:
+    rgb_array : np.ndarray
+        An n-dimensional array containing RGB values along the last axis.
 
-    ROI_volumes = np.zeros(RGB_hashes.shape[0])
-    volume_updates = np.identity(RGB_hashes.shape[0])
-
-    return RGB_dict, RGB_keys, ROI_volumes, volume_updates
+    Returns:
+    np.ndarray
+        An n-1 dimensional array, where the RGB values have been collapsed into
+        a single integer value.
+    """
+    # We want to actually do this as RGB, so swap 0,1,2
+    int_array = (rgb_array[..., 2] << 16) | (rgb_array[..., 1] << 8) | rgb_array[..., 0]
+    return int_array.astype(np.uint32)
 
 
 ######################
 ### Slice Labeling ###
 ######################
 @njit(cache=True)
-def update_bounds(mins, maxes, z, y, x, indx):
-    if z < mins[indx, 0]:
-        mins[indx, 0] = z
-    elif z > maxes[indx, 0]:
-        maxes[indx, 0] = z
-    if y < mins[indx, 1]:
-        mins[indx, 1] = y
-    elif y > maxes[indx, 1]:
-        maxes[indx, 1] = y
-    if x < mins[indx, 2]:
-        mins[indx, 2] = x
-    elif x > maxes[indx, 2]:
-        maxes[indx, 2] = x
+def update_bounds(minima, maxima, z, y, x, index):
+    """Given XYZ coordinates, update the bounds for the current region.
+
+    Parameters:
+    minima : np.ndarray
+
+    maxima : np.ndarray
+
+    z : int
+
+    y : int
+
+    x : int
+
+    index : int
+        The index of the minima/maxima array to update.
+    """
+    if z < minima[index, 0]:
+        minima[index, 0] = z
+    elif z > maxima[index, 0]:
+        maxima[index, 0] = z
+    if y < minima[index, 1]:
+        minima[index, 1] = y
+    elif y > maxima[index, 1]:
+        maxima[index, 1] = y
+    if x < minima[index, 2]:
+        minima[index, 2] = x
+    elif x > maxima[index, 2]:
+        maxima[index, 2] = x
     return
 
 
@@ -339,7 +399,7 @@ def slice_labeling(
 ### Volume Labeling ###
 #######################
 ## RGB Atlas processing (Mostly likely from QuickNII or VisuAlign)
-def RGB_labeling_input(volume, annotation_folder, RGB_array, verbose=False):
+def RGB_labeling_input(volume, annotation_folder, ROI_array, verbose=False):
     # Load the images from the RGB annotation folder
     annotation_images = ImProc.dir_files(annotation_folder)
 
@@ -347,19 +407,18 @@ def RGB_labeling_input(volume, annotation_folder, RGB_array, verbose=False):
         return None, None, None, None
 
     # Prepare all of the necessary items
-    RGB_dict, RGB_keys, ROI_volumes, volume_updates = prep_RGB_annotation(RGB_array)
+    RGB_dict, RGB_keys, ROI_volumes, volume_updates = prep_ROI_array(ROI_array)
     slice_volumes = ROI_volumes.copy()
 
     # Convert RGB_keys back into np.array
     RGB_keys = np.asarray(list(RGB_keys))
 
-    mins = np.ones((RGB_array.shape[0], 3), dtype=np.int_) * np.array(volume.shape)
-    maxes = np.zeros((RGB_array.shape[0], 3), dtype=np.int_)
+    minima, maxima = build_minima_maxima_arrays(volume, ROI_array)
 
     for i, file in enumerate(annotation_images):
         t = pf()
         image = cv2.imread(file)
-        RGB_hash = hash_RGB_array(image)  # convert the RGB
+        RGB_hash = convert_bgr_to_int(image)  # convert the RGB
         slice_labeling(
             volume,
             RGB_hash,
@@ -381,23 +440,22 @@ def RGB_labeling_input(volume, annotation_folder, RGB_array, verbose=False):
                 flush=True,
             )
 
-    return volume, ROI_volumes, mins, maxes
+    return volume, ROI_volumes, minima, maxima
 
 
 ###########################
 ### ID Volume Labeling ####
 ###########################
 # For images that have dtype incompatible with numba
-def nn_id_labeling(volume, a_memmap, id_array, verbose=False):
+def nn_id_labeling(volume, a_memmap, ROI_array, verbose=False):
     # Prepare all of the necessary items
-    id_dict, id_keys, ROI_volumes, volume_updates = prep_id_annotation(id_array)
+    id_dict, id_keys, ROI_volumes, volume_updates = prep_ROI_array(ROI_array)
     slice_volumes = ROI_volumes.copy()
 
     # Convert id_keys back into np.array
     id_keys = np.asarray(list(id_keys))
 
-    mins = np.ones((id_array.shape[0], 3), dtype=np.int_) * np.array(volume.shape)
-    maxes = np.zeros((id_array.shape[0], 3), dtype=np.int_)
+    minima, maxima = build_minima_maxima_arrays(ROI_array, volume)
 
     # Process slice by slice
     for i in range(volume.shape[0]):
@@ -410,8 +468,8 @@ def nn_id_labeling(volume, a_memmap, id_array, verbose=False):
             volume_updates,
             id_dict,
             id_keys,
-            mins,
-            maxes,
+            minima,
+            maxima,
             i,
         )
         ROI_volumes += slice_volumes
@@ -423,16 +481,15 @@ def nn_id_labeling(volume, a_memmap, id_array, verbose=False):
                 end="\r",
             )
 
-    return volume, ROI_volumes, mins, maxes
+    return volume, ROI_volumes, minima, maxima
 
 
 ### Numba dtype compatible segmentation
 @njit(parallel=True, nogil=True, cache=True)
-def numba_id_labeling(vprox, a_volume, id_array):
-    id_dict, id_keys, ROI_volumes, volume_updates = prep_id_annotation(id_array)
+def numba_id_labeling(vprox, a_volume, ROI_array):
+    id_dict, id_keys, ROI_volumes, volume_updates = prep_ROI_array(ROI_array)
 
-    mins = np.ones((id_array.shape[0], 3), dtype=np.int_) * np.array(vprox.shape)
-    maxes = np.zeros((id_array.shape[0], 3), dtype=np.int_)
+    minima, maxima = build_minima_maxima_arrays(ROI_array, volume)
 
     for z in prange(a_volume.shape[0]):
         for y in range(a_volume.shape[1]):
@@ -443,15 +500,15 @@ def numba_id_labeling(vprox, a_volume, id_array):
                     ROI_volumes += volume_updates[ROI_id]
                     if vprox[z, y, x]:
                         vprox[z, y, x] = ROI_id + 1
-                        update_bounds(mins, maxes, z, y, x, id_dict[p])
+                        update_bounds(minima, maxima, z, y, x, id_dict[p])
                 elif vprox[z, y, x]:
                     vprox[z, y, x] = 0
-    maxes = maxes + 1
-    return vprox, ROI_volumes, mins, maxes
+    maxima = maxima + 1
+    return vprox, ROI_volumes, minima, maxima
 
 
 # Label the volume with id-based annotations
-def id_labeling_input(volume, annotation_file, id_array, verbose=False):
+def id_labeling_input(volume, annotation_file, ROI_array, verbose=False):
     # Load a memmap of the annotation file
     annotation_memmap = ImProc.load_nii_volume(annotation_file)
 
@@ -464,11 +521,11 @@ def id_labeling_input(volume, annotation_file, id_array, verbose=False):
 
     if numba_seg:
         labeled_volume, ROI_volumes, mins, maxes = numba_id_labeling(
-            volume, annotation_memmap, id_array
+            volume, annotation_memmap, ROI_array
         )
     else:
         labeled_volume, ROI_volumes, mins, maxes = nn_id_labeling(
-            volume, annotation_memmap, id_array, verbose=verbose
+            volume, annotation_memmap, ROI_array, verbose=verbose
         )
 
     return labeled_volume, ROI_volumes, mins, maxes
@@ -525,7 +582,7 @@ if __name__ == "__main__":
     ### RGB Testing
     volume = ImProc.load_nii_volume("")
     annotation_folder = ""
-    RGB_array = prep_RGB_array(annotation_data)
+    RGB_array = annotation_data
     volume, ROI_volumes, mins, maxes = RGB_labeling_input(
         volume, annotation_folder, RGB_array, verbose=True
     )

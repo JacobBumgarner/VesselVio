@@ -101,9 +101,8 @@ def check_file_size(file):
 # Check to see if the dtype of a loaded proxy image is compatible with Numba.
 def dtype_check(volume_prox):
     numba_compatible = True
-    if volume_prox.dtype == np.dtype(">f") or volume_prox.dtype == np.dtype(
-        ">i"
-    ):  # this is seems specific to ImageJ NIfTI export.
+    # this is seems specific to ImageJ NIfTI export.
+    if volume_prox.dtype == np.dtype(">f") or volume_prox.dtype == np.dtype(">i"):
         numba_compatible = False
     elif not (
         np.issubdtype(volume_prox.dtype, np.floating)
