@@ -29,23 +29,6 @@ htmlcov/
 *.code-workspace
 .vscode/
 
-<<<<<<< HEAD
-.DS_Store
-
-
-# VesselVio Specific 
-Segmented/
-VesselVio Log/
-VesselVio.code-workspace
-VesselVio.spec
-tmp/VesselVio.zip
-build_app.sh
-library/cache/results_cache.csv
-a.py
-VesselVio Build and Distribution Instructions.rtf
-entitlements.plist
-fix_app.py
-=======
 # VesselVio Specific
 library/cache/results_cache.csv
->>>>>>> f581f59bbadac7f3ad5039149b14c0f11bd1e3c1
+a.py
