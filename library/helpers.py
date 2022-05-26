@@ -14,6 +14,7 @@ import json
 import os
 import platform
 import sys
+import typing
 from itertools import chain
 from math import floor
 from multiprocessing import cpu_count, get_context
@@ -25,7 +26,6 @@ import pyvista as pv
 from matplotlib.cm import get_cmap
 from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QFileDialog
-from pyvista.plotting.colors import hex_to_rgb as pv_hex_to_rgb
 
 
 ##########################
@@ -354,8 +354,8 @@ def multiprocessing_input(function, list_size, workers: int = None, sublist=Fals
 ########################
 def get_widget_rgb(widget):
     color = widget.palette().color(QPalette.Background)
-    hex = color.name()
-    rgb = hex_to_rgb(hex)
+    hex_value = color.name()
+    rgb = hex_to_rgb(hex_value)
     return rgb
 
 
@@ -367,13 +367,50 @@ def update_widget_color(widget, color):
     return
 
 
-def rgb_to_hex(rgb: list):
-    hex = "%02x%02x%02x" % (rgb[0], rgb[1], rgb[2])
-    return hex
+def rgb_to_hex(rgb: typing.Union[list, tuple]) -> str:
+    """Convert an RGB iterable into a hex color.
+
+    Parameters:
+    rgb : list, tuple
+        A (3,) iterable of RGB values.
+
+    Returns:
+    str : A str representation of the RGB in hex format.
+    """
+    if not isinstance(rgb, (list, tuple)):
+        raise TypeError("rgb must be passed as a list or tuple")
+    if not len(rgb) == 3:
+        raise TypeError("rgb must have exactly three values")
+
+    hex_color = "%02x%02x%02x" % (rgb[0], rgb[1], rgb[2])
+    return hex_color
 
 
-def hex_to_rgb(hex):
-    rgb = pv_hex_to_rgb(hex)
+def hex_to_rgb(hex_value: str, normalize=True) -> tuple:
+    """Convert a hex string into a tuple of three values.
+
+    The returned values can either be uint8 or 0-1 floats.
+
+    Parameters:
+    hex : str
+
+    normalized : bool
+        Determines whether the values are returned as uint8 values or 0-1 float
+        values. ``True`` return 0-1 float values, ``False`` return 0-255 values.
+        Default ``True``.
+
+    Returns:
+    list : A tuple containing three uint8 values
+    """
+    if not isinstance(hex_value, str):
+        raise TypeError("hex_value must be passed as a string")
+    hex_value = hex_value.strip("#")
+
+    rgb = tuple(int(hex_value[i : i + 2], base=16) for i in (0, 2, 4))
+
+    if normalize:
+        rgb = tuple(value / 255 for value in rgb)
+
     return rgb
 
 

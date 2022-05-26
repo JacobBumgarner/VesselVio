@@ -100,7 +100,6 @@ def build_edge_graph(raw_g, a_key, resolution, Visualize=False):
         g.es["surface_area"] = surf_areas
 
     if a_key.edge_hex:
-        # rgb = [helpers.hex_to_rgb(hex) for hex in raw_g.es[a_key.edge_hex]]
         g.es["hex"] = raw_g.es[a_key.edge_hex]
         if "ROI_ID" in raw_g.es.attributes():
             g.es["ROI_ID"] = raw_g.es["ROI_ID"]
@@ -180,7 +179,6 @@ def load_csv_edges(
             g = FeatExt.egraph_sa_calc(g)
 
         if a_key.edge_hex:
-            # rgb = [helpers.hex_to_rgb(hex) for hex in data[a_key.edge_hex]]
             g.es["hex"] = data[a_key.edge_hex]
 
     return g
