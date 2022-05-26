@@ -27,6 +27,8 @@ from library import (
     volume_processing as VolProc,
     volume_visualization as VolVis,
 )
+from library.annotation import roi_processing
+
 from PyQt5.QtCore import pyqtSignal, QThread
 
 
@@ -64,7 +66,7 @@ class VolumeThread(QThread):
         if gen_options.annotation_type == "None":
             annotation_data = {None: None}
         else:
-            ROI_array = AnnProc.build_ROI_array(
+            ROI_array = roi_processing.build_ROI_array(
                 annotation_data, annotation_type=gen_options.annotation_type
             )
 
@@ -415,7 +417,7 @@ class VolumeVisualizationThread(QThread):
         if annotation_type == "None":
             annotation_data = {None: None}
         else:
-            ROI_array = AnnProc.build_ROI_array(
+            ROI_array = roi_processing.build_ROI_array(
                 annotation_data, annotation_type=annotation_type
             )
 

@@ -10,7 +10,6 @@ import numpy as np
 from library import annotation_processing as AnnProc
 from library.annotation import tree_processing
 
-# from skimage.io import imread
 
 THIS_PATH = os.path.realpath(__file__)
 FIXTURE_DIR = os.path.join(os.path.dirname(THIS_PATH), "test_files")
@@ -18,7 +17,7 @@ ANNOTATION_DIR = os.path.join(FIXTURE_DIR, "annotation_data")
 
 
 @pytest.mark.datafiles(ANNOTATION_DIR)
-def test_convert_hex_to_int_tree(datafiles):
+def test_convert_hex_list_to_int(datafiles):
     annotation_dict = tree_processing.load_annotation_file(
         os.path.join(datafiles, "Cortex Unique.json")
     )
@@ -73,4 +72,14 @@ def test_RGB_duplicates_check(datafiles):
         os.path.join(datafiles, "HPF Duplicates.json")
     )
     assert AnnProc.RGB_duplicates_check(duplicate_annotation_data) is True
+    return
+
+
+def test_find_max_children_count():
+
+    return
+
+
+def test_prep_ROI_array():
+
     return

@@ -26,7 +26,7 @@ from library import (
     volume_processing as VolProc,
     volume_visualization as VolVis,
 )
-from library.annotation import tree_processing
+from library.annotation import roi_processing, tree_processing
 
 
 #######################
@@ -137,7 +137,7 @@ def process_volume(
     if ann_options.annotation_type == "None":
         annotation_data = {None: None}
     else:
-        ROI_array = AnnProc.build_ROI_array(
+        ROI_array = roi_processing.build_ROI_array(
             annotation_data, annotation_type=ann_options.annotation_type
         )
 
