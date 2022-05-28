@@ -15,7 +15,7 @@ import sys
 
 from library import helpers, input_classes as IC, qt_threading as QtTh
 
-from library.annotation_processing import RGB_duplicates_check
+from library.annotation.roi_processing import RGB_duplicates_check
 from library.gui import qt_objects as QtO
 from library.gui.annotation_page import RGB_Warning
 
