@@ -173,3 +173,29 @@ def convert_annotation_data(
         annotation_info[region] = find_family(tree, region, tree_keys)
 
     return annotation_info
+
+
+################################################################################
+def RGB_duplicates_check(annotation_data) -> bool:
+    """Determine whether duplicate colors exist among annotation regions.
+
+    For RGB processing, it is important to determine whether individual regions
+    share the same color coded values. For example, in the hippocampal formation
+    of mice, the Allen Brain Atlas color coding scheme uses both ``"7ED04B"``
+    and ``"66A83D"`` for the Ammon's Horn and Dentate Gyrus regions. If both
+    regions were selected for separate analyses, the results would include
+    vessels from both regions.
+
+    Parameters:
+    annotation_data : dict
+        A dict output of the `Annotation Processing` export that has been pre-
+        processed using `prep_RGB_annotation`.
+
+    Returns:
+    bool : True if duplicates present, False otherwise
+    """
+    nested_hexes = [annotation_data[key]["colors"] for key in annotation_data.keys()]
+    hexes = [color for nested_colors in nested_hexes for color in nested_colors]
+
+    duplicates = len(hexes) != len(set(hexes))
+    return duplicates

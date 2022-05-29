@@ -183,7 +183,7 @@ class AnnotationPage(QWidget):
         return
 
     ## ROI Table processing
-    def add_ROI_row(self, ROI):
+    def add_roi_row(self, ROI):
         row = self.annTable.rowCount()
         self.annTable.insertRow(row)
         for i in range(3):
@@ -194,15 +194,15 @@ class AnnotationPage(QWidget):
         self.aTree.identify_checked()
         ROIs = self.aTree.checked
         if ROIs:
-            ROI_info = tree_processing.convert_annotation_data(
+            roi_info = tree_processing.convert_annotation_data(
                 ROIs, self.tree_file, self.aTree.tree_info
             )
-            for key in ROI_info.keys():
+            for key in roi_info.keys():
                 # This is the most convoluted way to deal with this, but whatever.
                 # Couldn't figure out how to assign lists to QTableWidgetItems
-                colors = ", ".join(ROI_info[key]["colors"])
-                ids = ", ".join([str(id) for id in ROI_info[key]["ids"]])
-                self.add_ROI_row([key, colors, ids])
+                colors = ", ".join(roi_info[key]["colors"])
+                ids = ", ".join([str(id) for id in roi_info[key]["ids"]])
+                self.add_roi_row([key, colors, ids])
         self.aTree.uncheck_all()
         return
 
@@ -228,7 +228,7 @@ class AnnotationPage(QWidget):
             if len(name) == 0:
                 name = "None"
             ROI = [name, hex, dialog.idBox.value()]
-            self.add_ROI_row(ROI)
+            self.add_roi_row(ROI)
         return
 
     def export_ROIs(self):

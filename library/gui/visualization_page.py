@@ -22,7 +22,7 @@ from library import (
     input_classes as IC,
     qt_threading as QtTh,
 )
-from library.annotation.roi_processing import RGB_duplicates_check
+from library.annotation.tree_processing import RGB_duplicates_check
 
 from library.gui import qt_objects as QtO
 from library.gui.analysis_page import AnalysisOptions, GraphOptions

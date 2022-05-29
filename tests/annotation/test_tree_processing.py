@@ -107,3 +107,17 @@ def test_convert_annotation_data(expected_data):
     assert list(annotation_info.keys()) == ["grooves"]
     assert sorted(annotation_info["grooves"]["ids"]) == expected_data["ids"]
     assert annotation_info["grooves"]["colors"] == expected_data["colors"]
+
+
+@pytest.mark.datafiles(ANNOTATION_DIR)
+def test_RGB_duplicates_check(datafiles):
+    unique_annotation_data = tree_processing.load_annotation_file(
+        os.path.join(datafiles, "Cortex Unique.json")
+    )
+    assert tree_processing.RGB_duplicates_check(unique_annotation_data) is False
+
+    duplicate_annotation_data = tree_processing.load_annotation_file(
+        os.path.join(datafiles, "HPF Duplicates.json")
+    )
+    assert tree_processing.RGB_duplicates_check(duplicate_annotation_data) is True
+    return

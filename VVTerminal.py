@@ -26,7 +26,7 @@ from library import (
     volume_processing as VolProc,
     volume_visualization as VolVis,
 )
-from library.annotation import roi_processing, tree_processing
+from library.annotation import segmentation_prep, tree_processing
 
 
 #######################
@@ -112,7 +112,7 @@ def process_graph(file_path, gen_options, graph_options, vis_options, verbose):
         ResExp.write_results(gen_options.results_folder)
         if gen_options.save_seg_results:
             ResExp.write_seg_results(
-                seg_result, gen_options.results_folder, filename, ROI_Name="None"
+                seg_result, gen_options.results_folder, filename, roi_Name="None"
             )
         if verbose:
             print(f"Analysis complete in {time.perf_counter() - tic:0.2f} seconds.")
@@ -137,16 +137,16 @@ def process_volume(
     if ann_options.annotation_type == "None":
         annotation_data = {None: None}
     else:
-        ROI_array = roi_processing.build_ROI_array(
+        roi_array = segmentation_prep.build_roi_array(
             annotation_data, annotation_type=ann_options.annotation_type
         )
 
     g_main = ig.Graph()
 
-    for i, ROI_name in enumerate(annotation_data.keys()):
-        if verbose and ROI_name:
-            if ROI_name:
-                print(f"Analyzing {filename}: {ROI_name}.")
+    for i, roi_name in enumerate(annotation_data.keys()):
+        if verbose and roi_name:
+            if roi_name:
+                print(f"Analyzing {filename}: {roi_name}.")
             else:
                 print(f"Analyzing {filename}.")
 
@@ -160,9 +160,9 @@ def process_volume(
             break
 
         # If there as an ROI, segment the ROI from the volume.
-        if ROI_name:
-            ROI_id = i % 255
-            if ROI_id == 0:
+        if roi_name:
+            roi_id = i % 255
+            if roi_id == 0:
                 if not helpers.check_storage(volume_file):
                     file_size = helpers.get_file_size(volume_file, GB=True)
                     if verbose:
@@ -172,35 +172,35 @@ def process_volume(
                     return
 
                 # We have to relabel every 255 elements because the volume.dtype == uint8.
-                ROI_sub_array = ROI_array[i : i + 255]
-                ROI_volumes, minima, maxima = AnnProc.volume_labeling_input(
+                roi_sub_array = roi_array[i : i + 255]
+                roi_volumes, minima, maxima = AnnProc.volume_labeling_input(
                     volume,
                     ann_options.annotation_file,
-                    ROI_sub_array,
+                    roi_sub_array,
                     ann_options.annotation_type,
                     verbose=verbose,
                 )
-                if ROI_volumes is None:
+                if roi_volumes is None:
                     break
-            ROI_volume = ROI_volumes[ROI_id]
-            if ROI_volume > 0:
-                point_minima, point_maxima = minima[ROI_id], maxima[ROI_id]
+            roi_volume = roi_volumes[roi_id]
+            if roi_volume > 0:
+                point_minima, point_maxima = minima[roi_id], maxima[roi_id]
                 volume = AnnProc.segmentation_input(
-                    point_minima, point_maxima, ROI_id + 1, verbose=verbose
+                    point_minima, point_maxima, roi_id + 1, verbose=verbose
                 )
 
             # Make sure the ROI is in the volume.
-            if not ROI_volume or not ImProc.volume_check(volume, verbose=verbose):
+            if not roi_volume or not ImProc.volume_check(volume, verbose=verbose):
                 ResExp.cache_result(
-                    [filename, ROI_name, "ROI not in dataset."]
+                    [filename, roi_name, "ROI not in dataset."]
                 )  # Cache results
                 if verbose:
                     print("ROI Not in dataset.")
                 continue
         else:
             volume, point_minima = VolProc.volume_prep(volume)
-            ROI_name = "None"
-            ROI_volume = "NA"
+            roi_name = "None"
+            roi_volume = "NA"
 
         # Pad the volume for skeletonizatino
         volume = VolProc.pad_volume(volume)
@@ -262,8 +262,8 @@ def process_volume(
             filename,
             image_dim=gen_options.image_dimensions,
             image_shape=image_shape,
-            ROI_name=ROI_name,
-            ROI_volume=ROI_volume,
+            roi_name=roi_name,
+            roi_volume=roi_volume,
             save_seg_results=gen_options.save_seg_results,
             # Reduce graph if saving or visualizing
             reduce_graph=vis_options.visualize or gen_options.save_graph,
@@ -272,14 +272,14 @@ def process_volume(
         ResExp.cache_result(result)  # Cache results
 
         if gen_options.save_seg_results:
-            ResExp.write_seg_results(seg_results, results_folder, filename, ROI_name)
+            ResExp.write_seg_results(seg_results, results_folder, filename, roi_name)
 
         if gen_options.save_graph and not vis_options.visualize:
             GIO.save_graph(graph, filename, results_folder, verbose=verbose)
 
-        if ROI_name != "None":
-            graph.es["hex"] = [annotation_data[ROI_name]["colors"][0]]
-            graph.es["ROI_ID"] = i
+        if roi_name != "None":
+            graph.es["hex"] = [annotation_data[roi_name]["colors"][0]]
+            graph.es["roi_ID"] = i
         else:
             graph.es["hex"] = ["FFFFFF"]
         g_main += graph

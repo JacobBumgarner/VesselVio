@@ -448,30 +448,30 @@ def annotation_colorization_input(graph, meshes):
     unique_hexes = get_unique_hexes(hexes)
 
     # Add ROI
-    if "ROI_ID" in graph.es.attributes():
-        ids = graph.es["ROI_ID"]
+    if "roi_ID" in graph.es.attributes():
+        ids = graph.es["roi_ID"]
     else:
         ids = match_hex_ids(hexes, unique_hexes)
-        graph.es["ROI_ID"] = ids
+        graph.es["roi_ID"] = ids
 
     # Zip the two together
     id_hex_dict = generate_id_hex_dict(ids, hexes)
 
     # First create a key that contains shifted colors from the original color
     shifted_dict = {
-        ROI_ID: generate_shifted_rgb(hex_to_rgb(id_hex_dict[ROI_ID])) for ROI_ID in ids
+        roi_ID: generate_shifted_rgb(hex_to_rgb(id_hex_dict[roi_ID])) for roi_ID in ids
     }
 
     # Then create a key that links all ids to a random rainbow color
     colortable = get_colortable("gist_rainbow")[:, :3]
-    rainbow_dict = {ROI_ID: generate_rainbow_rgb(colortable) for ROI_ID in ids}
+    rainbow_dict = {roi_ID: generate_rainbow_rgb(colortable) for roi_ID in ids}
 
     # Then iterate through each ID and add the original, shifted, or rainbow hexes to new arrays
     original_rgb = [
-        hex_to_rgb(ROI_hex) for ROI_hex in hexes
+        hex_to_rgb(roi_hex) for roi_hex in hexes
     ]  # Just convert hexes to RGB
-    shifted_rgb = [shifted_dict[ROI_ID] for ROI_ID in ids]
-    rainbow_rgb = [rainbow_dict[ROI_ID] for ROI_ID in ids]
+    shifted_rgb = [shifted_dict[roi_ID] for roi_ID in ids]
+    rainbow_rgb = [rainbow_dict[roi_ID] for roi_ID in ids]
 
     del graph.es["hex"]
     # Add the color arrays to the graph
@@ -505,7 +505,7 @@ def match_hex_ids(hexes, unique_hexes):
 
 
 def generate_id_hex_dict(ids, hexes):
-    id_to_hex = {ROI_ID: hexes[i] for i, ROI_ID in enumerate(ids)}
+    id_to_hex = {roi_ID: hexes[i] for i, roi_ID in enumerate(ids)}
     return id_to_hex
 
 
@@ -533,7 +533,7 @@ def randomize_mesh_colors(meshes, rainbow=False, shifted=False):
         # Generate a new rainbow color for each unique color
         colortable = get_colortable("gist_rainbow")[:, :3]  # sent back as RGBA
         id_rainbow_dict = {
-            ROI_ID: generate_rainbow_rgb(colortable) for ROI_ID in id_hex_dict.keys()
+            roi_ID: generate_rainbow_rgb(colortable) for roi_ID in id_hex_dict.keys()
         }
 
         for mesh in meshes.iter_vessel_meshes():
@@ -552,8 +552,8 @@ def randomize_mesh_colors(meshes, rainbow=False, shifted=False):
     if shifted:
         # Create a new dict that matches ids to shifted RGBs based on their original color
         id_shifted_dict = {
-            ROI_ID: generate_shifted_rgb(hex_to_rgb(id_hex_dict[ROI_ID]))
-            for ROI_ID in id_hex_dict.keys()
+            roi_ID: generate_shifted_rgb(hex_to_rgb(id_hex_dict[roi_ID]))
+            for roi_ID in id_hex_dict.keys()
         }
 
         for mesh in meshes.iter_vessel_meshes():

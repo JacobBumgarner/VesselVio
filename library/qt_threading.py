@@ -27,7 +27,7 @@ from library import (
     volume_processing as VolProc,
     volume_visualization as VolVis,
 )
-from library.annotation import roi_processing
+from library.annotation import segmentation_prep
 
 from PyQt5.QtCore import pyqtSignal, QThread
 
@@ -66,7 +66,7 @@ class VolumeThread(QThread):
         if gen_options.annotation_type == "None":
             annotation_data = {None: None}
         else:
-            ROI_array = roi_processing.build_ROI_array(
+            roi_array = segmentation_prep.build_roi_array(
                 annotation_data, annotation_type=gen_options.annotation_type
             )
 
@@ -75,7 +75,7 @@ class VolumeThread(QThread):
             tic = pf()
             file_analyzed = True  # Used to prevent overwriting errors
 
-            for j, ROI_name in enumerate(annotation_data.keys()):
+            for j, roi_name in enumerate(annotation_data.keys()):
                 speeds = []
 
                 ## File initialization
@@ -102,8 +102,8 @@ class VolumeThread(QThread):
                     file_analyzed = False
                     break
 
-                if ROI_name:
-                    ROI_id = j % 255
+                if roi_name:
+                    roi_id = j % 255
                     if j % 255 == 0:
                         if not helpers.check_storage(volume_file):
                             file_size = helpers.get_file_size(volume_file, GB=True)
@@ -116,37 +116,37 @@ class VolumeThread(QThread):
                             break
 
                         self.analysis_status.emit([i, "Labeling volume..."])
-                        ROI_sub_array = ROI_array[j : j + 255]
-                        ROI_volumes, minima, maxima = AnnProc.volume_labeling_input(
+                        roi_sub_array = roi_array[j : j + 255]
+                        roi_volumes, minima, maxima = AnnProc.volume_labeling_input(
                             volume,
                             annotation_files[i],
-                            ROI_sub_array,
+                            roi_sub_array,
                             gen_options.annotation_type,
                         )
 
-                        if ROI_volumes is None:
+                        if roi_volumes is None:
                             self.analysis_status.emit([i, "Error labeling volume..."])
                             file_analyzed = False
                             break
 
-                    ROI_volume = ROI_volumes[ROI_id]
-                    if ROI_volume > 0:
-                        self.analysis_status.emit([i, f"Segmenting {ROI_name}..."])
-                        point_minima, point_maxima = minima[ROI_id], maxima[ROI_id]
+                    roi_volume = roi_volumes[roi_id]
+                    if roi_volume > 0:
+                        self.analysis_status.emit([i, f"Segmenting {roi_name}..."])
+                        point_minima, point_maxima = minima[roi_id], maxima[roi_id]
                         volume = AnnProc.segmentation_input(
-                            point_minima, point_maxima, ROI_id + 1
+                            point_minima, point_maxima, roi_id + 1
                         )
                         # point_minima += 1
 
                     # Make sure the volume is still present after ROI segmentation
-                    if not ROI_volume or not ImProc.volume_check(volume):
+                    if not roi_volume or not ImProc.volume_check(volume):
                         self.analysis_status.emit([i, "ROI not in dataset..."])
                         # Cache results
-                        ResExp.cache_result([filename, ROI_name, "ROI not in dataset."])
+                        ResExp.cache_result([filename, roi_name, "ROI not in dataset."])
                         continue
                 else:
                     volume, point_minima = VolProc.volume_prep(volume)
-                    ROI_name, ROI_volume = "None", "NA"
+                    roi_name, roi_volume = "None", "NA"
 
                 #####
                 speeds.append(pf() - a)
@@ -213,8 +213,8 @@ class VolumeThread(QThread):
                     filename,
                     image_dim=gen_options.image_dimensions,
                     image_shape=image_shape,
-                    ROI_name=ROI_name,
-                    ROI_volume=ROI_volume,
+                    roi_name=roi_name,
+                    roi_volume=roi_volume,
                     save_seg_results=gen_options.save_seg_results,
                     reduce_graph=gen_options.save_graph,
                 )
@@ -231,16 +231,16 @@ class VolumeThread(QThread):
                 self.analysis_status.emit([i, "Exporting segment results..."])
                 if gen_options.save_seg_results:
                     ResExp.write_seg_results(
-                        seg_results, gen_options.results_folder, filename, ROI_name
+                        seg_results, gen_options.results_folder, filename, roi_name
                     )
 
                 if gen_options.save_graph:
-                    if ROI_name != "None":
-                        color = annotation_data[ROI_name]["colors"][0]
+                    if roi_name != "None":
+                        color = annotation_data[roi_name]["colors"][0]
                         if type(color) == list:
                             color = helpers.rgb_to_hex(color)
                         graph.es["hex"] = color
-                        graph.es["ROI_ID"] = j
+                        graph.es["roi_ID"] = j
 
                     graph = GIO.save_graph(
                         graph, filename, gen_options.results_folder, caching=True
@@ -354,7 +354,7 @@ class GraphThread(QThread):
             ResExp.cache_result(result)
             if gen_options.save_seg_results:
                 ResExp.write_seg_results(
-                    seg_result, gen_options.results_folder, filename, ROI_Name="None"
+                    seg_result, gen_options.results_folder, filename, roi_Name="None"
                 )
 
             if gen_options.save_graph:
@@ -417,7 +417,7 @@ class VolumeVisualizationThread(QThread):
         if annotation_type == "None":
             annotation_data = {None: None}
         else:
-            ROI_array = roi_processing.build_ROI_array(
+            roi_array = segmentation_prep.build_roi_array(
                 annotation_data, annotation_type=annotation_type
             )
 
@@ -425,12 +425,12 @@ class VolumeVisualizationThread(QThread):
         main_graph = ig.Graph()  # main graph for final visualization
 
         # Progress bar update values
-        ROI_count = len(annotation_data.keys())
+        roi_count = len(annotation_data.keys())
         progress = 0
-        step_weight = (70 / ROI_count) / 8
+        step_weight = (70 / roi_count) / 8
 
         # Iterate through the ROI's or single file and generate graphs
-        for i, ROI_name in enumerate(annotation_data.keys()):
+        for i, roi_name in enumerate(annotation_data.keys()):
             ## File initialization
             if not self.running:
                 self.analysis_status.emit(["Canceled", 0])
@@ -445,9 +445,9 @@ class VolumeVisualizationThread(QThread):
                 break
             progress += step_weight
 
-            if ROI_name:
+            if roi_name:
 
-                ROI_id = i % 255
+                roi_id = i % 255
                 if i % 255 == 0:
                     # Make sure there is enough disk space for the labeled_volume file
                     if not helpers.check_storage(volume_file):
@@ -464,30 +464,30 @@ class VolumeVisualizationThread(QThread):
                         return
 
                     self.analysis_status.emit(["Labeling volume...", progress])
-                    ROI_sub_array = ROI_array[i : i + 255]
-                    ROI_volumes, minima, maxima = AnnProc.volume_labeling_input(
-                        volume, annotation_file, ROI_sub_array, annotation_type
+                    roi_sub_array = roi_array[i : i + 255]
+                    roi_volumes, minima, maxima = AnnProc.volume_labeling_input(
+                        volume, annotation_file, roi_sub_array, annotation_type
                     )
-                    if ROI_volumes is None:
+                    if roi_volumes is None:
                         self.analysis_status.emit(["Error labeling volume...", 0])
                         break
 
-                ROI_volume = ROI_volumes[ROI_id]
-                if ROI_volume > 0:
-                    self.analysis_status.emit([f"Segmenting {ROI_name}...", progress])
-                    point_minima, point_maxima = minima[ROI_id], maxima[ROI_id]
+                roi_volume = roi_volumes[roi_id]
+                if roi_volume > 0:
+                    self.analysis_status.emit([f"Segmenting {roi_name}...", progress])
+                    point_minima, point_maxima = minima[roi_id], maxima[roi_id]
                     volume = AnnProc.segmentation_input(
-                        point_minima, point_maxima, ROI_id + 1
+                        point_minima, point_maxima, roi_id + 1
                     )
 
-                if not ROI_volume or not ImProc.volume_check(volume):
+                if not roi_volume or not ImProc.volume_check(volume):
                     progress += step_weight * 7
                     self.analysis_status.emit(["ROI not in dataset...", progress])
                     continue
 
             else:
                 volume, point_minima = VolProc.volume_prep(volume)
-                ROI_name, ROI_volume = "None", "NA"
+                roi_name, roi_volume = "None", "NA"
 
             # Pad the volume for skeletonization
             volume = VolProc.pad_volume(volume)
@@ -542,26 +542,26 @@ class VolumeVisualizationThread(QThread):
                 filename,
                 image_dim=gen_options.image_dimensions,
                 image_shape=image_shape,
-                ROI_name=ROI_name,
-                ROI_volume=ROI_volume,
+                roi_name=roi_name,
+                roi_volume=roi_volume,
                 reduce_graph=True,
             )
 
             ## add mesh colors
             if vis_options.render_annotations:
-                if ROI_name != "None":
-                    color = annotation_data[ROI_name]["colors"][0]
+                if roi_name != "None":
+                    color = annotation_data[roi_name]["colors"][0]
                     if type(color) == list:
                         color = helpers.rgb_to_hex(color)
                     graph.es["hex"] = color
-                    graph.es["ROI_ID"] = i
+                    graph.es["roi_ID"] = i
 
-            if ROI_name != "None":
-                status = f"{ROI_name} analysis complete."
+            if roi_name != "None":
+                status = f"{roi_name} analysis complete."
             else:
                 status = "Analysis complete."
             progress += step_weight
-            self.analysis_status.emit([status, progress, f"{i+1}/{ROI_count}"])
+            self.analysis_status.emit([status, progress, f"{i+1}/{roi_count}"])
 
             if not self.running:
                 self.analysis_status.emit(["Canceled", 0])

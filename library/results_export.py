@@ -32,7 +32,7 @@ def load_headers():
     results_header = [
         "File Name",
         "ROI Name",
-        "ROI_Volume",
+        "roi_Volume",
         "Volume",
         "Network Length",
         "Surface Area",
@@ -131,7 +131,7 @@ def write_results(results_folder, image_dimensions=3, verbose=False):
     return
 
 
-def write_seg_results(seg_results, results_folder, filename, ROI_Name):
+def write_seg_results(seg_results, results_folder, filename, roi_Name):
     _, segment_results_header = load_headers()
 
     # Make sure the folder exists
@@ -142,15 +142,15 @@ def write_seg_results(seg_results, results_folder, filename, ROI_Name):
         os.mkdir(segments_folder)
 
     # Add the ROI name if it exists
-    if ROI_Name != "None":
-        file = os.path.join(segments_folder, filename + "_" + ROI_Name + ".csv")
+    if roi_Name != "None":
+        file = os.path.join(segments_folder, filename + "_" + roi_Name + ".csv")
     else:
         file = os.path.join(segments_folder, filename + ".csv")
 
     # Save the info
     with open(file, "w") as f:
         writer = csv.writer(f)
-        writer.writerow(["Filename:", filename, "ROI Name:", ROI_Name])
+        writer.writerow(["Filename:", filename, "ROI Name:", roi_Name])
         writer.writerow(segment_results_header)
         writer.writerows(seg_results)
     return

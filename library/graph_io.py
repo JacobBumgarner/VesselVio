@@ -101,8 +101,8 @@ def build_edge_graph(raw_g, a_key, resolution, Visualize=False):
 
     if a_key.edge_hex:
         g.es["hex"] = raw_g.es[a_key.edge_hex]
-        if "ROI_ID" in raw_g.es.attributes():
-            g.es["ROI_ID"] = raw_g.es["ROI_ID"]
+        if "roi_ID" in raw_g.es.attributes():
+            g.es["roi_ID"] = raw_g.es["roi_ID"]
 
     return g
 

@@ -13,22 +13,22 @@ import numpy as np
 from numba import njit
 
 
-def build_ROI_array(ROI_dict, annotation_type: str = "ID") -> np.ndarray:
-    """Convert a list of parent and child annotations into into an ROI_array.
+def build_roi_array(roi_dict: dict, annotation_type: str = "ID") -> np.ndarray:
+    """Convert a list of parent and child annotations into into an roi_array.
 
-    Given an ROI_dict (Annotation Processing export), this function converts the
+    Given an roi_dict (Annotation Processing export), this function converts the
     parent structure list into
 
     Parameters:
-    ROI_dict : dict
-        An ROI_dict created from the Annotation Processing page. Must be pre-
+    roi_dict : dict
+        An roi_dict created from the Annotation Processing page. Must be pre-
         loaded using the `load_annotation_file` function.
 
-    annotation_type : str
+    annotation_type : str, optional
         The type of annotation. Options [`"ID"`, `"RGB"`]. Default `"ID"`.
 
     Returns:
-    np.array : An ROI_Array
+    np.array : roi_Array
         An array of (n,m) shape, where `n` is the number of parents, and `m` is
         the largest number of children that an individual parent has.
     """
@@ -39,7 +39,7 @@ def build_ROI_array(ROI_dict, annotation_type: str = "ID") -> np.ndarray:
         raise ValueError("annotation_type must be one of the follow: 'ID', 'RGB'.")
 
     dict_key = "ids" if annotation_type.lower() == "id" else "colors"
-    ROIs = [ROI_dict[key][dict_key] for key in ROI_dict.keys()]
+    ROIs = [roi_dict[key][dict_key] for key in roi_dict.keys()]
 
     if annotation_type == "RGB":
         ROIs = convert_hex_list_to_int(ROIs)
@@ -54,12 +54,12 @@ def build_ROI_array(ROI_dict, annotation_type: str = "ID") -> np.ndarray:
     max_len = find_max_children_count(ROIs)  # find depth of upcoming array
 
     # Convert into array, fill with ROI ids, leaving 0's behind rest
-    ROI_array = np.zeros(
+    roi_array = np.zeros(
         (len(ROIs), max_len + 1), dtype=np.uint32
     )  # Make sure a zero is in every set ---
     for i, ROI in enumerate(ROIs):
-        ROI_array[i, : len(ROI)] = ROI
-    return ROI_array
+        roi_array[i, : len(ROI)] = ROI
+    return roi_array
 
 
 def convert_hex_list_to_int(hex_family_tree: list) -> list:
@@ -101,29 +101,61 @@ def find_max_children_count(parent_tree: list) -> int:
 
 
 @njit(cache=True)
-def prep_ROI_array(id_array):
-    """Given an id_array, create a key set,
-    dict with hash keys that point to items that contain corresponding index,
-    and ROI_volume/volume_update arrays"""
+def prep_roi_array(roi_array: np.ndarray) -> typing.Tuple[dict, set]:
+    """Use the roi_array to prepare the objects for a segmentation.
+
+    Parameters:
+    roi_array : np.ndarray
+        The roi_array created with the ``build_roi_array` function. Stores the
+        ids associated with each parent region.
+
+    Returns:
+    id_dict : dict
+        A dict where each key points to the row number of the parent structure
+        that it is related to.
+
+    id_keys : set
+        The unique set of ids.
+    """
     id_dict = dict()
-    for n in range(id_array.shape[0]):
-        for ROI_id in range(id_array.shape[1]):
-            if not id_array[n, ROI_id]:
+    for n in range(roi_array.shape[0]):
+        for roi_id in range(roi_array.shape[1]):
+            if not roi_array[n, roi_id]:
                 break  # Break if we're at the end of the ids
-            id_dict[id_array[n, ROI_id]] = n
+            id_dict[roi_array[n, roi_id]] = n
 
-    id_keys = set(id_array.flatten())
+    id_keys = set(roi_array.flatten())
     id_keys.remove(0)
-
-    ROI_volumes = np.zeros(id_array.shape[0])
-    volume_updates = np.identity(id_array.shape[0])
-
-    return id_dict, id_keys, ROI_volumes, volume_updates
+    return id_dict, id_keys
 
 
-@njit()
+@njit(cache=True)
+def prep_volume_arrays(roi_array) -> typing.Tuple[np.ndarray, np.ndarray]:
+    """Prepare the arrays used to record ROI volumes.
+
+    Parameters:
+    roi_array : np.ndarray
+        The ROI array created with the ``build_roi_array`` function.
+
+    Returns:
+    np.ndarray : roi_volumes
+        An empty np.zeros() array used to add the ROI volume to.
+
+    np.ndarray : volume_updates
+        This is a complicated one... Hold on. Numba does not keep track of
+        updates to individual numpy array elements in parallel processing.
+        However, numba does keep track of whole-array updates during parallel
+        processing. As such, volume_updates is an ``np.identity`` array used
+        to update the element of interest during ``slice_labeling``.
+    """
+    roi_volumes = np.zeros(roi_array.shape[0])
+    volume_updates = np.identity(roi_array.shape[0])
+    return roi_volumes, volume_updates
+
+
+@njit(cache=True)
 def build_minima_maxima_arrays(
-    volume: np.ndarray, ROI_array: np.ndarray
+    volume: np.ndarray, roi_array: np.ndarray
 ) -> typing.Tuple[np.ndarray, np.ndarray]:
     """Return minima and maxima arrays for segmentation bounding.
 
@@ -133,38 +165,13 @@ def build_minima_maxima_arrays(
     Parameters:
     volume : np.ndarray
 
-    ROI_array : np.ndarray
+    roi_array : np.ndarray
 
     Returns:
     np.ndarray : minima
 
     np.ndarray : maxima
     """
-    minima = np.ones((ROI_array.shape[0], 3), dtype=np.int_) * np.array(volume.shape)
-    maxima = np.zeros((ROI_array.shape[0], 3), dtype=np.int_)
+    minima = np.ones((roi_array.shape[0], 3), dtype=np.int_) * np.array(volume.shape)
+    maxima = np.zeros((roi_array.shape[0], 3), dtype=np.int_)
     return minima, maxima
-
-
-def RGB_duplicates_check(annotation_data) -> bool:
-    """Determine whether duplicate colors exist among annotation regions.
-
-    For RGB processing, it is important to determine whether individual regions
-    share the same color coded values. For example, in the hippocampal formation
-    of mice, the Allen Brain Atlas color coding scheme uses both ``"7ED04B"``
-    and ``"66A83D"`` for the Ammon's Horn and Dentate Gyrus regions. If both
-    regions were selected for separate analyses, the results would include
-    vessels from both regions.
-
-    Parameters:
-    annotation_data : dict
-        A dict output of the `Annotation Processing` export that has been pre-
-        processed using `prep_RGB_annotation`.
-
-    Returns:
-    bool : True if duplicates present, False otherwise
-    """
-    nested_hexes = [annotation_data[key]["colors"] for key in annotation_data.keys()]
-    hexes = [color for nested_colors in nested_hexes for color in nested_colors]
-
-    duplicates = len(hexes) != len(set(hexes))
-    return duplicates
