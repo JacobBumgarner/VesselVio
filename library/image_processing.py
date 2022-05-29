@@ -54,7 +54,6 @@ def load_volume(file, verbose=False):
 def load_nii_volume(file):
     proxy = nibabel.load(file)
     data = proxy.dataobj.get_unscaled().transpose()
-    # data = np.asarray(proxy.dataobj, dtype=np.float32).transpose()
     if data.ndim == 4:
         data = data[0]
     return data
@@ -123,7 +122,7 @@ def prep_numba_compatability(volume):
 ####################################
 # Get the annotation slice. Some 3D nifti files are saved in 4D rather than 3D (e.g., FIJI output)
 def get_annotation_slice(a_prox, i):
-    a_slice = a_prox[i].astype(np.float_)
+    a_slice = a_prox[i].astype(np.int_)
     return a_slice
 
 
@@ -150,20 +149,26 @@ def RGB_dim_check(files, vshape, verbose=False):
         return True
 
 
-def cache_labeled_volume(labeled_volume, verbose=False):
+def cache_labeled_volume(
+    labeled_volume: np.ndarray, cache_directory: str = None, verbose: bool = False
+) -> None:
+    """Save a copy of the labeled volume as an .npy file.
+
+    Parameters:
+    labeled_volume : np.ndarray
+
+    cache_directory : str, optional
+        The filepath to save the labeled volume. Default ``None``.
+
+    verbose : bool, optional
+        Default ``False``.
+    """
     if verbose:
         t = pf()
         print("Saving cache of labeled volume...", end="\r")
 
-    cache_path = helpers.get_volume_cache()
+    cache_path = helpers.get_volume_cache_path(cache_directory)
     np.save(cache_path, np.asarray(labeled_volume, dtype=np.uint8))
-    # try:
-    #     image = nibabel.Nifti1Image(np.ones([3,3,3]), affine=np.eye(4))
-    #     nibabel.save(image, cache_path)
-    #     image.uncache()
-    # except:
-    #     ??????????
-    # WriteImage(GetImageFromArray(labeled_volume), cache_path)
 
     if verbose:
         print(f"Labeled volume caching complete in {pf() - t:0.2f} seconds.")
@@ -171,7 +176,7 @@ def cache_labeled_volume(labeled_volume, verbose=False):
 
 
 def load_labeled_volume_cache():
-    labeled_cache = helpers.get_volume_cache()
+    labeled_cache = helpers.get_volume_cache_path()
     if os.path.exists(labeled_cache):
         labeled_volume = np.lib.format.open_memmap(labeled_cache, mode="r")
     else:
@@ -180,7 +185,7 @@ def load_labeled_volume_cache():
 
 
 def clear_labeled_cache():
-    labeled_cache = helpers.get_volume_cache()
+    labeled_cache = helpers.get_volume_cache_path()
     if os.path.exists(labeled_cache):
         os.remove(labeled_cache)
     return

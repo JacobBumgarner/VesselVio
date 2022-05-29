@@ -16,7 +16,6 @@ import igraph as ig
 import numpy as np
 
 from library import (
-    annotation_processing as AnnProc,
     feature_extraction as FeatExt,
     graph_io as GIO,
     graph_processing as GProc,
@@ -27,7 +26,7 @@ from library import (
     volume_processing as VolProc,
     volume_visualization as VolVis,
 )
-from library.annotation import segmentation_prep
+from library.annotation import labeling, segmentation, segmentation_prep
 
 from PyQt5.QtCore import pyqtSignal, QThread
 
@@ -117,7 +116,7 @@ class VolumeThread(QThread):
 
                         self.analysis_status.emit([i, "Labeling volume..."])
                         roi_sub_array = roi_array[j : j + 255]
-                        roi_volumes, minima, maxima = AnnProc.volume_labeling_input(
+                        roi_volumes, minima, maxima = labeling.volume_labeling_input(
                             volume,
                             annotation_files[i],
                             roi_sub_array,
@@ -133,7 +132,7 @@ class VolumeThread(QThread):
                     if roi_volume > 0:
                         self.analysis_status.emit([i, f"Segmenting {roi_name}..."])
                         point_minima, point_maxima = minima[roi_id], maxima[roi_id]
-                        volume = AnnProc.segmentation_input(
+                        volume = segmentation.segmentation_input(
                             point_minima, point_maxima, roi_id + 1
                         )
                         # point_minima += 1
@@ -465,7 +464,7 @@ class VolumeVisualizationThread(QThread):
 
                     self.analysis_status.emit(["Labeling volume...", progress])
                     roi_sub_array = roi_array[i : i + 255]
-                    roi_volumes, minima, maxima = AnnProc.volume_labeling_input(
+                    roi_volumes, minima, maxima = labeling.volume_labeling_input(
                         volume, annotation_file, roi_sub_array, annotation_type
                     )
                     if roi_volumes is None:
@@ -476,7 +475,7 @@ class VolumeVisualizationThread(QThread):
                 if roi_volume > 0:
                     self.analysis_status.emit([f"Segmenting {roi_name}...", progress])
                     point_minima, point_maxima = minima[roi_id], maxima[roi_id]
-                    volume = AnnProc.segmentation_input(
+                    volume = segmentation.segmentation_input(
                         point_minima, point_maxima, roi_id + 1
                     )
 

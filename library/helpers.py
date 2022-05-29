@@ -254,11 +254,25 @@ def get_graph_cache():
     return graph_cache
 
 
-def get_volume_cache():
-    wd = get_cwd()
-    volume_cache = os.path.join(wd, "library", "cache", "labeled_volume.npy")
-    volume_cache = std_path(volume_cache)
-    return volume_cache
+def get_volume_cache_path(directory: str = None) -> str:
+    """Return the filepath where the labeled_volume is/will be cached.
+
+    Parameters:
+    directory : str, optional
+        The cache directory. Default ``None``, which leads to a save in the
+        ``"library/cache/"`` folder.
+
+    Returns:
+    str : cache_directory
+    """
+    if not directory:
+        directory = os.path.join(get_cwd(), "library", "cache")
+
+    cache_directory = os.path.join(directory, "labeled_volume.npy")
+
+    cache_directory = std_path(cache_directory)
+
+    return cache_directory
 
 
 def silence_update_alerts():

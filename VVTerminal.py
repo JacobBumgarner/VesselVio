@@ -15,7 +15,6 @@ import time
 import igraph as ig
 
 from library import (
-    annotation_processing as AnnProc,
     feature_extraction as FeatExt,
     graph_io as GIO,
     graph_processing as GProc,
@@ -26,7 +25,12 @@ from library import (
     volume_processing as VolProc,
     volume_visualization as VolVis,
 )
-from library.annotation import segmentation_prep, tree_processing
+from library.annotation import (
+    labeling,
+    segmentation,
+    segmentation_prep,
+    tree_processing,
+)
 
 
 #######################
@@ -173,7 +177,7 @@ def process_volume(
 
                 # We have to relabel every 255 elements because the volume.dtype == uint8.
                 roi_sub_array = roi_array[i : i + 255]
-                roi_volumes, minima, maxima = AnnProc.volume_labeling_input(
+                roi_volumes, minima, maxima = labeling.volume_labeling_input(
                     volume,
                     ann_options.annotation_file,
                     roi_sub_array,
@@ -185,7 +189,7 @@ def process_volume(
             roi_volume = roi_volumes[roi_id]
             if roi_volume > 0:
                 point_minima, point_maxima = minima[roi_id], maxima[roi_id]
-                volume = AnnProc.segmentation_input(
+                volume = segmentation.segmentation_input(
                     point_minima, point_maxima, roi_id + 1, verbose=verbose
                 )
 

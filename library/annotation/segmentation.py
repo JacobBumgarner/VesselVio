@@ -44,7 +44,7 @@ def segment_roi(
     """
     # Isolate the segmented region from the main volume
     volume = labeled_volume[
-        minima[0] : maxima[0], minima[1] : maxima[1], minima[2] : maxima[2]
+        minima[0] : maxima[0] + 1, minima[1] : maxima[1] + 1, minima[2] : maxima[2] + 1
     ].copy()
     volume = np.asarray(volume, dtype=np.uint8)
 
