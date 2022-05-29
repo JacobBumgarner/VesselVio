@@ -175,7 +175,9 @@ def convert_annotation_data(
     return annotation_info
 
 
-################################################################################
+###########
+### RGB ###
+###########
 def RGB_duplicates_check(annotation_data) -> bool:
     """Determine whether duplicate colors exist among annotation regions.
 

@@ -21,9 +21,7 @@ from library.annotation import segmentation_prep
 from numba import njit, prange
 
 
-######################
-### RGB Processing ###
-######################
+################################################################################
 @njit(cache=True)
 def convert_bgr_to_int(rgb_array) -> np.ndarray:
     """Collapse an RGB array into a single value along the RGB dimension.
