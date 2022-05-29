@@ -14,6 +14,7 @@ import json
 import os
 import platform
 import sys
+import typing
 from itertools import chain
 from math import floor
 from multiprocessing import cpu_count, get_context
@@ -25,7 +26,6 @@ import pyvista as pv
 from matplotlib.cm import get_cmap
 from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QFileDialog
-from pyvista.plotting.colors import hex_to_rgb as pv_hex_to_rgb
 
 
 ##########################
@@ -306,11 +306,25 @@ def get_graph_cache():
     return graph_cache
 
 
-def get_volume_cache():
-    wd = get_cwd()
-    volume_cache = os.path.join(wd, "library", "cache", "labeled_volume.npy")
-    volume_cache = std_path(volume_cache)
-    return volume_cache
+def get_volume_cache_path(directory: str = None) -> str:
+    """Return the filepath where the labeled_volume is/will be cached.
+
+    Parameters:
+    directory : str, optional
+        The cache directory. Default ``None``, which leads to a save in the
+        ``"library/cache/"`` folder.
+
+    Returns:
+    str : cache_directory
+    """
+    if not directory:
+        directory = os.path.join(get_cwd(), "library", "cache")
+
+    cache_directory = os.path.join(directory, "labeled_volume.npy")
+
+    cache_directory = std_path(cache_directory)
+
+    return cache_directory
 
 
 def silence_update_alerts():
@@ -406,8 +420,8 @@ def multiprocessing_input(function, list_size, workers: int = None, sublist=Fals
 ########################
 def get_widget_rgb(widget):
     color = widget.palette().color(QPalette.Background)
-    hex = color.name()
-    rgb = hex_to_rgb(hex)
+    hex_value = color.name()
+    rgb = hex_to_rgb(hex_value)
     return rgb
 
 
@@ -419,13 +433,50 @@ def update_widget_color(widget, color):
     return
 
 
-def rgb_to_hex(rgb: list):
-    hex = "%02x%02x%02x" % (rgb[0], rgb[1], rgb[2])
-    return hex
+def rgb_to_hex(rgb: typing.Union[list, tuple]) -> str:
+    """Convert an RGB iterable into a hex color.
+
+    Parameters:
+    rgb : list, tuple
+        A (3,) iterable of RGB values.
+
+    Returns:
+    str : A str representation of the RGB in hex format.
+    """
+    if not isinstance(rgb, (list, tuple)):
+        raise TypeError("rgb must be passed as a list or tuple")
+    if not len(rgb) == 3:
+        raise TypeError("rgb must have exactly three values")
+
+    hex_color = f"{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}"
+    return hex_color
 
 
-def hex_to_rgb(hex):
-    rgb = pv_hex_to_rgb(hex)
+def hex_to_rgb(hex_value: str, normalize=True) -> tuple:
+    """Convert a hex string into a tuple of three values.
+
+    The returned values can either be uint8 or 0-1 floats.
+
+    Parameters:
+    hex : str
+
+    normalized : bool
+        Determines whether the values are returned as uint8 values or 0-1 float
+        values. ``True`` return 0-1 float values, ``False`` return 0-255 values.
+        Default ``True``.
+
+    Returns:
+    list : A tuple containing three uint8 values
+    """
+    if not isinstance(hex_value, str):
+        raise TypeError("hex_value must be passed as a string")
+    hex_value = hex_value.strip("#")
+
+    rgb = tuple(int(hex_value[i : i + 2], base=16) for i in (0, 2, 4))
+
+    if normalize:
+        rgb = tuple(value / 255 for value in rgb)
+
     return rgb
 
 
@@ -463,30 +514,30 @@ def annotation_colorization_input(graph, meshes):
     unique_hexes = get_unique_hexes(hexes)
 
     # Add ROI
-    if "ROI_ID" in graph.es.attributes():
-        ids = graph.es["ROI_ID"]
+    if "roi_ID" in graph.es.attributes():
+        ids = graph.es["roi_ID"]
     else:
         ids = match_hex_ids(hexes, unique_hexes)
-        graph.es["ROI_ID"] = ids
+        graph.es["roi_ID"] = ids
 
     # Zip the two together
     id_hex_dict = generate_id_hex_dict(ids, hexes)
 
     # First create a key that contains shifted colors from the original color
     shifted_dict = {
-        ROI_ID: generate_shifted_rgb(hex_to_rgb(id_hex_dict[ROI_ID])) for ROI_ID in ids
+        roi_ID: generate_shifted_rgb(hex_to_rgb(id_hex_dict[roi_ID])) for roi_ID in ids
     }
 
     # Then create a key that links all ids to a random rainbow color
     colortable = get_colortable("gist_rainbow")[:, :3]
-    rainbow_dict = {ROI_ID: generate_rainbow_rgb(colortable) for ROI_ID in ids}
+    rainbow_dict = {roi_ID: generate_rainbow_rgb(colortable) for roi_ID in ids}
 
     # Then iterate through each ID and add the original, shifted, or rainbow hexes to new arrays
     original_rgb = [
-        hex_to_rgb(ROI_hex) for ROI_hex in hexes
+        hex_to_rgb(roi_hex) for roi_hex in hexes
     ]  # Just convert hexes to RGB
-    shifted_rgb = [shifted_dict[ROI_ID] for ROI_ID in ids]
-    rainbow_rgb = [rainbow_dict[ROI_ID] for ROI_ID in ids]
+    shifted_rgb = [shifted_dict[roi_ID] for roi_ID in ids]
+    rainbow_rgb = [rainbow_dict[roi_ID] for roi_ID in ids]
 
     del graph.es["hex"]
     # Add the color arrays to the graph
@@ -520,7 +571,7 @@ def match_hex_ids(hexes, unique_hexes):
 
 
 def generate_id_hex_dict(ids, hexes):
-    id_to_hex = {ROI_ID: hexes[i] for i, ROI_ID in enumerate(ids)}
+    id_to_hex = {roi_ID: hexes[i] for i, roi_ID in enumerate(ids)}
     return id_to_hex
 
 
@@ -548,7 +599,7 @@ def randomize_mesh_colors(meshes, rainbow=False, shifted=False):
         # Generate a new rainbow color for each unique color
         colortable = get_colortable("gist_rainbow")[:, :3]  # sent back as RGBA
         id_rainbow_dict = {
-            ROI_ID: generate_rainbow_rgb(colortable) for ROI_ID in id_hex_dict.keys()
+            roi_ID: generate_rainbow_rgb(colortable) for roi_ID in id_hex_dict.keys()
         }
 
         for mesh in meshes.iter_vessel_meshes():
@@ -567,8 +618,8 @@ def randomize_mesh_colors(meshes, rainbow=False, shifted=False):
     if shifted:
         # Create a new dict that matches ids to shifted RGBs based on their original color
         id_shifted_dict = {
-            ROI_ID: generate_shifted_rgb(hex_to_rgb(id_hex_dict[ROI_ID]))
-            for ROI_ID in id_hex_dict.keys()
+            roi_ID: generate_shifted_rgb(hex_to_rgb(id_hex_dict[roi_ID]))
+            for roi_ID in id_hex_dict.keys()
         }
 
         for mesh in meshes.iter_vessel_meshes():

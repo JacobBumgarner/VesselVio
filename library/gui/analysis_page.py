@@ -15,8 +15,7 @@ import sys
 
 from library import helpers, qt_threading as QtTh
 
-from library.annotation_processing import RGB_check
-
+from library.annotation.tree_processing import RGB_duplicates_check
 from library.gui import qt_objects as QtO
 from library.gui.annotation_page import RGB_Warning
 from library.gui.file_loading_widgets.analysis_file_loaders import (
@@ -728,17 +727,26 @@ class FileManagerWidget(QWidget):
                 self.JSON_error("Incorrect filetype!")
             else:
                 # If loading an RGB filetype, make sure there's no duplicate colors.
-                if self.annotationType.currentText() == "RGB" and RGB_check(
+                if self.annotationType.currentText() == "RGB" and RGB_duplicates_check(
                     annotation_data["VesselVio Annotations"]
                 ):
-                    if RGB_Warning().exec_() == QMessageBox.No:
-                        return
+                    self.JSON_error("Incorrect filetype!")
+                else:
+                    # If loading an RGB filetype, make sure there's no duplicate colors.
+                    if (
+                        self.annotationType.currentText() == "RGB"
+                        and RGB_duplicates_check(
+                            annotation_data["VesselVio Annotations"]
+                        )
+                    ):
+                        if RGB_Warning().exec_() == QMessageBox.No:
+                            return
 
-                self.loadedJSON.setStyleSheet(self.JSONdefault)
-                filename = os.path.basename(loaded_file)
-                self.loadedJSON.setText(filename)
-                self.annotation_data = annotation_data["VesselVio Annotations"]
-                self.update_queue()
+                    self.loadedJSON.setStyleSheet(self.JSONdefault)
+                    filename = os.path.basename(loaded_file)
+                    self.loadedJSON.setText(filename)
+                    self.annotation_data = annotation_data["VesselVio Annotations"]
+                    self.update_queue()
         return
 
     def JSON_error(self, warning):

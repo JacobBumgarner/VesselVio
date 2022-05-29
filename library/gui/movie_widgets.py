@@ -45,8 +45,9 @@ from PyQt5.QtWidgets import (
 )
 
 
-# Orbit widgets
-################################################################################
+#####################
+### Orbit widgets ###
+#####################
 class OrbitWidget(QWidget):
     """The dialogue used to create an orbital movie around a mesh.
 
@@ -131,8 +132,9 @@ class OrbitWidget(QWidget):
         self.update_orbit()
 
 
-# Flythrough widgets
-################################################################################
+##########################
+### Flythrough widgets ###
+##########################
 class FlyThroughTable(QTableWidget):
     """Table widget used to track and modify keyframes for the flythrough movie.
 
@@ -496,8 +498,9 @@ class FlythroughWidget(QWidget):
         self.pathTable.reset()
 
 
-# Movie generation
-################################################################################
+########################
+### Movie generation ###
+########################
 class MovieDialogue(QDialog):
     """Dialogue widget used to create movies.
 
@@ -782,8 +785,9 @@ class MovieDialogue(QDialog):
         self.reject()
 
 
-# Rendering
-################################################################################
+#################
+### Rendering ###
+#################
 class RenderDialogue(QDialog):
     """Popup widget used to visualize the progress of the movie rendering.
 
