@@ -20,7 +20,7 @@ For example, the Allen Insitute `p56 mouse brain` atlas contains _hundreds_ of r
 These labeling functions handle the isolation of the selected regions during labeling. They also take advantage of `numba` for JIT and parallel processing.
 
 ### `segmentation.py`
-Once the regions of interest have been labeled and are being analyed, there's no need to analyze the entire input volume. 
+Once the regions of interest have been labeled and are being analyzed, there's no need to analyze the entire input volume. 
 
 These functions serve to segment the region of interest from the labeled volume and bound the segmented volume for faster array processing.
 

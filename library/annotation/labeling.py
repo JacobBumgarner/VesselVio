@@ -26,7 +26,7 @@ from numba import njit, prange
 ########################
 ### General Labeling ###
 ########################
-@njit(cache=True)
+@njit(cache=False)
 def update_bounds(
     minima: np.ndarray, maxima: np.ndarray, z: int, y: int, x: int, index: int
 ) -> typing.Tuple[np.ndarray, np.ndarray]:
@@ -130,7 +130,7 @@ def label_slice(
 ####################
 ### RGB-Specific ###
 ####################
-@njit(cache=True)
+@njit(cache=False)
 def convert_bgr_to_int(rgb_array) -> np.ndarray:
     """Collapse an RGB array into a single value along the RGB dimension.
 
@@ -324,7 +324,7 @@ def nn_id_labeling(
 
 
 ### Numba dtype compatible segmentation
-@njit(parallel=True, nogil=True, cache=True)
+@njit(parallel=True, nogil=True, cache=False)
 def numba_id_labeling(
     volume: np.ndarray, annotation_memmap: np.memmap, roi_array: np.ndarray
 ) -> typing.Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
