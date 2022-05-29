@@ -1,11 +1,8 @@
 import os
-import sys
-
-import pytest
-
-sys.path.insert(1, "/Users/jacobbumgarner/Documents/GitHub/VesselVio")
 
 import numpy as np
+
+import pytest
 
 from library import image_processing as ImProc
 from library.annotation import labeling, segmentation_prep

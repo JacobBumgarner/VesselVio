@@ -1,8 +1,6 @@
 import json
 import os
-import sys
 
-sys.path.insert(1, "/Users/jacobbumgarner/Documents/GitHub/VesselVio")
 import pytest
 
 from library.annotation import tree_processing

@@ -1,11 +1,8 @@
 import os
-import sys
-
-import pytest
-
-sys.path.insert(1, "/Users/jacobbumgarner/Documents/GitHub/VesselVio")
 
 import numpy as np
+
+import pytest
 
 from library.annotation import segmentation
 from skimage.io import imread

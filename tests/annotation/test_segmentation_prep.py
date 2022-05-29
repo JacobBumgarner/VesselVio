@@ -1,12 +1,9 @@
 import os
-import sys
-
-import pytest
-
-sys.path.insert(1, "/Users/jacobbumgarner/Documents/GitHub/VesselVio")
 
 import numba
 import numpy as np
+
+import pytest
 
 from library.annotation import segmentation_prep, tree_processing
 
