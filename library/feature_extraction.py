@@ -611,7 +611,7 @@ def egraph_analysis(g):
     attributes = g.edge_attributes()
     for i, e in enumerate(g.es()):
         for attribute in attributes:
-            if attribute not in ["hex", "ROI_ID"]:
+            if attribute not in ["hex", "roi_ID"]:
                 features[attribute][i] = e[attribute]
 
     return (
@@ -637,8 +637,8 @@ def feature_input(
     image_dim=3,
     image_shape=None,
     graph_type="Centerlines",
-    ROI_name="None",
-    ROI_volume="NA",
+    roi_name="None",
+    roi_volume="NA",
     centerline_smoothing=True,
     save_seg_results=False,
     reduce_graph=False,
@@ -647,7 +647,7 @@ def feature_input(
 
     # Check to make sure that the graph has remaining vessels
     if not g.vs():
-        return [filename, ROI_name, "Empty dataset"], ["Empty Dataset"]
+        return [filename, roi_name, "Empty dataset"], ["Empty Dataset"]
 
     if verbose:
         t1 = pf()
@@ -710,13 +710,13 @@ def feature_input(
     endpoints = len(es)
 
     # ROI Volume
-    if not isinstance(ROI_volume, str):  # 'NA' for non-annotated volumes
-        ROI_volume *= np.prod(resolution)
+    if not isinstance(roi_volume, str):  # 'NA' for non-annotated volumes
+        roi_volume *= np.prod(resolution)
 
     network_features = [
         filename,
-        ROI_name,
-        ROI_volume,
+        roi_name,
+        roi_volume,
         network_volume_or_PAF,
         network_length,
         network_SA,

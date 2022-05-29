@@ -15,7 +15,7 @@ import sys
 
 from library import helpers, input_classes as IC, qt_threading as QtTh
 
-from library.annotation_processing import RGB_check
+from library.annotation.tree_processing import RGB_duplicates_check
 from library.gui import qt_objects as QtO
 from library.gui.annotation_page import RGB_Warning
 
@@ -816,8 +816,11 @@ class LoadingWidget(QWidget):
                     self.JSON_error("Incorrect filetype!")
                 else:
                     # If loading an RGB filetype, make sure there's no duplicate colors.
-                    if self.annotationType.currentText() == "RGB" and RGB_check(
-                        annotation_data["VesselVio Annotations"]
+                    if (
+                        self.annotationType.currentText() == "RGB"
+                        and RGB_duplicates_check(
+                            annotation_data["VesselVio Annotations"]
+                        )
                     ):
                         if RGB_Warning().exec_() == QMessageBox.No:
                             return

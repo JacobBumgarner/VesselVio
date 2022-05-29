@@ -159,7 +159,7 @@ def add_line_attributes(line, e, annotation):
         line["Original_RGB"] = [e["original_rgb"]]
         line["Shifted_RGB"] = [e["shifted_rgb"]]
         line["Rainbow_RGB"] = [e["rainbow_rgb"]]
-        line["ids"] = [e["ROI_ID"]]
+        line["ids"] = [e["roi_ID"]]
 
     return line
 
@@ -395,7 +395,7 @@ def graph_plot(meshes, g, graph_type, vis_options, status_updater):
             original_colors.append([edges["original_rgb"][max_r_loc]])
             shifted_colors.append([edges["shifted_rgb"][max_r_loc]])
             rainbow_colors.append([edges["rainbow_rgb"][max_r_loc]])
-            cap_ids.append([edges["ROI_ID"][max_r_loc]])
+            cap_ids.append([edges["roi_ID"][max_r_loc]])
 
         # Index end points and branch points
         if v.degree() == 1:
@@ -404,7 +404,7 @@ def graph_plot(meshes, g, graph_type, vis_options, status_updater):
                 end_original_RGB.append([edges["original_rgb"][max_r_loc]])
                 end_shifted_RGB.append([edges["shifted_rgb"][max_r_loc]])
                 end_rainbow_RGB.append([edges["rainbow_rgb"][max_r_loc]])
-                end_ids.append([edges["ROI_ID"][max_r_loc]])
+                end_ids.append([edges["roi_ID"][max_r_loc]])
 
         elif v.degree() > 2:
             branch_locations.append(i)
@@ -412,7 +412,7 @@ def graph_plot(meshes, g, graph_type, vis_options, status_updater):
                 branches_original_RGB.append([edges["original_rgb"][max_r_loc]])
                 branches_shifted_RGB.append([edges["shifted_rgb"][max_r_loc]])
                 branches_rainbow_RGB.append([edges["rainbow_rgb"][max_r_loc]])
-                branch_ids.append([edges["ROI_ID"][max_r_loc]])
+                branch_ids.append([edges["roi_ID"][max_r_loc]])
 
     coords = np.array(g.vs["v_coords"])
 
