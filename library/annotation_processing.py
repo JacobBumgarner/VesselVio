@@ -216,7 +216,7 @@ def numba_id_labeling(vprox, a_volume, roi_array):
                         update_bounds(minima, maxima, z, y, x, id_dict[p])
                 elif vprox[z, y, x]:
                     vprox[z, y, x] = 0
-    maxima = maxima + 1
+
     return vprox, roi_volumes, minima, maxima
 
 

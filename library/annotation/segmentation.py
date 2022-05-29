@@ -13,15 +13,21 @@ import numpy as np
 
 from library import image_processing as ImProc
 from numba import njit, prange
+from skimage.io import imread
 
 
 @njit(parallel=True, nogil=True, cache=True)
-def segment_volume(labeled_volume, mins, maxes, segmentation_id):
+def segment_roi(
+    labeled_volume: np.ndarray,
+    minima: np.ndarray,
+    maxima: np.ndarray,
+    segmentation_id: int,
+) -> np.ndarray:
     """Given a labeled volume and ROI bounds, segment the loaded id.
 
     Parameters:
     labeled_volume : np.ndarray
-        An ndim=3 array containing labeled regions
+        An ndim=3 array containing labeled regions.
 
     mins : np.ndarray
         An (3,) array containing the lower bounds of the ROI.
@@ -33,11 +39,12 @@ def segment_volume(labeled_volume, mins, maxes, segmentation_id):
         An int id of the volume to segment
 
     Returns:
-    np.ndarray : An ndim=3 array where the region of interest is segmented.
+    np.ndarray : volume
+        The segmented and bounded region of interest.
     """
     # Isolate the segmented region from the main volume
     volume = labeled_volume[
-        mins[0] : maxes[0], mins[1] : maxes[1], mins[2] : maxes[2]
+        minima[0] : maxima[0], minima[1] : maxima[1], minima[2] : maxima[2]
     ].copy()
     volume = np.asarray(volume, dtype=np.uint8)
 
@@ -53,15 +60,51 @@ def segment_volume(labeled_volume, mins, maxes, segmentation_id):
     return volume
 
 
-def segmentation_input(mins, maxes, segmentation_id, verbose=False):
+def roi_segmentation_input(
+    minima: np.ndarray,
+    maxima: np.ndarray,
+    segmentation_id: int,
+    labeled_volume_fname: str = None,
+    verbose: bool = False,
+) -> np.ndarray:
+    """Load the cached labeled volume and segment the desired ROI.
+
+    This is a higher-level input function that is used during backend
+    dataset processing. A cache of the labeled volume is stored prior to
+    segmentation
+
+    Parameters:
+    minima : np.ndarray
+
+    maxima : np.ndarray
+
+    segmentation_id : int
+        The integer-id of the ROI that will be segmented.
+
+    labeled_volume_fname : str, optional
+        The filepath pointing to the labeled volume.
+
+    verbose : bool, optional
+        Default ``False``.
+
+    Returns:
+    np.ndarray : volume
+        The segmented and bounded region of interest.
+
+    """
     if verbose:
         t = pf()
         print("Segmenting ROI from volume...", end="\r")
 
-    labeled_volume = ImProc.load_labeled_volume_cache()
-    volume = segment_volume(labeled_volume, mins, maxes, segmentation_id)
+    if not labeled_volume_fname:
+        labeled_volume = ImProc.load_labeled_volume_cache()
+    else:
+        labeled_volume = imread(labeled_volume_fname)
+
+    volume = segment_roi(labeled_volume, minima, maxima, segmentation_id)
     del labeled_volume
 
     if verbose:
         print(f"ROI segmented in {pf() - t:0.2f} seconds.")
+
     return volume
