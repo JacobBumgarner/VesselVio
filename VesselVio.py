@@ -34,7 +34,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from pyvistaqt import QtInteractor
 
 ######
-__version__ = "V 1.1.1"
+__version__ = "V 1.1.2"
 ######
 
 
