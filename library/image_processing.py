@@ -80,7 +80,6 @@ def reshape_2D(points, volume, verbose=False):
     return points, volume, image_shape
 
 
-# Confirm that the volume was either loaded or segmented properly
 def binary_check(volume: np.ndarray) -> bool:
     """Return a bool indicating if the loaded volume is binary or not.
 
