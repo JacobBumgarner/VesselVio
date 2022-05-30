@@ -93,7 +93,7 @@ If you want to build a local standalone VesselVio application, follow these inst
    - Activate python 3.8.8
    - Execute the following command in your command prompt:
 ```markdown
-pyinstaller --add-data=Library;Library --additional-hooks-dir=Hooks --icon Icons\icon.ico --windowed VesselVio.py 
+pyinstaller --add-data=Library;Library --additional-hooks-dir=Hooks --icon library\icons\icon.ico --windowed VesselVio.py 
 ```
    - The .exe file will be located in the 'dist' folder in the folder that contains the original source-code. Create a shortcut to this .exe file, and move it wherever you prefer.
 
