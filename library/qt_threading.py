@@ -100,7 +100,7 @@ class VolumeThread(QThread):
                     file_size = helpers.get_file_size(volume_file, GB=True)
                     self.analysis_status.emit([i, "Error: Unable to read image."])
                     file_analyzed = False
-                if not ImProc.binary_check(volume, loading=True):
+                if not ImProc.binary_check(volume):
                     file_size = helpers.get_file_size(volume_file, GB=True)
                     self.analysis_status.emit([i, "Error: Non-binary image loaded."])
                     file_analyzed = False
@@ -446,7 +446,7 @@ class VolumeVisualizationThread(QThread):
             volume, image_shape = ImProc.load_volume(volume_file)
             if volume is None:
                 self.analysis_status.emit(["Error: Unable to read image.", 0])
-            if not ImProc.binary_check(volume, loading=True):
+            if not ImProc.binary_check(volume):
                 file_size = helpers.get_file_size(volume_file, GB=True)
                 self.analysis_status.emit(["Error: Non-binary image loaded.", 0])
                 break
