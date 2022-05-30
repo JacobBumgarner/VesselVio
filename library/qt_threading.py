@@ -100,7 +100,8 @@ class VolumeThread(QThread):
                     file_size = helpers.get_file_size(volume_file, GB=True)
                     self.analysis_status.emit([i, "Error: Unable to read image."])
                     file_analyzed = False
-                if not ImProc.binary_check(volume):
+                    break
+                elif not ImProc.binary_check(volume):
                     file_size = helpers.get_file_size(volume_file, GB=True)
                     self.analysis_status.emit([i, "Error: Non-binary image loaded."])
                     file_analyzed = False
@@ -433,6 +434,8 @@ class VolumeVisualizationThread(QThread):
         progress = 0
         step_weight = (70 / roi_count) / 8
 
+        error_present = False
+
         # Iterate through the ROI's or single file and generate graphs
         for i, roi_name in enumerate(annotation_data.keys()):
             ## File initialization
@@ -446,9 +449,12 @@ class VolumeVisualizationThread(QThread):
             volume, image_shape = ImProc.load_volume(volume_file)
             if volume is None:
                 self.analysis_status.emit(["Error: Unable to read image.", 0])
-            if not ImProc.binary_check(volume):
+                error_present = True
+                break
+            elif not ImProc.binary_check(volume):
                 file_size = helpers.get_file_size(volume_file, GB=True)
                 self.analysis_status.emit(["Error: Non-binary image loaded.", 0])
+                error_present = True
                 break
 
             progress += step_weight
@@ -469,6 +475,7 @@ class VolumeVisualizationThread(QThread):
                         self.failure_emit.emit(1)
                         self.running = False
                         self.complete = True
+                        error_present = True
                         return
 
                     self.analysis_status.emit(["Labeling volume...", progress])
@@ -478,6 +485,7 @@ class VolumeVisualizationThread(QThread):
                     )
                     if roi_volumes is None:
                         self.analysis_status.emit(["Error labeling volume...", 0])
+                        error_present = True
                         break
 
                 roi_volume = roi_volumes[roi_id]
@@ -607,9 +615,10 @@ class VolumeVisualizationThread(QThread):
                     status_updater=self.analysis_status,
                 )
             else:
-                self.analysis_status.emit(
-                    ["Visualization cancelled: Volume has no vessels.", 0]
-                )
+                if not error_present:
+                    self.analysis_status.emit(
+                        ["Visualization cancelled: Volume has no vessels.", 0]
+                    )
                 self.failure_emit.emit(1)
                 self.running = False
 

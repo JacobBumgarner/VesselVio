@@ -161,6 +161,7 @@ def process_volume(
         if volume is None:  # make sure the image was loaded.
             if verbose:
                 print("Error loading volume.")
+            break
         elif not ImProc.binary_check(volume):
             if verbose:
                 print("Error: Non-binary image loaded.")
