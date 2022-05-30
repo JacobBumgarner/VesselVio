@@ -279,7 +279,7 @@ class AnalysisPage(QWidget):
             True if loaded correctly, False if incorrectly or incompletely
             loaded
         """
-        if not self.fileManager.column1_files:  # General file check
+        if not self.fileTable.column1_files:  # General file check
             return False
 
         if self.fileManager.datasetType.currentText() == "Volume":  # Specific check
@@ -300,8 +300,8 @@ class AnalysisPage(QWidget):
         bool
             True if the number of files match, False if they are different
         """
-        file_check = len(self.fileManager.column1_files) == len(
-            self.fileManager.column2_files
+        file_check = len(self.fileTable.column1_files) == len(
+            self.fileTable.column2_files
         )
         return file_check
 
@@ -415,10 +415,9 @@ class FileTableWidget(QTableWidget):
         files : list
             A list of str file paths. Updates the self.column1_files attribute.
         """
-        self.setRowCount()
+        self.setRowCount(len(files))
+        self.column1_files.extend(files)
         for i, file in enumerate(self.column1_files):
-            if i + 1 > self.rowCount():
-                self.insertRow(self.rowCount())
             filename = os.path.basename(file)
             self.setItem(i, 0, QTableWidgetItem(filename))
 
