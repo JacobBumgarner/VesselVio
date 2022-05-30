@@ -12,7 +12,7 @@ Currently the stand-alone VesselVio application is available for Windows 10 and 
 
   | VesselVio Version |  Windows 10 | MacOS 11.6+|
   |:-------------:|:---------------:|:---------------:|
-  | 1.1.1           | [Download*](https://sourceforge.net/projects/vesselvio/files/1.1.1%20Downloads/VesselVio%201.1.1.zip/download) | [Download](https://sourceforge.net/projects/vesselvio/files/1.1.1%20Downloads/VesselVio.app.zip/download)  |
+  | 1.1.2           | [Download*](https://sourceforge.net/projects/vesselvio/files/1.1.2%20Downloads/VesselVio%201.1.2.zip/download) | [Download](https://sourceforge.net/projects/vesselvio/files/1.1.2%20Downloads/VesselVio.zip/download)  |
 
 *<b>Warning!</b> The shortcut link for the Windows application is currently broken. To run the application, go to Contents>VesselVio.exe and create a shortcut of that .exe file. This problem will be fixed in the next version! 
 
