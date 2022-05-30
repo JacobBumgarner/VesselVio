@@ -80,15 +80,45 @@ def reshape_2D(points, volume, verbose=False):
     return points, volume, image_shape
 
 
-# Confirm that the volume was either loaded or segmented properly
-def volume_check(volume, loading=False, verbose=False):
+def binary_check(volume: np.ndarray) -> bool:
+    """Return a bool indicating if the loaded volume is binary or not.
+
+    Takes a slice from the volume and checks to confirm that only two unique
+    values are present.
+
+    Parameters:
+    volume : np.ndarray
+
+    Returns:
+    bool
+        True if the spot check of the volume only return two unique values,
+        False if more than two unique values were identified.
+    """
+    middle = int(volume.shape[0] / 2)
+    unique = np.unique(volume[middle])
+
+    return unique.shape[0] < 3
+
+
+def segmentation_check(volume: np.ndarray) -> bool:
+    """Return a bool indicating if volume has vessels after the segmentation.
+
+    Some regions of interest may be present in the annotation, but there may
+    be no corresponding vasculature in the datasets. This function checks to see
+    if vessels are present.
+
+    Parameters:
+    volume : np.ndarray
+
+    Returns:
+    bool
+        True if vessels are present, False if not.
+    """
     if volume is None:
         return False
-
-    elif not loading and not np.any(volume):
+    elif not np.any(volume):
         return False
-    else:
-        return True
+    return True
 
 
 # Returns file size in bytes

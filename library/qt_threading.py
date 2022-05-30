@@ -95,9 +95,15 @@ class VolumeThread(QThread):
 
                 ## Volume processing
                 volume, image_shape = ImProc.load_volume(volume_file)
-                if not ImProc.volume_check(volume, loading=True):
+
+                if volume is None:
                     file_size = helpers.get_file_size(volume_file, GB=True)
                     self.analysis_status.emit([i, "Error: Unable to read image."])
+                    file_analyzed = False
+                    break
+                elif not ImProc.binary_check(volume):
+                    file_size = helpers.get_file_size(volume_file, GB=True)
+                    self.analysis_status.emit([i, "Error: Non-binary image loaded."])
                     file_analyzed = False
                     break
 
@@ -138,7 +144,7 @@ class VolumeThread(QThread):
                         # point_minima += 1
 
                     # Make sure the volume is still present after ROI segmentation
-                    if not roi_volume or not ImProc.volume_check(volume):
+                    if not roi_volume or not ImProc.segmentation_check(volume):
                         self.analysis_status.emit([i, "ROI not in dataset..."])
                         # Cache results
                         ResExp.cache_result([filename, roi_name, "ROI not in dataset."])
@@ -428,6 +434,8 @@ class VolumeVisualizationThread(QThread):
         progress = 0
         step_weight = (70 / roi_count) / 8
 
+        error_present = False
+
         # Iterate through the ROI's or single file and generate graphs
         for i, roi_name in enumerate(annotation_data.keys()):
             ## File initialization
@@ -439,9 +447,16 @@ class VolumeVisualizationThread(QThread):
 
             ## Volume processing
             volume, image_shape = ImProc.load_volume(volume_file)
-            if not ImProc.volume_check(volume, loading=True):
+            if volume is None:
                 self.analysis_status.emit(["Error: Unable to read image.", 0])
+                error_present = True
                 break
+            elif not ImProc.binary_check(volume):
+                file_size = helpers.get_file_size(volume_file, GB=True)
+                self.analysis_status.emit(["Error: Non-binary image loaded.", 0])
+                error_present = True
+                break
+
             progress += step_weight
 
             if roi_name:
@@ -460,6 +475,7 @@ class VolumeVisualizationThread(QThread):
                         self.failure_emit.emit(1)
                         self.running = False
                         self.complete = True
+                        error_present = True
                         return
 
                     self.analysis_status.emit(["Labeling volume...", progress])
@@ -469,6 +485,7 @@ class VolumeVisualizationThread(QThread):
                     )
                     if roi_volumes is None:
                         self.analysis_status.emit(["Error labeling volume...", 0])
+                        error_present = True
                         break
 
                 roi_volume = roi_volumes[roi_id]
@@ -479,7 +496,7 @@ class VolumeVisualizationThread(QThread):
                         point_minima, point_maxima, roi_id + 1
                     )
 
-                if not roi_volume or not ImProc.volume_check(volume):
+                if not roi_volume or not ImProc.segmentation_check(volume):
                     progress += step_weight * 7
                     self.analysis_status.emit(["ROI not in dataset...", progress])
                     continue
@@ -598,9 +615,10 @@ class VolumeVisualizationThread(QThread):
                     status_updater=self.analysis_status,
                 )
             else:
-                self.analysis_status.emit(
-                    ["Visualization cancelled: Volume has no vessels.", 0]
-                )
+                if not error_present:
+                    self.analysis_status.emit(
+                        ["Visualization cancelled: Volume has no vessels.", 0]
+                    )
                 self.failure_emit.emit(1)
                 self.running = False
 
