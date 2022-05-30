@@ -95,9 +95,14 @@ class VolumeThread(QThread):
 
                 ## Volume processing
                 volume, image_shape = ImProc.load_volume(volume_file)
-                if not ImProc.volume_check(volume, loading=True):
+
+                if volume is None:
                     file_size = helpers.get_file_size(volume_file, GB=True)
                     self.analysis_status.emit([i, "Error: Unable to read image."])
+                    file_analyzed = False
+                if not ImProc.binary_check(volume, loading=True):
+                    file_size = helpers.get_file_size(volume_file, GB=True)
+                    self.analysis_status.emit([i, "Error: Non-binary image loaded."])
                     file_analyzed = False
                     break
 
@@ -138,7 +143,7 @@ class VolumeThread(QThread):
                         # point_minima += 1
 
                     # Make sure the volume is still present after ROI segmentation
-                    if not roi_volume or not ImProc.volume_check(volume):
+                    if not roi_volume or not ImProc.segmentation_check(volume):
                         self.analysis_status.emit([i, "ROI not in dataset..."])
                         # Cache results
                         ResExp.cache_result([filename, roi_name, "ROI not in dataset."])
@@ -439,9 +444,13 @@ class VolumeVisualizationThread(QThread):
 
             ## Volume processing
             volume, image_shape = ImProc.load_volume(volume_file)
-            if not ImProc.volume_check(volume, loading=True):
+            if volume is None:
                 self.analysis_status.emit(["Error: Unable to read image.", 0])
+            if not ImProc.binary_check(volume, loading=True):
+                file_size = helpers.get_file_size(volume_file, GB=True)
+                self.analysis_status.emit(["Error: Non-binary image loaded.", 0])
                 break
+
             progress += step_weight
 
             if roi_name:
@@ -479,7 +488,7 @@ class VolumeVisualizationThread(QThread):
                         point_minima, point_maxima, roi_id + 1
                     )
 
-                if not roi_volume or not ImProc.volume_check(volume):
+                if not roi_volume or not ImProc.segmentation_check(volume):
                     progress += step_weight * 7
                     self.analysis_status.emit(["ROI not in dataset...", progress])
                     continue
