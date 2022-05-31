@@ -158,9 +158,13 @@ def process_volume(
         # region
         volume, image_shape = ImProc.load_volume(volume_file, verbose=verbose)
 
-        if not ImProc.volume_check(volume, loading=True, verbose=verbose):
+        if volume is None:  # make sure the image was loaded.
             if verbose:
                 print("Error loading volume.")
+            break
+        elif not ImProc.binary_check(volume):
+            if verbose:
+                print("Error: Non-binary image loaded.")
             break
 
         # If there as an ROI, segment the ROI from the volume.
@@ -194,7 +198,7 @@ def process_volume(
                 )
 
             # Make sure the ROI is in the volume.
-            if not roi_volume or not ImProc.volume_check(volume, verbose=verbose):
+            if not roi_volume or not ImProc.segmentation_check(volume):
                 ResExp.cache_result(
                     [filename, roi_name, "ROI not in dataset."]
                 )  # Cache results

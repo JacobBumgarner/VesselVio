@@ -51,7 +51,6 @@ QtPy==1.9.0
 scikit-image==0.18.1
 scipy==1.6.3
 scooby==0.5.7
-SimpleITK==2.0.2
 six==1.16.0
 texttable==1.6.3
 tifffile==2021.4.8
