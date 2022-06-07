@@ -7,6 +7,8 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
+from typing import Union
+
 from library.annotation import tree_processing
 
 
@@ -53,6 +55,36 @@ class AnalysisFileHandler:
             annotation_file
         )
         return True
+
+    def remove_main_files(self, indices: Union[int, list]):
+        """Remove the indicated files from the main files list.
+
+        Parameters:
+        indices : int, list
+            The single selection or top and bottom indices of the selection
+            of files to be removed from the list. The top index will be removed.
+        """
+        if isinstance(indices, int):
+            self.main_files.pop(indices)
+        elif isinstance(indices, list) and len(indices) == 2:
+            for index in range(indices[0], indices[1] + 1):
+                self.main_files.pop(indices[0])
+        return
+
+    def remove_associated_files(self, indices: Union[int, list]):
+        """Remove the indicated files from the associated files list.
+
+        Parameters:
+        indices : int, list
+            The single selection or top and bottom indices of the selection
+            of files to be removed from the list.
+        """
+        if isinstance(indices, int):
+            self.associated_files.pop(indices)
+        elif isinstance(indices, list) and len(indices) == 2:
+            for index in range(indices[0], indices[1] + 1):
+                self.associated_files.pop(indices[0])
+        return
 
     def paired_files_check(self):
         """Return a bool indicating that the length of file lists is equal.
