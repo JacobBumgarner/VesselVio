@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import numpy as np
 
@@ -9,10 +10,9 @@ from library.annotation import labeling, segmentation_prep
 from skimage.io import imread
 
 
-THIS_PATH = os.path.realpath(__file__)
-FIXTURE_DIR = os.path.join(os.path.dirname(THIS_PATH), "test_files")
-ANNOTATION_DIR = os.path.join(FIXTURE_DIR, "annotation_data")
-
+THIS_PATH = Path(__file__).parent.absolute()
+FIXTURE_DIR = Path(*THIS_PATH.parts[: list(THIS_PATH.parts).index("tests") + 1])
+ANNOTATION_DIR = os.path.join(FIXTURE_DIR, "test_files", "annotation_data")
 
 labeled_volume = imread(os.path.join(ANNOTATION_DIR, "test_labeled.nii"))
 VOLUME = (labeled_volume > 0).astype(np.uint8)

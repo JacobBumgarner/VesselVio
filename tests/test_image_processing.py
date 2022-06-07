@@ -1,12 +1,8 @@
 import os
-import sys
-
-import pytest
-
-sys.path.insert(1, "/Users/jacobbumgarner/Documents/GitHub/VesselVio")
-
 
 import numpy as np
+
+import pytest
 from library import image_processing
 
 from skimage.io import imread

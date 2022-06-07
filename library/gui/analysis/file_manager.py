@@ -14,11 +14,11 @@ import os
 
 from PyQt5.QtWidgets import QLabel, QMessageBox, QTableWidgetItem, QWidget
 
-from ... import helpers
-from ...annotation.tree_processing import RGB_duplicates_check
+from library import helpers
+from library.annotation.tree_processing import RGB_duplicates_check
 
-from .. import qt_objects as QtO
-from ..annotation_page import RGB_Warning
+from library.gui import qt_objects as QtO
+from library.gui.annotation_page import RGB_Warning
 
 
 class FileManager(QWidget):

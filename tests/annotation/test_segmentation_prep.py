@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import numba
 import numpy as np
@@ -8,14 +9,14 @@ import pytest
 from library.annotation import segmentation_prep, tree_processing
 
 
-THIS_PATH = os.path.realpath(__file__)
-FIXTURE_DIR = os.path.join(os.path.dirname(THIS_PATH), "test_files")
-ANNOTATION_DIR = os.path.join(FIXTURE_DIR, "annotation_data")
+THIS_PATH = Path(__file__).parent.absolute()
+FIXTURE_DIR = Path(*THIS_PATH.parts[: list(THIS_PATH.parts).index("tests") + 1])
+ANNOTATION_DIR = os.path.join(FIXTURE_DIR, "test_files", "annotation_data")
 
 
 @pytest.mark.datafiles(ANNOTATION_DIR)
 def test_build_roi_array(datafiles):
-    annotation_dict = tree_processing.load_annotation_file(
+    annotation_dict = tree_processing.load_vesselvio_annotation_file(
         os.path.join(datafiles, "Cortex Unique.json")
     )
 
@@ -36,7 +37,7 @@ def test_build_roi_array(datafiles):
 
 @pytest.mark.datafiles(ANNOTATION_DIR)
 def test_convert_hex_list_to_int(datafiles):
-    annotation_dict = tree_processing.load_annotation_file(
+    annotation_dict = tree_processing.load_vesselvio_annotation_file(
         os.path.join(datafiles, "Cortex Unique.json")
     )
     hex_ROIs = [annotation_dict[key]["colors"] for key in annotation_dict.keys()]
@@ -51,7 +52,7 @@ test_children = [("Max Children Test.json", 41), ("Cortex Unique.json", 1)]
 
 @pytest.mark.parametrize("datafile, expected_length", test_children)
 def test_find_max_children_count(datafile, expected_length):
-    annotation_data = tree_processing.load_annotation_file(
+    annotation_data = tree_processing.load_vesselvio_annotation_file(
         os.path.join(ANNOTATION_DIR, datafile)
     )
 
@@ -67,7 +68,7 @@ test_roi_prep = [("Max Children Test.json", 552), ("Cortex Unique.json", 151)]
 
 @pytest.mark.parametrize("datafile, expected_keys", test_roi_prep)
 def test_prep_roi_array(datafile, expected_keys):
-    annotation_data = tree_processing.load_annotation_file(
+    annotation_data = tree_processing.load_vesselvio_annotation_file(
         os.path.join(ANNOTATION_DIR, datafile)
     )
 
@@ -81,7 +82,7 @@ def test_prep_roi_array(datafile, expected_keys):
 
 @pytest.mark.datafiles(ANNOTATION_DIR)
 def test_prep_volume_arrays(datafiles):
-    annotation_data = tree_processing.load_annotation_file(
+    annotation_data = tree_processing.load_vesselvio_annotation_file(
         os.path.join(datafiles, "Cortex Unique.json")
     )
 

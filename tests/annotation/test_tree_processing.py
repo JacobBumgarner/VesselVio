@@ -1,3 +1,11 @@
+import sys
+from pathlib import Path
+
+VESSELVIO_DIR = Path.cwd()
+# sys.path.insert(1, "/Users/jacobbumgarner/Documents/GitHub/VesselVio")
+sys.path.insert(1, str(VESSELVIO_DIR))
+
+
 import json
 import os
 
@@ -6,9 +14,9 @@ import pytest
 from library.annotation import tree_processing
 
 
-THIS_PATH = os.path.realpath(__file__)
-FIXTURE_DIR = os.path.join(os.path.dirname(THIS_PATH), "test_files")
-ANNOTATION_DIR = os.path.join(FIXTURE_DIR, "annotation_data")
+THIS_PATH = Path(__file__).parent.absolute()
+FIXTURE_DIR = Path(*THIS_PATH.parts[: list(THIS_PATH.parts).index("tests") + 1])
+ANNOTATION_DIR = os.path.join(FIXTURE_DIR, "test_files", "annotation_data")
 
 
 @pytest.fixture
@@ -49,9 +57,22 @@ def test_JSON_Options():
     assert default_options.color == "color_hex_triplet"
 
 
+annotation_check_test_data = [
+    ("p56 Mouse Brain.json", False),
+    ("Cortex Unique.json", True),
+]
+
+
+@pytest.mark.parametrize("input_file, compatible", annotation_check_test_data)
+def test_check_annotation_data_origin(input_file, compatible):
+    data_file = os.path.join(ANNOTATION_DIR, input_file)
+    compatibility = tree_processing.check_annotation_data_origin(data_file)
+    assert compatibility == compatible
+
+
 @pytest.mark.datafiles(ANNOTATION_DIR)
-def test_load_annotation_file(datafiles):
-    annotation_dict = tree_processing.load_annotation_file(
+def test_load_vesselvio_annotation_file(datafiles):
+    annotation_dict = tree_processing.load_vesselvio_annotation_file(
         os.path.join(datafiles, "Cortex Unique.json")
     )
     regions = [
@@ -109,12 +130,12 @@ def test_convert_annotation_data(expected_data):
 
 @pytest.mark.datafiles(ANNOTATION_DIR)
 def test_RGB_duplicates_check(datafiles):
-    unique_annotation_data = tree_processing.load_annotation_file(
+    unique_annotation_data = tree_processing.load_vesselvio_annotation_file(
         os.path.join(datafiles, "Cortex Unique.json")
     )
     assert tree_processing.RGB_duplicates_check(unique_annotation_data) is False
 
-    duplicate_annotation_data = tree_processing.load_annotation_file(
+    duplicate_annotation_data = tree_processing.load_vesselvio_annotation_file(
         os.path.join(datafiles, "HPF Duplicates.json")
     )
     assert tree_processing.RGB_duplicates_check(duplicate_annotation_data) is True

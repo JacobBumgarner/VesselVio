@@ -7,13 +7,16 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
-class AnalysisFiles:
+from library.annotation import tree_processing
+
+
+class AnalysisFileHandler:
     """A"""
 
     def __init__(self):
         self.main_files = []
         self.associated_files = []
-        self.annotation_JSON = None
+        self.annotation_data = None
 
     def add_main_files(self, files: list):
         """Add main file(s) to the file list.
@@ -22,8 +25,6 @@ class AnalysisFiles:
         files : list
             A list of str file paths. Updates the self.column1_files attribute.
         """
-        if not isinstance(files, list):
-            raise TypeError("``files`` must be a list.")
         self.main_files.extend(files)
 
     def add_associated_files(self, files: list):
@@ -34,6 +35,32 @@ class AnalysisFiles:
             A list of str file paths. Updates the self.column1_files attribute.
         """
         self.associated_files.extend(files)
+
+    def add_annotation_JSON(self, annotation_file: str) -> bool:
+        """Add an annotation file to the dataset.
+
+        Parameters:
+        annotation_file : str
+            The filepath to the JSON-based annotation file.
+
+        Returns:
+        bool : added
+        """
+        if not tree_processing.check_annotation_data_origin(annotation_file):
+            return False
+
+        self.annotation_data = tree_processing.load_vesselvio_annotation_file(
+            annotation_file
+        )
+        return True
+
+    def paired_files_check(self):
+        """Return a bool indicating that the length of file lists is equal.
+
+        Returns:
+        bool : equal_lengths
+        """
+        return len(self.main_files) == len(self.associated_files)
 
     def clear_analysis_files(self):
         """Clear the files from the table."""

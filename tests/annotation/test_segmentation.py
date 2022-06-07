@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import numpy as np
 
@@ -8,9 +9,9 @@ from library.annotation import segmentation
 from skimage.io import imread
 
 
-THIS_PATH = os.path.realpath(__file__)
-FIXTURE_DIR = os.path.join(os.path.dirname(THIS_PATH), "test_files")
-ANNOTATION_DIR = os.path.join(FIXTURE_DIR, "annotation_data")
+THIS_PATH = Path(__file__).parent.absolute()
+FIXTURE_DIR = Path(*THIS_PATH.parts[: list(THIS_PATH.parts).index("tests") + 1])
+ANNOTATION_DIR = os.path.join(FIXTURE_DIR, "test_files", "annotation_data")
 
 
 segmentation_data = [

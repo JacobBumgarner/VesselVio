@@ -38,7 +38,23 @@ class JSON_Options:
         self.color = color
 
 
-def load_annotation_file(file: str) -> dict:
+def check_annotation_data_origin(file: str) -> bool:
+    """Confirm that a loaded annotation data JSON comes from VesselVio.
+
+    Parameters:
+    file : str
+
+    Returns:
+    bool : compatible_data
+        A tree structure dict containing the name, color, id, and children of
+        each region.
+    """
+    with open(file) as f:
+        annotation_data = json.load(f)
+    return "VesselVio Annotations" in annotation_data.keys()
+
+
+def load_vesselvio_annotation_file(file: str) -> dict:
     """Load a VesselVio Annotation file.
 
     Parameters:
