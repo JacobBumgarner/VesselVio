@@ -18,14 +18,6 @@ import imageio_ffmpeg  # Needed for PyInstaller
 import pyvista as pv
 from imageio import get_writer
 
-from library import (
-    helpers,
-    input_classes as IC,
-    movie_processing as MovProc,
-    qt_threading as QtTh,
-)
-from library.gui import qt_objects as QtO
-
 from PyQt5.Qt import pyqtSlot
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
@@ -43,6 +35,14 @@ from PyQt5.QtWidgets import (
     QTableWidgetItem,
     QWidget,
 )
+
+from library import (
+    helpers,
+    input_classes as IC,
+    movie_processing as MovProc,
+    qt_threading as QtTh,
+)
+from library.gui import qt_objects as QtO
 
 
 #####################

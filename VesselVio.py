@@ -11,7 +11,7 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 import os
 import sys
 
-from library.gui import analysis_page
+from library.gui import AnalysisPage
 
 os.environ["QT_MAC_WANTS_LAYER"] = "1"
 
@@ -59,7 +59,7 @@ class mainWindow(QMainWindow):
 
         self.qStack = QStackedWidget()  # Stacked widget for the pages
 
-        self.page1 = analysis_page.AnalysisPage()
+        self.page1 = AnalysisPage()
         self.page2 = visualization_page.VisualizationPage(self.plotter, self)
         self.page3 = annotation_page.AnnotationPage()
 

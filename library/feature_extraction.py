@@ -16,10 +16,10 @@ from time import perf_counter as pf
 
 import numpy as np
 from geomdl import knotvector
-
-from library import graph_processing as GProc, helpers, image_processing as ImProc
 from numba import njit
 from scipy import interpolate
+
+from library import graph_processing as GProc, helpers, image_processing as ImProc
 
 
 #############################

@@ -17,9 +17,9 @@ import matplotlib.pyplot as plt
 import mcubes
 import numpy as np
 import pyvista as pv
+from numba import njit, prange
 
 from library import helpers, input_classes as IC, volume_processing as VolProc
-from numba import njit, prange
 
 
 ############################

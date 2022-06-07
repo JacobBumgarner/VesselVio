@@ -15,19 +15,6 @@ import sys
 
 import numpy as np
 import pyvista as pv
-
-from library import (
-    helpers,
-    image_processing as ImProc,
-    input_classes as IC,
-    qt_threading as QtTh,
-)
-from library.annotation.tree_processing import RGB_duplicates_check
-
-from library.gui import qt_objects as QtO
-from library.gui.analysis_page import AnalysisOptions, GraphOptions
-from library.gui.annotation_page import RGB_Warning
-from library.gui.movie_widgets import MovieDialogue, RenderDialogue
 from PyQt5.Qt import pyqtSlot
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import (
@@ -45,6 +32,18 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 from pyvistaqt import QtInteractor
+
+from library import (
+    helpers,
+    image_processing as ImProc,
+    input_classes as IC,
+    qt_threading as QtTh,
+)
+from library.annotation.tree_processing import RGB_duplicates_check
+
+from library.gui import AnalysisOptions, GraphOptions, qt_objects as QtO
+from library.gui.annotation_page import RGB_Warning
+from library.gui.movie_widgets import MovieDialogue, RenderDialogue
 
 
 class mainWindow(QMainWindow):

@@ -14,9 +14,9 @@ from time import perf_counter as pf
 
 import igraph as ig
 import numpy as np
+from numba import njit
 
 from library import feature_extraction as FeatExt, helpers, volume_processing as VolProc
-from numba import njit
 
 
 #######################

@@ -10,9 +10,10 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
+from PyQt5.QtWidgets import QLabel, QWidget
+
 from library import input_classes as IC
 from library.gui import qt_objects as QtO
-from PyQt5.QtWidgets import QLabel, QWidget
 
 
 class GraphOptions(QWidget):

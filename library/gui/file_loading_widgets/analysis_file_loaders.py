@@ -9,10 +9,10 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 import os
 
+from PyQt5.QtWidgets import QDialog, QLabel, QLayout
+
 from library.file_processing import dataset_io
 from library.gui import qt_objects as QtO
-
-from PyQt5.QtWidgets import QDialog, QLabel, QLayout
 
 
 ## File loading

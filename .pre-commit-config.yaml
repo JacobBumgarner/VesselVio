@@ -3,6 +3,7 @@ repos:
   rev: v1.3.1
   hooks:
   - id: ufmt
+    exclude: __init__.py
 
 - repo: https://gitlab.com/PyCQA/flake8
   rev: 3.9.2

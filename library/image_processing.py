@@ -16,9 +16,9 @@ from time import perf_counter as pf
 import cv2
 import nibabel
 import numpy as np
+from skimage.io import imread
 
 from library import helpers
-from skimage.io import imread
 
 ## Global min_resolution variable
 min_resolution = 1

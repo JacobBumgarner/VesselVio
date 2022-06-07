@@ -14,9 +14,9 @@ from math import ceil
 import numpy as np
 import pyvista as pv
 
-from library import helpers, input_classes as IC
-
 from scipy import interpolate
+
+from library import helpers, input_classes as IC
 
 
 ################################

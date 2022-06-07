@@ -12,11 +12,6 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 import json
 import os
 
-from library import helpers
-
-from library.annotation import tree_processing
-from library.gui import qt_objects as QtO
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QAbstractItemView,
@@ -38,6 +33,11 @@ from PyQt5.QtWidgets import (
     QTreeWidgetItem,
     QWidget,
 )
+
+from library import helpers
+
+from library.annotation import tree_processing
+from library.gui import qt_objects as QtO
 
 
 class mainWindow(QMainWindow):

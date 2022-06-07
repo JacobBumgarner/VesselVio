@@ -15,6 +15,8 @@ from time import perf_counter as pf, sleep
 import igraph as ig
 import numpy as np
 
+from PyQt5.QtCore import pyqtSignal, QThread
+
 from library import (
     feature_extraction as FeatExt,
     graph_io as GIO,
@@ -27,8 +29,6 @@ from library import (
     volume_visualization as VolVis,
 )
 from library.annotation import labeling, segmentation, segmentation_prep
-
-from PyQt5.QtCore import pyqtSignal, QThread
 
 
 ################

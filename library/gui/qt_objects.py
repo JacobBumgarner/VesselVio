@@ -9,7 +9,6 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
-from library import helpers
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import (
     QButtonGroup,
@@ -30,6 +29,8 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
+from library import helpers
 
 
 ###############
