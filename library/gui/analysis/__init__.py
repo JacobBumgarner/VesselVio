@@ -1,4 +1,5 @@
-from .file_manager import FileManager
+from .analysis_file_controller import AnalysisFileController
 from .file_table import AnalysisFileTable
-from .results_path_manager import ResultsPathManager
+from .results_path_controller import ResultsPathManager
+from .anlaysis_controller import AnalysisController
 from .analysis_page import AnalysisPage

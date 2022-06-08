@@ -12,14 +12,16 @@ from typing import Union
 from library.annotation import tree_processing
 
 
-class AnalysisFileHandler:
-    """A"""
+class AnalysisFileManager:
+    """The class that stores and manages the input files used for analyses."""
 
     def __init__(self):
+        """Initialize the manager."""
         self.main_files = []
         self.associated_files = []
         self.annotation_data = None
 
+    # File addition
     def add_main_files(self, files: list):
         """Add main file(s) to the file list.
 
@@ -56,7 +58,8 @@ class AnalysisFileHandler:
         )
         return True
 
-    def remove_main_files(self, indices: Union[int, list]):
+    # File removal
+    def remove_main_files(self, selected: Union[int, list]):
         """Remove the indicated files from the main files list.
 
         Parameters:
@@ -64,14 +67,17 @@ class AnalysisFileHandler:
             The single selection or top and bottom indices of the selection
             of files to be removed from the list. The top index will be removed.
         """
-        if isinstance(indices, int):
-            self.main_files.pop(indices)
-        elif isinstance(indices, list) and len(indices) == 2:
-            for index in range(indices[0], indices[1] + 1):
-                self.main_files.pop(indices[0])
+        if not self.main_files:
+            return
+
+        if isinstance(selected, int):
+            self.main_files.pop(selected)
+        elif isinstance(selected, list):
+            for row in selected:
+                self.main_files.pop(row)
         return
 
-    def remove_associated_files(self, indices: Union[int, list]):
+    def remove_associated_files(self, selected: Union[int, list]):
         """Remove the indicated files from the associated files list.
 
         Parameters:
@@ -79,31 +85,38 @@ class AnalysisFileHandler:
             The single selection or top and bottom indices of the selection
             of files to be removed from the list.
         """
-        if isinstance(indices, int):
-            self.associated_files.pop(indices)
-        elif isinstance(indices, list) and len(indices) == 2:
-            for index in range(indices[0], indices[1] + 1):
-                self.associated_files.pop(indices[0])
+        if not self.associated_files:
+            return
+
+        if isinstance(selected, int):
+            self.associated_files.pop(selected)
+        elif isinstance(selected, list):
+            for row in selected:
+                self.associated_files.pop(row)
         return
 
-    def paired_files_check(self):
-        """Return a bool indicating that the length of file lists is equal.
+    def clear_selected_files(self, selected: Union[int, list]):
+        """Remove the indicated files from the file lists.
 
-        Returns:
-        bool : equal_lengths
+        Parameters:
+        indices : int, list
+            The single selection or top and bottom indices of the selection
+            of files to be removed from the list.
         """
-        return len(self.main_files) == len(self.associated_files)
+        self.remove_main_files(selected)
+        self.remove_associated_files(selected)
 
+    # Resetting
     def clear_analysis_files(self):
         """Clear the files from the table."""
         self.main_files = []
         self.associated_files = []
 
-    def clear_annotation_JSON(self):
+    def clear_annotation_data(self):
         """Clear the input annotation JSON file."""
-        self.annotation_JSON = None
+        self.annotation_data = None
 
     def clear_all_files(self):
         """Reset the object and clear all files."""
         self.clear_analysis_files()
-        self.clear_annotation_JSON()
+        self.clear_annotation_data()

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from library.objects.analysis_file_handler import AnalysisFileHandler
+from library.objects.analysis_file_manager import AnalysisFileHandler
 
 
 THIS_PATH = Path(__file__).parent.absolute()

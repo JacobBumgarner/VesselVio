@@ -178,7 +178,7 @@ def load_graph_file(graph_format):
     return files[0]
 
 
-def load_graph_files(graph_format):
+def load_graph_files(graph_format: str):
     message = f"Load {graph_format} files"
     file_filter = f"{graph_format} (*.{graph_format})"
     files = QFileDialog.getOpenFileNames(

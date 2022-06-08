@@ -19,11 +19,11 @@ def load_volume_files(message="Load volume files"):
 
     Parameters:
     message : str, optional
-        Message for the loading dialog. Default ``"Load volume files"``
+        Message for the loading dialog. Default ``"Load volume files"``.
 
     Returns:
     list, None
-        List of the selected files, or None if no files were selected
+        List of the selected files, or None if no files were selected.
 
     """
     file_filter = "Images (*.nii *.png *.bmp *.tif *.tiff *.jpg *.jpeg)"
@@ -40,11 +40,11 @@ def load_volume_file(message="Load volume file"):
 
     Parameters:
     message : str, optional
-        Message for the loading dialog. Default ``"Load volume file"``
+        Message for the loading dialog. Default ``"Load volume file"``.
 
     Returns:
     list, None
-        List of the selected files, or None if no files were selected
+        List of the selected files, or None if no files were selected.
 
     """
     file_filter = "Images (*.nii *.png *.bmp *.tif *.tiff *.jpg *.jpeg)"
@@ -56,18 +56,18 @@ def load_volume_file(message="Load volume file"):
     return file
 
 
-def load_graph_file(graph_format, message=None):
+def load_graph_file(graph_format: str, message=None):
     """Return the selected graph file of the specified format.
 
     Parameters:
     graph_format : str
 
     message : str, optional
-        Message for the loading dialog. Default f"Load {graph_format} file"
+        Message for the loading dialog. Default f"Load {graph_format} file".
 
     Returns:
     str, None
-        List of the selected files, or None if no files were selected
+        List of the selected files, or None if no files were selected.
 
     """
     if not message:
@@ -79,18 +79,18 @@ def load_graph_file(graph_format, message=None):
     return files[0]
 
 
-def load_graph_files(graph_format, message=None):
+def load_graph_files(graph_format: str, message=None):
     """Return the selected graph files of the specified format.
 
     Parameters:
     graph_format : str
 
     message : str, optional
-        Message for the loading dialog. Default f"Load {graph_format} files"
+        Message for the loading dialog. Default f"Load {graph_format} files".
 
     Returns:
     list, None
-        List of the selected files, or None if no files were selected
+        List of the selected files, or None if no files were selected.
 
     """
     if not message:
@@ -109,11 +109,12 @@ def load_nii_annotation_files(message="Load .nii annotation files"):
 
     Parameters:
     message : str, optional
-        Message for the loading dialog. Default ``"Load .nii annotation files"``
+        Message for the loading dialog.
+        Default ``"Load .nii annotation files"``.
 
     Returns:
     list, None
-        List of the selected files, or None if no files were selected
+        List of the selected files, or None if no files were selected.
 
     """
     file_filter = "nii (*.nii)"
@@ -130,7 +131,7 @@ def load_nii_annotation_file(message="Load .nii annotation file"):
 
     Parameters:
     message : str, optional
-        Message for the loading dialog. Default ``"Load .nii annotation file"``
+        Message for the loading dialog. Default ``"Load .nii annotation file"``.
 
     Returns:
     str
@@ -150,7 +151,7 @@ def load_RGB_folder(message="Select RGB annotation folder"):
 
     Parameters:
     message : str, optional
-        Default: ``"Select RGB annotation folder"``
+        Default: ``"Select RGB annotation folder"``.
 
     Returns:
     folder : str
@@ -164,3 +165,20 @@ def load_RGB_folder(message="Select RGB annotation folder"):
     if folder:
         folder = path_processing.std_path(folder)
     return folder
+
+
+def load_JSON(message="Select VesselVio Annotation JSON File"):
+    """Open a QFileDialog to load a JSON file.
+
+    Parameters:
+    message : str
+        Default: ``"Select VesselVio Annotation JSON File"``.
+    """
+    file_filter = "json (*.json)"
+    loaded_file = QFileDialog.getOpenFileName(
+        QFileDialog(), message, path_processing.get_desktop_path(), file_filter
+    )[0]
+
+    if loaded_file:
+        loaded_file = path_processing.std_path(loaded_file)
+    return loaded_file

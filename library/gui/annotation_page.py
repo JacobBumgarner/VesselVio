@@ -37,6 +37,7 @@ from PyQt5.QtWidgets import (
 from library import helpers
 
 from library.annotation import tree_processing
+from library.file_processing import dataset_io
 from library.gui import qt_objects as QtO
 
 
@@ -553,7 +554,7 @@ class LoadTreeFile(QDialog):
         return
 
     def load_json_file(self):
-        loaded_file = helpers.load_JSON(helpers.get_dir("Desktop"))
+        loaded_file = dataset_io.load_JSON(helpers.get_dir("Desktop"))
         if loaded_file:
             self.file_name = loaded_file
             self.accept()

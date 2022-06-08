@@ -40,7 +40,7 @@ from library import (
     qt_threading as QtTh,
 )
 from library.annotation.tree_processing import RGB_duplicates_check
-
+from library.file_processing import dataset_io
 from library.gui import AnalysisOptions, GraphOptions, qt_objects as QtO
 from library.gui.annotation_page import RGB_Warning
 from library.gui.movie_widgets import MovieDialogue, RenderDialogue
@@ -738,10 +738,10 @@ class LoadingDialog(QDialog):
     ## File selection
     def select_file1(self):
         if self.datasetType.currentText() == "Volume":
-            file = helpers.load_volume_file()
+            file = dataset_io.load_volume_file()
         else:
             graph_type = self.graphOptions.graphFormat.currentText()
-            file = helpers.load_graph_file(graph_type)
+            file = dataset_io.load_graph_file(graph_type)
 
         if file:
             self.files.file1 = file
@@ -751,12 +751,12 @@ class LoadingDialog(QDialog):
     def select_file2(self):
         if self.datasetType.currentText() == "Volume":
             if self.annotationType.currentText() == "ID":
-                file = helpers.load_nii_annotation_file()
+                file = dataset_io.load_nii_annotation_file()
             else:
-                file = helpers.load_RGB_folder()
+                file = dataset_io.load_RGB_folder()
         else:
             graph_type = self.graphOptions.graphFormat.currentText()
-            file = helpers.load_graph_file(graph_type)
+            file = dataset_io.load_graph_file(graph_type)
 
         if file:
             self.files.file2 = file
@@ -779,7 +779,7 @@ class LoadingDialog(QDialog):
         return
 
     def load_annotation_file(self):
-        loaded_file = helpers.load_JSON(helpers.get_dir("Desktop"))
+        loaded_file = dataset_io.load_JSON()
 
         if loaded_file:
             with open(loaded_file) as f:

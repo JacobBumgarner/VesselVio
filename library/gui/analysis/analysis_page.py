@@ -16,14 +16,15 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 from PyQt5.QtWidgets import QMessageBox, QTabWidget, QWidget
 
-from library import helpers, qt_threading as QtTh
+from library import qt_threading as QtTh
 from library.gui import AnalysisOptions, GraphOptions, qt_objects as QtO
-from library.gui.analysis import AnalysisFileTable, FileManager, ResultsPathManager
-
-from library.gui.file_loading_widgets.analysis_file_loaders import (
-    AnnotationFileLoader,
-    CSVGraphFileLoader,
+from library.gui.analysis import (
+    AnalysisController,
+    AnalysisFileController,
+    AnalysisFileTable,
+    ResultsPathManager,
 )
+from library.objects import AnalysisFileManager
 
 
 class AnalysisPage(QWidget):
@@ -38,19 +39,32 @@ class AnalysisPage(QWidget):
     def __init__(self):
         """Build the analysis page."""
         super().__init__()
-        self.analyzed = False
+
+        # Initialize all of the objects up front. Organization below.
+        self.file_mananger = AnalysisFileManager()
+        self.optionsBox = QTabWidget()
+        self.graphOptions = GraphOptions()
+        self.analysisOptions = AnalysisOptions()
+        self.fileTable = AnalysisFileTable(self.file_mananger)
+        self.fileController = AnalysisFileController(
+            self.file_mananger, self.fileTable, self.graphOptions
+        )
+        self.resultsPathManager = ResultsPathManager()
+        self.analysisController = AnalysisController(
+            self.run_analysis, self.cancel_analysis
+        )
 
         ### This page is organized into two vertical sections.
         pageLayout = QtO.new_layout(self, "V", spacing=5, margins=20)
 
-        ## Top section - two widgets: file loading and file table
+        ## Top section - two widgets: fileManager
         topWidget = QtO.new_widget()
         topLayout = QtO.new_layout(topWidget, margins=(0, 0, 0, 0))
 
-        # Top right - file table widget, results export widget
+        # Top right - two widgets: file table widget, results export widget
         topRightWidget = QtO.new_widget()
         topRightLayout = QtO.new_layout(topRightWidget, "V", no_spacing=True)
-        self.fileTable = AnalysisFileTable()
+        self.fileTable = AnalysisFileTable(self.file_mananger)
 
         # Result path manager
         self.resultsPathManager = ResultsPathManager()
@@ -58,8 +72,10 @@ class AnalysisPage(QWidget):
         QtO.add_widgets(topRightLayout, [self.fileTable, self.resultsPathManager])
 
         # Top left - file manager
-        self.fileManager = FileManager(self.fileTable)
-        self.fileManager.loadButton.clicked.connect(self.load_files)
+        self.fileManager = AnalysisFileController(
+            self.file_mananger,
+            self.fileTable,
+        )
 
         # Add widgets to the top layout
         QtO.add_widgets(topLayout, [self.fileManager, topRightWidget])
@@ -74,70 +90,17 @@ class AnalysisPage(QWidget):
         spacer = QtO.new_widget(150)
 
         # Middle column is a tab widget
-        self.analysisOptions = AnalysisOptions()
-        self.graphOptions = GraphOptions(self.fileTable)
-        self.optionsTab = QTabWidget()
-        self.optionsTab.addTab(self.analysisOptions, "Analysis Options")
-        self.optionsTab.addTab(self.graphOptions, "Graph File Options")
+        self.optionsBox.addTab(self.analysisOptions, "Analysis Options")
+        self.optionsBox.addTab(self.graphOptions, "Graph File Options")
+        self.optionsBox.setTabEnabled(1, False)
 
-        # Connect the loading filetype to the second options tab
-        self.optionsTab.setTabEnabled(1, False)
-        self.fileManager.datasetType.currentIndexChanged.connect(self.update_table_view)
-
-        # Right column
-        rightColumn = QtO.new_layout(orient="V", spacing=13)
-        self.analyzeButton = QtO.new_button("Analyze", self.run_analysis)
-        self.cancelButton = QtO.new_button("Cancel", self.cancel_analysis)
-        self.cancelButton.setDisabled(True)
-        QtO.add_widgets(rightColumn, [0, self.analyzeButton, self.cancelButton, 0])
-
-        QtO.add_widgets(bottomLayout, [spacer, 0, self.optionsTab, rightColumn, 0])
+        # Bottom Layout
+        QtO.add_widgets(
+            bottomLayout, [spacer, 0, self.optionsTab, self.analysisController, 0]
+        )
 
         ## Add it all together
         QtO.add_widgets(pageLayout, [topWidget, bottomWidget])
-
-    ## File loading
-    def load_files(self):
-        """Load files based on the selected filetypes.
-
-        Dispatches loading for segmented files, annotation files,
-        and graph files.
-        """
-        dataset_type = self.fileManager.datasetType.currentText()
-        annotation_type = self.fileManager.annotationType.currentText()
-        graph_format = self.graphOptions.graphFormat.currentText()
-
-        column1_files, column2_files = None, None
-        self.file_loader = None
-        if dataset_type == "Volume":
-            if annotation_type == "None":
-                column1_files = helpers.load_volume_files()
-            else:
-                self.file_loader = AnnotationFileLoader(annotation_type)
-
-        elif dataset_type == "Graph":
-            if graph_format == "CSV":
-                self.file_loader = CSVGraphFileLoader()
-            else:
-                column1_files = helpers.load_graph_files(graph_format)
-
-        # If dual file loading is necessary, exec the file loader.
-        if self.file_loader and self.file_loader.exec_():
-            if self.file_loader.column1_files:
-                column1_files = self.file_loader.column1_files
-            if self.file_loader.column2_files:
-                column2_files = self.file_loader.column2_files
-            del self.file_loader
-
-        if self.analyzed:
-            self.fileTable.clear_files()
-            self.analyzed = False
-        if column1_files:
-            self.fileTable.add_column1_files(column1_files)
-        if column2_files:
-            self.fileTable.add_column2_files(column2_files)
-
-        return
 
     # Analysis Processing
     def run_analysis(self):
@@ -293,22 +256,3 @@ class AnalysisPage(QWidget):
         )
         msgBox.setText(message)
         msgBox.exec_()
-
-    # Tab viewing
-    def update_table_view(self):
-        """Update the view of the file loading table.
-
-        If an annotation-based analysis or a CSV graph-based analysis are
-        selected, an additional column is added for the relevant files.
-        """
-        active = False
-        if self.fileManager.datasetType.currentText() == "Graph":
-            active = True
-            if self.graphOptions.graphFormat.currentText() != "CSV":
-                self.fileTable.apply_default_layout()
-            else:
-                self.fileTable.apply_csv_layout()
-        elif self.fileManager.annotationType.currentText() != "None":
-            self.fileTable.apply_annotation_layout()
-        self.optionsTab.setTabEnabled(1, active)
-        return

@@ -22,8 +22,8 @@ class CSVGraphFileLoader(QDialog):
     def __init__(self):
         """Build the CSV file loader."""
         super().__init__()
-        self.column1_files = []
-        self.column2_files = []
+        self.main_files = None
+        self.associated_files = None
 
         # Dialog contains a form layout with a cancel button
         windowLayout = QtO.new_layout(orient="V")
@@ -66,7 +66,7 @@ class CSVGraphFileLoader(QDialog):
             graph_format="csv", message="Load CSV vertex files"
         )
         if files:
-            self.column1_files += files
+            self.main_files = files
             self.accept()
         return
 
@@ -76,7 +76,7 @@ class CSVGraphFileLoader(QDialog):
             graph_format="csv", message="Load CSV edge files"
         )
         if files:
-            self.column2_files += files
+            self.associated_files = files
             self.accept()
         return
 
@@ -97,8 +97,8 @@ class AnnotationFileLoader(QDialog):
     def __init__(self, annotation_type):
         """Build the file loading widget."""
         super().__init__()
-        self.column1_files = []
-        self.column2_files = []
+        self.main_files = None
+        self.associated_files = None
         self.annotation_type = annotation_type
 
         # Dialog contains a form layout with a cancel button
@@ -145,7 +145,7 @@ class AnnotationFileLoader(QDialog):
         """Load volume files for the analysis."""
         files = dataset_io.load_volume_files()
         if files:
-            self.column1_files += files
+            self.main_files = files
             self.accept()
         return
 
@@ -168,7 +168,7 @@ class AnnotationFileLoader(QDialog):
                 ]
 
         if files:
-            self.column2_files += files
+            self.associated_files = files
             self.accept()
         return
 
