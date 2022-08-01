@@ -41,7 +41,7 @@ from library import (
 )
 from library.annotation.tree_processing import RGB_duplicates_check
 from library.file_processing import dataset_io
-from library.gui import AnalysisOptions, GraphOptions, qt_objects as QtO
+from library.gui import AnalysisOptionsWidget, GraphOptionsWidget, qt_objects as QtO
 from library.gui.annotation_page import RGB_Warning
 from library.gui.movie_widgets import MovieDialogue, RenderDialogue
 
@@ -287,7 +287,7 @@ class VisualizationDialog(QDialog):
 
         analysisBox = QGroupBox()
         analysisLayout = QtO.new_layout(analysisBox, no_spacing=True)
-        self.analysisOptions = AnalysisOptions(visualizing=True)
+        self.analysisOptions = AnalysisOptionsWidget(visualizing=True)
 
         # If a centerline graph was loaded, add centerline smoothing buttons
         if self.files.dataset_type == "Graph":
@@ -616,7 +616,7 @@ class LoadingDialog(QDialog):
         graphHeader = QLabel("<b>Graph File Options")
         bottomBox = QGroupBox()
         bottomBoxLayout = QtO.new_layout(bottomBox, no_spacing=True)
-        self.graphOptions = GraphOptions()
+        self.graphOptions = GraphOptionsWidget()
 
         self.graphOptions.graphFormat.currentIndexChanged.connect(self.toggle_type)
         self.graphOptions.centerlineLine.setVisible(False)
