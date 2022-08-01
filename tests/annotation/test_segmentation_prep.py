@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-import numba
 import numpy as np
 
 import pytest
@@ -73,8 +72,7 @@ def test_prep_roi_array(datafile, expected_keys):
     )
 
     roi_array = segmentation_prep.build_roi_array(annotation_data, "ID")
-    id_dict, id_keys = segmentation_prep.prep_roi_array(roi_array)
-    assert isinstance(id_dict, numba.typed.typeddict.Dict)
+    id_dict, id_keys = segmentation_prep.prep_roi_array.py_func(roi_array)
     assert isinstance(id_keys, set)
     assert len(id_keys) == expected_keys
     return
@@ -87,7 +85,9 @@ def test_prep_volume_arrays(datafiles):
     )
 
     roi_array = segmentation_prep.build_roi_array(annotation_data, "ID")
-    roi_volumes, volume_updates = segmentation_prep.prep_volume_arrays(roi_array)
+    roi_volumes, volume_updates = segmentation_prep.prep_volume_arrays.py_func(
+        roi_array
+    )
 
     assert isinstance(roi_volumes, np.ndarray)
     assert roi_volumes.shape == (6,)
@@ -98,7 +98,9 @@ def test_build_minima_maxima_arrays():
     volume = np.zeros((5, 10, 10))
     roi_array = np.zeros((10, 5))
 
-    minima, maxima = segmentation_prep.build_minima_maxima_arrays(volume, roi_array)
+    minima, maxima = segmentation_prep.build_minima_maxima_arrays.py_func(
+        volume, roi_array
+    )
     assert minima.shape == (roi_array.shape[0], 3)
     assert maxima.shape == (roi_array.shape[0], 3)
 

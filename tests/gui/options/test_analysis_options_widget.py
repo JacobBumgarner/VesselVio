@@ -1,14 +1,21 @@
+import sys
+from pathlib import Path
+
+VESSELVIO_DIR = Path.cwd()
+sys.path.insert(1, str(VESSELVIO_DIR))
+
+
 from library import input_classes as IC
-from library.gui.options_widgets.analysis_options_widget import AnalysisOptions
+from library.gui.options_widgets.analysis_options_widget import AnalysisOptionsWidget
 from PyQt5.QtCore import Qt
 
 
-def test_widget_creation(qtbot):
-    widget = AnalysisOptions(visualizing=False)
+def test_widget_init(qtbot):
+    widget = AnalysisOptionsWidget(visualizing=False)
     assert hasattr(widget, "saveGraph")
     assert hasattr(widget, "saveSegmentResults")
 
-    widget = AnalysisOptions(visualizing=True)
+    widget = AnalysisOptionsWidget(visualizing=True)
     assert not hasattr(widget, "saveGraph")
     assert not hasattr(widget, "saveSegmentResults")
 
@@ -16,7 +23,7 @@ def test_widget_creation(qtbot):
 
 
 def test_default_values(qtbot):
-    widget = AnalysisOptions()
+    widget = AnalysisOptionsWidget()
 
     # Resolution default values
     assert widget.isoResolution.value() == 1
@@ -31,7 +38,7 @@ def test_default_values(qtbot):
 
 
 def test_dimensions(qtbot):
-    widget = AnalysisOptions()
+    widget = AnalysisOptionsWidget()
     widget.show()
     qtbot.addWidget(widget)
 
@@ -44,7 +51,7 @@ def test_dimensions(qtbot):
 
 
 def test_isotropy(qtbot):
-    widget = AnalysisOptions()
+    widget = AnalysisOptionsWidget()
     widget.show()
     qtbot.addWidget(widget)
 
@@ -58,7 +65,7 @@ def test_isotropy(qtbot):
 
 
 def test_options_export(qtbot):
-    widget = AnalysisOptions()
+    widget = AnalysisOptionsWidget()
     widget.show()
     qtbot.addWidget(widget)
 

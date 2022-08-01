@@ -27,7 +27,7 @@ def test_segement_roi(minima, maxima, seg_id, roi_volume):
 
     minima = np.asarray(minima)
     maxima = np.asarray(maxima)
-    volume = segmentation.segment_roi(labeled_volume, minima, maxima, seg_id)
+    volume = segmentation.segment_roi.py_func(labeled_volume, minima, maxima, seg_id)
 
     assert volume.sum() == roi_volume
     return
@@ -38,6 +38,6 @@ def test_roi_segmenation_input(minima, maxima, seg_id, roi_volume):
     labeled_volume_fname = os.path.join(ANNOTATION_DIR, "test_labeled.nii")
 
     volume = segmentation.roi_segmentation_input(
-        minima, maxima, seg_id, labeled_volume_fname
+        minima, maxima, seg_id, labeled_volume_fname, verbose=True
     )
     assert volume.sum() == roi_volume
