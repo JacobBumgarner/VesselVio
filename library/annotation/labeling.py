@@ -131,7 +131,7 @@ def label_slice(
 ### RGB-Specific ###
 ####################
 @njit(cache=False)
-def convert_bgr_to_int(rgb_array) -> np.ndarray:
+def convert_bgr_to_int(rgb_array: np.ndarray) -> np.ndarray:
     """Collapse an RGB array into a single value along the RGB dimension.
 
     This function conducts bitwise shifts of the RGB values to identify the
