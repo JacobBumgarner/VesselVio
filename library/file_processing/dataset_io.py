@@ -1,6 +1,4 @@
-"""
-Dataset filepath processing functions.
-"""
+"""Dataset filepath processing functions."""
 
 __author__ = "Jacob Bumgarner <jrbumgarner@mix.wvu.edu>"
 __license__ = "GPLv3 - GNU General Pulic License v3 (see LICENSE)"
@@ -15,7 +13,7 @@ from PyQt5.QtWidgets import QFileDialog
 
 
 def load_volume_files(message="Load volume files"):
-    """Return selected image files
+    """Return selected image files.
 
     Parameters:
     message : str, optional
@@ -24,7 +22,6 @@ def load_volume_files(message="Load volume files"):
     Returns:
     list, None
         List of the selected files, or None if no files were selected.
-
     """
     file_filter = "Images (*.nii *.png *.bmp *.tif *.tiff *.jpg *.jpeg)"
     files = QFileDialog.getOpenFileNames(
