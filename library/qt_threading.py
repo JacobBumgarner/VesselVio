@@ -138,7 +138,7 @@ class VolumeThread(QThread):
                     if roi_volume > 0:
                         self.analysis_status.emit([i, f"Segmenting {roi_name}..."])
                         point_minima, point_maxima = minima[roi_id], maxima[roi_id]
-                        volume = segmentation.segmentation_input(
+                        volume = segmentation.roi_segmentation_input(
                             point_minima, point_maxima, roi_id + 1
                         )
                         # point_minima += 1
@@ -492,7 +492,7 @@ class VolumeVisualizationThread(QThread):
                 if roi_volume > 0:
                     self.analysis_status.emit([f"Segmenting {roi_name}...", progress])
                     point_minima, point_maxima = minima[roi_id], maxima[roi_id]
-                    volume = segmentation.segmentation_input(
+                    volume = segmentation.roi_segmentation_input(
                         point_minima, point_maxima, roi_id + 1
                     )
 
