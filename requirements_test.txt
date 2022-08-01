@@ -3,5 +3,6 @@
 pytest
 pytest-cov
 pytest-datafiles
+pytest-mock
 pytest-qt
 coverage
