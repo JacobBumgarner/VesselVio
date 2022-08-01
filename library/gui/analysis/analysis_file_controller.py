@@ -1,6 +1,4 @@
-"""
-The file controller for the analysis page.
-"""
+"""The file controller for the analysis page."""
 
 __author__ = "Jacob Bumgarner <jrbumgarner@mix.wvu.edu>"
 __license__ = "GPLv3 - GNU General Pulic License v3 (see LICENSE)"
@@ -10,34 +8,45 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 import os
 
-from PyQt5.QtWidgets import QGroupBox, QLabel, QWidget
+from PyQt5.QtWidgets import QLabel, QTabWidget, QWidget
 
 from library.file_processing import dataset_io
-from library.gui import (
-    AnalysisFileTable,
-    AnnotationFileLoader,
-    AnnotationJSONWarning,
-    CSVGraphFileLoader,
-    GraphOptions,
-    qt_objects as QtO,
-)
+from library.gui import qt_objects as QtO
+from library.gui.analysis import AnalysisFileTable
+from library.gui.file_loading_widgets import AnnotationFileLoader, CSVGraphFileLoader
+from library.gui.options_widgets import GraphOptionsWidget
+from library.gui.warnings import AnnotationJSONWarning
 from library.objects import AnalysisFileManager
 
 
 class AnalysisFileController(QWidget):
+    """The controller that manages file loading for the analysis page.
+
+    Parameters:
+    file_manager : AnalysisFileManager
+
+    fileTable : AnalysisFileTable
+
+    graphOptions : GraphOptions
+
+    optionsBox : QTabWidget
+        The QGroupBox that contains the AnalysisOptions and GraphOptions widgets.
+        Needed to control access to the GraphOptions tab.
+    """
+
     def __init__(
         self,
         file_manager: AnalysisFileManager,
         fileTable: AnalysisFileTable,
-        graphOptions: GraphOptions,
-        optionsBox: QGroupBox,
+        graphOptions: GraphOptionsWidget,
+        optionsBox: QTabWidget,
     ):
+        """Build the AnalysisFileController."""
         super().__init__()
         self.file_manager = file_manager
         self.fileTable = fileTable
         self.graphOptions = graphOptions  # simply to check the file_format
         self.optionsBox = optionsBox  # used to toggle graph options lock
-        self.analyzed = False  # analysis status
 
         self.setMinimumHeight(400)
         self.setFixedWidth(150)
@@ -45,26 +54,29 @@ class AnalysisFileController(QWidget):
         ## Loading column
         layout = QtO.new_layout(self, orient="V", margins=(0, 0, 0, 0))
 
-        loadButton = QtO.new_button("Load Files", self.file_loading_dispatch)
-        clearFileButton = QtO.new_button("Remove File", self.clear_selected_files)
-        clearAllFilesButton = QtO.new_button("Clear Files", self.clear_all_files)
+        self.loadButton = QtO.new_button("Load Files", self.file_loading_dispatch)
+        self.clearSelectedFileButton = QtO.new_button(
+            "Remove File", self.clear_selected_files
+        )
+        self.clearAllFilesButton = QtO.new_button("Clear Files", self.clear_all_files)
 
         # Volume Options
         datasetTypeHeader = QLabel("<b>Dataset Type:")
         self.datasetType = QtO.new_combo(
-            ["Volume", "Graph"], connect=self.file_type_options
+            ["Volume", "Graph"], connect=self.update_dataset_type_view
         )
 
         # Annotation options
         annotationTypeHeader = QLabel("<b>Annotation Type:")
         self.annotationType = QtO.new_combo(
-            ["None", "ID", "RGB"], connect=self.annotation_options
+            ["None", "ID", "RGB"], connect=self.update_annotation_type_view
         )
-        self.annotationType.currentIndexChanged.connect(self.update_JSON)
 
         # Load annotation
         self.annotationLoadingWidget = QtO.new_widget()
-        aFileLayout = QtO.new_layout(self.loadAnnotationFile, "V", margins=(0, 0, 0, 0))
+        aFileLayout = QtO.new_layout(
+            self.annotationLoadingWidget, "V", margins=(0, 0, 0, 0)
+        )
 
         loadJSON = QtO.new_button("Load JSON", self.load_vesselvio_annotation_file)
         loadJSON.setToolTip(
@@ -72,16 +84,16 @@ class AnalysisFileController(QWidget):
         )
         loaded = QLabel("<center>Loaded JSON:")
         self.loadedJSON = QtO.new_line_edit("None", "Center", locked=True)
-        self.loadAnnotationFile.setVisible(False)
+        self.annotationLoadingWidget.setVisible(False)
         QtO.add_widgets(aFileLayout, [loadJSON, loaded, self.loadedJSON], "Center")
 
         QtO.add_widgets(
             layout,
             [
                 40,
-                loadButton,
-                clearFileButton,
-                clearAllFilesButton,
+                self.loadButton,
+                self.clearSelectedFileButton,
+                self.clearAllFilesButton,
                 QtO.new_line("H", 100),  # visual dividing line
                 datasetTypeHeader,
                 self.datasetType,
@@ -96,10 +108,10 @@ class AnalysisFileController(QWidget):
     def file_loading_dispatch(self):
         """Load the main files for the analysis.
 
-        Depending on the the dataset type and annotation type, opens a
-        QFileDialog or builds a FileLoadingDialog. If files are loaded, the
-        controller then updates AnalysisFileManager model and updates
-        the AnalysisFileTable.
+        Depending on the the dataset type and annotation type, open a QFileDialog
+        or build a FileLoadingDialog.
+
+        If files are loaded, the controller then updates AnalysisFileManager model and updates the AnalysisFileTable.
         """
         # collect shorthand copies of the relevant settings
         dataset_type = self.datasetType.currentText()
@@ -107,27 +119,19 @@ class AnalysisFileController(QWidget):
         graph_format = self.graphOptions.graphFormat.currentText()
 
         # if an analysis has been run, clear the analysis files
-        if self.analyzed:
+        if self.file_manager.analyzed:
             self.clear_all_files()
+            self.file_manager.analyzed = False
 
         # check to see if a simple file loader can be used
         if (dataset_type == "Volume" and annotation_type == "None") or (
             dataset_type == "Graph" and graph_format != "CSV"
         ):
             self.load_main_files(dataset_type, graph_format)
-            return
+        else:
+            self.open_multi_file_loader()
 
-        # if not, create a file loader
-        if annotation_type != "None":
-            fileLoader = AnnotationFileLoader()
-        elif graph_format == "CSV":
-            fileLoader = CSVGraphFileLoader()
-
-        if fileLoader.exec_():
-            if fileLoader.main_files:
-                self.update_main_files(fileLoader.main_files)
-            elif fileLoader.associated_files:
-                self.update_associated_files(fileLoader.associated_files)
+        self.fileTable.update_body()
 
     def load_main_files(self, dataset_type: str, graph_format: str):
         """Call the relevant function to load the specified main filetypes."""
@@ -138,6 +142,21 @@ class AnalysisFileController(QWidget):
 
         if main_files:
             self.update_main_files(main_files)
+
+    def open_multi_file_loader(self):
+        """Open a multi-file loader widget."""
+        annotation_type = self.annotationType.currentText()
+        graph_format = self.graphOptions.graphFormat.currentText()
+        if annotation_type != "None":
+            self.fileLoader = AnnotationFileLoader(annotation_type)
+        elif graph_format == "CSV":
+            self.fileLoader = CSVGraphFileLoader()
+
+        if self.fileLoader.exec_():
+            if self.fileLoader.main_files:
+                self.update_main_files(self.fileLoader.main_files)
+            elif self.fileLoader.associated_files:
+                self.update_associated_files(self.fileLoader.associated_files)
 
     def update_main_files(self, main_files: list):
         """Update the model and view with the loaded main files.
@@ -178,7 +197,7 @@ class AnalysisFileController(QWidget):
     def clear_selected_files(self):
         """Clear the selected files from the model and view."""
         selected_rows = self.fileTable.get_selected_row_indices()
-        if not len(selected_rows):
+        if not selected_rows:
             return
         self.fileTable.clear_selected_files(selected_rows)
         self.file_manager.clear_selected_files(selected_rows)
@@ -213,7 +232,8 @@ class AnalysisFileController(QWidget):
     def update_annotation_type_view(self):
         """Update the view of the annotation loading widget."""
         # Toggle the lock state of the annotation widget.
-        self.annotationType.setEnabled(self.datasetType.currentText() == "Volume")
+        enabled = self.datasetType.currentText() == "Volume"
+        self.annotationType.setEnabled(enabled)
 
         # Toggle the visibility of the loading widget
         visible = self.annotationType.currentIndex() > 0
@@ -224,7 +244,8 @@ class AnalysisFileController(QWidget):
             self.fileTable.apply_annotation_layout()
         else:
             self.loadedJSON.setText("None")
-            self.file_manager.clear_annotation_data()
+            self.file_manager.clear_all_files()
+            self.fileTable.apply_default_layout()
 
     def update_loaded_JSON_text(self, filename="None"):
         """Update the loadedJSON QLineEdit text.

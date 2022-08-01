@@ -17,12 +17,18 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 from PyQt5.QtWidgets import QMessageBox, QTabWidget, QWidget
 
 from library import qt_threading as QtTh
-from library.gui import AnalysisOptions, GraphOptions, qt_objects as QtO
+from library.gui import qt_objects as QtO
 from library.gui.analysis import (
     AnalysisController,
     AnalysisFileController,
     AnalysisFileTable,
-    ResultsPathManager,
+    ResultsPathController,
+)
+from library.gui.options_widgets import AnalysisOptionsWidget, GraphOptionsWidget
+from library.gui.warnings import (
+    IncompleteFileLoadingWarning,
+    PreviouslyAnalyzedWarning,
+    ResultsPathWarning,
 )
 from library.objects import AnalysisFileManager
 
@@ -30,10 +36,10 @@ from library.objects import AnalysisFileManager
 class AnalysisPage(QWidget):
     """The page for batch analysis of volumes and graphs.
 
-    Provides a GUI for users to load multiple datasets, including binary
-    volumes, annotated volumes, and graphs. Analysis and result export
-    options can be set, and batch analyses on the loaded datasets can be run.
-
+        Provides a GUI for users to load multiple datasets, including binary
+        volumes, annotated volumes, and graphs. Analysis and result export
+        options can be set, and batch analyses on the loaded datasets can be run.
+    s
     """
 
     def __init__(self):
@@ -43,13 +49,13 @@ class AnalysisPage(QWidget):
         # Initialize all of the objects up front. Organization below.
         self.file_mananger = AnalysisFileManager()
         self.optionsBox = QTabWidget()
-        self.graphOptions = GraphOptions()
-        self.analysisOptions = AnalysisOptions()
+        self.analysisOptions = AnalysisOptionsWidget()
         self.fileTable = AnalysisFileTable(self.file_mananger)
+        self.graphOptions = GraphOptionsWidget(self.fileTable)
+        self.resultsPathController = ResultsPathController()
         self.fileController = AnalysisFileController(
-            self.file_mananger, self.fileTable, self.graphOptions
+            self.file_mananger, self.fileTable, self.graphOptions, self.optionsBox
         )
-        self.resultsPathManager = ResultsPathManager()
         self.analysisController = AnalysisController(
             self.run_analysis, self.cancel_analysis
         )
@@ -57,28 +63,18 @@ class AnalysisPage(QWidget):
         ### This page is organized into two vertical sections.
         pageLayout = QtO.new_layout(self, "V", spacing=5, margins=20)
 
-        ## Top section - two widgets: fileManager
+        ## Top section - two widgets: fileController and top right widget
         topWidget = QtO.new_widget()
         topLayout = QtO.new_layout(topWidget, margins=(0, 0, 0, 0))
 
         # Top right - two widgets: file table widget, results export widget
         topRightWidget = QtO.new_widget()
         topRightLayout = QtO.new_layout(topRightWidget, "V", no_spacing=True)
-        self.fileTable = AnalysisFileTable(self.file_mananger)
 
-        # Result path manager
-        self.resultsPathManager = ResultsPathManager()
-
-        QtO.add_widgets(topRightLayout, [self.fileTable, self.resultsPathManager])
-
-        # Top left - file manager
-        self.fileManager = AnalysisFileController(
-            self.file_mananger,
-            self.fileTable,
-        )
+        QtO.add_widgets(topRightLayout, [self.fileTable, self.resultsPathController])
 
         # Add widgets to the top layout
-        QtO.add_widgets(topLayout, [self.fileManager, topRightWidget])
+        QtO.add_widgets(topLayout, [self.fileController, topRightWidget])
 
         ## Bottom section - three widgets: spacer, options, analyze/cancel
         # three column horizontal
@@ -96,7 +92,7 @@ class AnalysisPage(QWidget):
 
         # Bottom Layout
         QtO.add_widgets(
-            bottomLayout, [spacer, 0, self.optionsTab, self.analysisController, 0]
+            bottomLayout, [spacer, 0, self.optionsBox, self.analysisController, 0]
         )
 
         ## Add it all together
@@ -116,14 +112,8 @@ class AnalysisPage(QWidget):
         3. Start the QThread
 
         """
-        # If an analysis has already been run, make sure new files are loaded.
-        if self.analyzed:
-            self.analysis_warning()
-            return
-
-        # Make sure the appropriate files are loaded
-        if not self.file_check():
-            self.analysis_warning()
+        # Make sure everything is prepped correctly
+        if not self.pre_analysis_check():
             return
 
         # Check for the loaded files and initialize the appropriate QThread
@@ -138,8 +128,44 @@ class AnalysisPage(QWidget):
             self.fileTable.update_file_analysis_status
         )
         self.a_thread.start()
-        self.analyzed = True
+        self.file_mananger.analyzed = True
         return
+
+    def pre_analysis_check(self) -> bool:
+        """Check that the necessary steps have been completed for an analysis.
+
+        Returns:
+        bool
+            True if prepped correctly, False otherwise.
+        """
+        # If an analysis has already been run, make sure new files are loaded.
+        if self.fileController.analyzed:
+            PreviouslyAnalyzedWarning()
+            return False
+
+        # Make sure the appropriate files are loaded
+        any_loaded = self.fileTable.rowCount() > 0
+        dataset_type = self.fileController.datasetType.currentText()
+        annotation_check = (
+            dataset_type == "Volume"
+            and self.fileController.annotationType.currentText() != "None"
+        )
+        graph_check = (
+            dataset_type == "Graph"
+            and self.graphOptions.graphFormat.currentText() == "CSV"
+        )
+        print(annotation_check, graph_check)
+        if not any_loaded or annotation_check or graph_check:
+            IncompleteFileLoadingWarning()
+            return False
+
+        # Check that a results export path has been selected
+        if self.resultsPathController.results_dir == "None":
+            self.resultsPathController.highlight_empty_results_path_error()
+            ResultsPathWarning()
+            return False
+
+        return True
 
     # Volume analysis
     def initialize_volume_analysis(self):
@@ -148,7 +174,7 @@ class AnalysisPage(QWidget):
         Loads and prepares the relevant volume analysis options.
         """
         analysis_options = self.analysisOptions.prepare_options(
-            self.resultsPathManager.results_folder
+            self.resultsPathController.results_folder
         )
         analysis_options.annotation_type = self.fileManager.annotationType.currentText()
         self.a_thread = QtTh.VolumeThread(
@@ -166,7 +192,7 @@ class AnalysisPage(QWidget):
         Loads and prepares the relevant graph analysis options.
         """
         analysis_options = self.analysisOptions.prepare_options(
-            self.resultsPathManager.results_folder
+            self.resultsPathController.results_folder
         )
         graph_options = self.graphOptions.prepare_options()
         self.a_thread = QtTh.GraphThread(
@@ -198,43 +224,9 @@ class AnalysisPage(QWidget):
         """
         self.cancelButton.setEnabled(lock_state)
         self.fileManager.setDisabled(lock_state)
-        self.resultsPathManager.changeFolder.setDisabled(lock_state)
+        self.resultsPathController.changeFolder.setDisabled(lock_state)
         self.analyzeButton.setDisabled(lock_state)
         return
-
-    def file_check(self):
-        """Ensure that the appropriate files have been loaded for the analysis.
-
-        Returns:
-        bool
-            True if loaded correctly, False if incorrectly or incompletely
-            loaded
-        """
-        if not self.fileTable.column1_files:  # General file check
-            return False
-
-        if self.fileManager.datasetType.currentText() == "Volume":  # Specific check
-            if self.fileManager.annotationType.currentText() != "None":
-                if not self.column_file_check() or not self.fileManager.annotation_data:
-                    return False
-        if self.fileManager.datasetType.currentText() == "Graph":
-            if self.graphOptions.graphFormat.currentText() == "CSV":
-                if not self.column_file_check():
-                    return False
-        return True
-
-    def column_file_check(self):
-        """Ensures that two columns have equal file counts.
-
-        Returns
-        -------
-        bool
-            True if the number of files match, False if they are different
-        """
-        file_check = len(self.fileTable.column1_files) == len(
-            self.fileTable.column2_files
-        )
-        return file_check
 
     # Warnings
     def analysis_warning(self):

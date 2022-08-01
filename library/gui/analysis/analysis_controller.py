@@ -24,10 +24,11 @@ class AnalysisController(QWidget):
     """
 
     def __init__(self, start_function=None, end_function=None):
+        super().__init__()
         layout = QtO.new_layout(self, orient="V", spacing=13)
 
-        analyze_button = QtO.new_button("Analyze", start_function)
-        cancel_button = QtO.new_button("Cancel", end_function)
+        self.analyzeButton = QtO.new_button("Analyze", start_function)
+        self.cancelButton = QtO.new_button("Cancel", end_function)
         self.cancelButton.setDisabled(True)
 
-        QtO.add_widgets(layout, [0, analyze_button, cancel_button, 0])
+        QtO.add_widgets(layout, [0, self.analyzeButton, self.cancelButton, 0])

@@ -8,16 +8,14 @@ __copyright__ = "Copyright 2022 by Jacob Bumgarner"
 __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
+from typing import Union
 
-from PyQt5.QtWidgets import (
-    QAbstractItemView,
-    QHeaderView,
-    QTableWidget,
-    QTableWidgetItem,
-)
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QHeaderView, QTableWidget, QTableWidgetItem
 
+from library.file_processing import path_processing
 from library.gui import qt_objects as QtO
-from library.objects import AnalysisFileManager
+from library.objects import AnalysisFileManager, StatusUpdate
 
 
 class AnalysisFileTable(QTableWidget):
@@ -35,40 +33,27 @@ class AnalysisFileTable(QTableWidget):
         self.file_manager = file_manager
         self.layout_type = "Default"
 
+        self.setMinimumWidth(400)
         self.setShowGrid(False)
 
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setSelectionBehavior(QTableWidget.SelectRows)
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        # self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionMode(QTableWidget.MultiSelection)
         self.setEditTriggers(QTableWidget.NoEditTriggers)
 
-        self.verticalHeader().hide()
         self.horizontalHeader().setMinimumSectionSize(100)
+        self.horizontalHeader().setStretchLastSection(True)
+        self.horizontalHeader().setStretchLastSection(True)
 
-        self.setMinimumWidth(400)
-
-        self.apply_default_layout()
-
+        self.verticalHeader().hide()
         self.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.verticalHeader().setDefaultSectionSize(20)
 
+        self.apply_default_layout(startup=True)
+
     # File management
-    def update_main_file_list(self):
-        """Update the main file column."""
-        previous_file_count = self.rowCount()
-        self.setRowCount(len(self.file_manager.main_files))
-        for row in range(previous_file_count, self.rowCount()):
-            item = QTableWidgetItem(self.file_manager.main_files)
-            self.setItem(row, 0, item)
-
-    def update_associated_file_list(self):
-        """Update the associated file column."""
-        previous_file_count = self.rowCount()
-        self.setRowCount(len(self.file_manager.associated_files))
-        for row in range(previous_file_count, self.rowCount()):
-            item = QTableWidgetItem(self.file_manager.associated_files)
-            self.setItem(row, 1, item)
-
-    def clear_selected_files(self, selected_rows: list):
+    def clear_selected_files(self, selected_rows: Union[int, list] = None):
         """Clear the selected files from the table.
 
         Parameters:
@@ -85,17 +70,48 @@ class AnalysisFileTable(QTableWidget):
         self.setRowCount(0)
 
     # Layout management
-    def apply_default_layout(self):
+    def apply_default_layout(self, startup: bool = False):
         """Apply the default single file layout.
 
         Implements a two column layout:
         Column 1 shows file names.
         Column 2 shows the analysis status of the file.
+
+        Parameters:
+        startup : bool
+            Adjust the column sizes to the default width, emperically determined.
+            This necessary because the widget is resized after creation when being
+            built on startup, thereby destroying the default sizing.
         """
         self.layout_type = "Default"
 
         header = ["File Name", "File Status"]
-        self.set_table_layout(2, [300, 200], header)
+        file_width = self.width() - self.width() // 4
+        status_width = self.width() - file_width
+        widths = [file_width, status_width]
+
+        if startup:
+            widths = [675, 225]
+
+        self.set_table_layout(header, widths)
+        return
+
+    def apply_csv_layout(self):
+        """Update the table for loaded CSV files.
+
+        Implements a three column layout:
+        Column 1 shows the vertex file names.
+        Column 2 shows the edge file names.
+        Column 3 shows the analysis status of the file.
+        """
+        self.layout_type = "CSV"
+
+        header = ["File Name - Vertices", "File Name - Edges", "File Status"]
+        file_width = int(self.width() - self.width() // 4) / 2
+        status_width = self.width() - file_width * 2
+        widths = [file_width, file_width, status_width]
+
+        self.set_table_layout(header, widths)
         return
 
     def apply_annotation_layout(self):
@@ -115,71 +131,98 @@ class AnalysisFileTable(QTableWidget):
             "Regions Processed",
             "File Status",
         ]
-        self.set_table_layout(4, [200, 200, 150, 200], header)
+        widths = [
+            self.width() // 4 + (1 if x < self.width() % 4 else 0) for x in range(4)
+        ]
+
+        self.set_table_layout(header, widths)
         return
 
-    def apply_csv_layout(self):
-        """Update the table for loaded CSV files.
-
-        Implements a three column layout:
-        Column 1 shows the vertex file names.
-        Column 2 shows the edge file names.
-        Column 3 shows the analysis status of the file.
-        """
-        self.layout_type = "CSV"
-
-        header = ["File Name - Vertices", "File Name - Edges", "File Status"]
-        self.set_table_layout(3, [200] * 3, header)
-        return
-
-    def set_table_layout(self, column_count, widths, header):
+    def set_table_layout(self, header: list, widths: list):
         """Update the layout of the file table.
 
         Parameters:
-        column_count : int
-            Indicates how many many columns should be placed into the table.
-
-        widths : list
-            A list of integers indicating how wide each column should be in
-            pixels.
-
         header : list
             A list of strings used for the headers of each column.
 
+        widths : list
+            A list of integers with the file widths
         """
-        # Add columns and update column size
+        # Add columns
         self.setColumnCount(0)
-        self.setColumnCount(column_count)
-        for i in range(column_count):
-            self.setColumnWidth(i, widths[i])
+        self.setColumnCount(len(header))
 
         # Add column headers, adjust the sizing of the final column.
         self.setHorizontalHeaderLabels(header)
 
-        # Update format of the status column
-        last_column_index = self.columnCount() - 1
+        # Set text alignment for the file status and annotation columns
+        right_aligned_columns = [self.columnCount() - 1]
+        if self.layout_type == "Annotation":
+            right_aligned_columns.append(self.columnCount() - 2)
 
-        # If an annotation file is present, apply the
-        # fixed formatting to the annotation column..
-        if last_column_index == 3:
-            last_column_index -= 1
+        delegate = QtO.AlignCenterDelegate(self)
+        for column in right_aligned_columns:
+            self.setItemDelegateForColumn(column, delegate)
 
-        # Left align text for the file names
-        delegate = QtO.AlignLeftDelegate(self)
-        for i in range(last_column_index):
-            self.setItemDelegateForColumn(i, delegate)
-            self.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
+        # Set the width for the file columns
+        for column in range(self.columnCount()):
+            self.setColumnWidth(column, widths[column])
 
+        # Restore the filenames
+        self.update_body()
         return
 
     # File status updates
-    def update_file_queue_status(self):
-        """Add a 'queued' status to each of the loaded files."""
-        last_column = self.columnCount() - 1
-        for i in range(self.rowCount()):
-            self.setItem(i, last_column, QTableWidgetItem("Queued..."))
+    @property
+    def file_rows(self):
+        """The number of rows that the loaded files occupy."""
+        rows = max(
+            len(self.file_manager.main_files), len(self.file_manager.associated_files)
+        )
+        return rows
+
+    def update_body(self):
+        """Update the text for each loaded file."""
+        self.update_main_file_list()
+        self.update_associated_file_list()
+        self.update_file_queue_status(annotation_updates=False)
 
         if self.layout_type == "Annotation":
+            self.update_annotation_column_status()
+
+    def update_main_file_list(self):
+        """Update the main file column."""
+        self.setRowCount(self.file_rows)
+        for row in range(len(self.file_manager.main_files)):
+            filename = path_processing.get_basename(self.file_manager.main_files[row])
+            item = QTableWidgetItem(filename)
+            self.setItem(row, 0, item)
+
+    def update_associated_file_list(self):
+        """Update the associated file column."""
+        self.setRowCount(self.file_rows)
+        for row in range(len(self.file_manager.associated_files)):
+            filename = path_processing.get_basename(
+                self.file_manager.associated_files[row]
+            )
+            item = QTableWidgetItem(filename)
+            self.setItem(row, 1, item)
+
+    def update_file_queue_status(self, annotation_updates: bool = True):
+        """Add a 'queued' status to each of the loaded files.
+
+        Parameters:
+        body_update : bool, optional
+            Determines whether the annotation column needs to also be updated.
+            This isn't necessary when ``update_body`` is the call source.
+            Default ``True``.
+        """
+        last_column = self.columnCount() - 1
+        for i in range(self.rowCount()):
+            item = QTableWidgetItem("Queued...")
+            self.setItem(i, last_column, item)
+
+        if annotation_updates and self.layout_type == "Annotation":
             self.update_annotation_column_status()
         return
 
@@ -196,29 +239,42 @@ class AnalysisFileTable(QTableWidget):
             item = QTableWidgetItem(text)
             self.setItem(row, annotation_column, item)
 
-    def update_analysis_file_status(self, status: list):
+    def update_analysis_file_status(self, update_status: StatusUpdate):
         """Update the analysis status of a file.
 
         Parameters:
         status : list
 
         """
-        column = self.columnCount() - 1
-        self.selectRow(status[0])
-        self.setItem(status[0], column, QTableWidgetItem(status[1]))
+        # the analysis status will always be in the last column
+        update_column = self.columnCount() - 1
+        self.selectRow(update_status.file_row)  # select the updated row
 
-        if column == 3 and len(status) == 3:
-            self.setItem(status[0], column - 1, QTableWidgetItem(status[2]))
+        # Update the file status
+        self.setItem(
+            update_status.file_row,
+            update_column,
+            QTableWidgetItem(update_status.file_status),
+        )
+
+        # update the annotation progress
+        if self.layout_type == "Annotation" and update_status.annotation_progress:
+            self.setItem(
+                update_status.file_row,
+                update_column - 1,  # annotation ROI column is one to left
+                QTableWidgetItem(update_status.annotation_progress),
+            )
         return
 
     # Selection management
-    def update_row_selection(self, row):
+    def update_row_selection(self, row: int):
         """Update the selected row of the table.
 
         Parameters:
         row : int
         """
-        self.selectRow(row)
+        if row not in self.get_selected_row_indices():
+            self.selectRow(row)
         return
 
     def get_selected_row_indices(self) -> list:
@@ -228,4 +284,8 @@ class AnalysisFileTable(QTableWidget):
         list : selected_rows
         """
         selected_rows = self.selectionModel().selectedRows()
-        return selected_rows.sort(reverse=True)
+        if len(selected_rows):
+            selected_rows = [index.row() for index in selected_rows]
+
+        selected_rows.sort(reverse=True)
+        return selected_rows
