@@ -13,7 +13,7 @@ from library import input_classes as IC
 from library.gui import qt_objects as QtO
 
 
-class AnalysisOptions(QWidget):
+class AnalysisOptionsWidget(QWidget):
     """Options widget used to define the analysis parameters.
 
     Also dictates the results export settings during batch analysis

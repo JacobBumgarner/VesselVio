@@ -12,14 +12,21 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 from PyQt5.QtWidgets import QLabel, QWidget
 
-from library import input_classes as IC
 from library.gui import qt_objects as QtO
 
+from library.objects import GraphAnalysisOptions, GraphAttributeKey
 
-class GraphOptions(QWidget):
-    """The widget"""
 
-    def __init__(self, fileTable=None):
+class GraphOptionsWidget(QWidget):
+    """An options widget for graph analysis settings and graph feature keys.
+
+    Parameters:
+    fileTable : AnalysisFileTable
+
+    """
+
+    def __init__(self, fileTable: "AnalysisFileTable" = None):
+        """Construct the widget."""
         super().__init__()
         self.fileTable = fileTable
 
@@ -32,30 +39,32 @@ class GraphOptions(QWidget):
 
         formatHeader = QLabel("Graph file format:")
         self.graphFormat = QtO.new_combo(
-            ["GraphML", "DIMACS", "GML", "CSV"], 120, connect=self.update_graph_options
+            ["GraphML", "DIMACS", "GML", "CSV"],
+            120,
+            connect=self.update_graph_type_options,
         )
 
         typeHeader = QLabel("Vertex representation:")
         self.graphType = QtO.new_combo(
-            ["Branches", "Centerlines"], 120, "Left", self.update_graph_type
+            ["Branches", "Centerlines"], 120, "Left", self.update_graph_key_options
         )
 
         delimiterHeader = QLabel("CSV Delimiter:")
-        self.delimiterCombo = QtO.new_combo(
+        self.csvDelimiterCombo = QtO.new_combo(
             [",", ";", "Tab (\\t)", "Space ( )"],
             120,
         )
-        self.delimiterCombo.setDisabled(True)
+        self.csvDelimiterCombo.setDisabled(True)
 
-        self.clLabel = QLabel("")
-        self.centerlineLine = QtO.new_widget()
-        clLayout = QtO.new_layout(self.centerlineLine, no_spacing=True)
+        self.centerlineSpacer = QLabel("")
+        centerlineWidget = QtO.new_widget()
+        clLayout = QtO.new_layout(centerlineWidget, no_spacing=True)
         self.centerlineSmoothing = QtO.new_checkbox("Centerline smoothing")
         QtO.add_widgets(clLayout, [self.centerlineSmoothing])
 
         self.cliqueLabel = QLabel("")
-        self.cliqueLine = QtO.new_widget()
-        cliqueLayout = QtO.new_layout(self.cliqueLine, no_spacing=True)
+        cliqueWidget = QtO.new_widget()
+        cliqueLayout = QtO.new_layout(cliqueWidget, no_spacing=True)
         self.cliqueFiltering = QtO.new_checkbox("Clique filtering")
         QtO.add_widgets(cliqueLayout, [self.cliqueFiltering])
 
@@ -64,9 +73,9 @@ class GraphOptions(QWidget):
             [
                 [formatHeader, self.graphFormat],
                 [typeHeader, self.graphType],
-                [delimiterHeader, self.delimiterCombo],
-                [self.clLabel, self.centerlineLine],
-                [self.cliqueLabel, self.cliqueLine],
+                [delimiterHeader, self.csvDelimiterCombo],
+                [self.centerlineSpacer, centerlineWidget],
+                [self.cliqueLabel, cliqueWidget],
             ],
         )
 
@@ -78,27 +87,27 @@ class GraphOptions(QWidget):
         vertexHeader = QLabel("<b><center>Vertex identifiers:")
         QtO.add_widgets(headerLayout, [vertexHeader])
 
-        xHeader = QLabel("X position:")
-        self.xEdit = QtO.new_line_edit("X")
+        xPosHeader = QLabel("X position:")
+        self.vertexXPosKey = QtO.new_line_edit("X")
 
-        yHeader = QLabel("Y position:")
-        self.yEdit = QtO.new_line_edit("Y")
+        yPosHeader = QLabel("Y position:")
+        self.vertexYPosKey = QtO.new_line_edit("Y")
 
-        zHeader = QLabel("Z position:")
-        self.zEdit = QtO.new_line_edit("Z")
+        zPosHeader = QLabel("Z position:")
+        self.vertexZPosKey = QtO.new_line_edit("Z")
 
         radiusHeader = QLabel("Radius:")
-        self.vertexRadiusEdit = QtO.new_line_edit("radius")
-        self.vertexRadiusEdit.setDisabled(True)
+        self.vertexRadiusKey = QtO.new_line_edit("radius")
+        self.vertexRadiusKey.setDisabled(True)
 
         QtO.add_form_rows(
             self.middleColumn,
             [
                 columnHeader,
-                [xHeader, self.xEdit],
-                [yHeader, self.yEdit],
-                [zHeader, self.zEdit],
-                [radiusHeader, self.vertexRadiusEdit],
+                [xPosHeader, self.vertexXPosKey],
+                [yPosHeader, self.vertexYPosKey],
+                [zPosHeader, self.vertexZPosKey],
+                [radiusHeader, self.vertexRadiusKey],
             ],
         )
 
@@ -110,40 +119,40 @@ class GraphOptions(QWidget):
         edgeHeader = QLabel("<b><center>Edge identifiers:")
         QtO.add_widgets(headerLayout, [edgeHeader])
 
-        sourceHeader = QLabel("Edge source:")
-        self.sourceEdit = QtO.new_line_edit("Source ID")
-        self.sourceEdit.setDisabled(True)
+        edgeSourceHeader = QLabel("Edge source:")
+        self.edgeSourceKey = QtO.new_line_edit("Source ID")
+        self.edgeSourceKey.setDisabled(True)
 
-        targetHeader = QLabel("Edge target:")
-        self.targetEdit = QtO.new_line_edit("Target ID")
-        self.targetEdit.setDisabled(True)
+        edgeTargetHeader = QLabel("Edge target:")
+        self.edgeTargetKey = QtO.new_line_edit("Target ID")
+        self.edgeTargetKey.setDisabled(True)
 
-        segRadiusHeader = QLabel("Mean segment radius:")
-        self.segRadiusEdit = QtO.new_line_edit("radius_avg")
+        edgeRadiusHeader = QLabel("Mean segment radius:")
+        self.edgeRadiusKey = QtO.new_line_edit("radius_avg")
 
-        segLengthHeader = QLabel("Segment length:")
-        self.segLengthEdit = QtO.new_line_edit("length")
+        edgeLengthHeader = QLabel("Segment length:")
+        self.edgeLengthKey = QtO.new_line_edit("length")
 
-        segTortHeader = QLabel("Segment tortuosity")
-        self.segTortuosityEdit = QtO.new_line_edit("tortuosity")
+        edgeTortuosityHeader = QLabel("Segment tortuosity")
+        self.edgeTortuosityKey = QtO.new_line_edit("tortuosity")
 
-        segVolumeHeader = QLabel("Segment volume:")
-        self.segVolumeEdit = QtO.new_line_edit("volume")
+        edgeVolumeHeader = QLabel("Segment volume:")
+        self.edgeVolumeKey = QtO.new_line_edit("volume")
 
-        segSAHeader = QLabel("Segment surface area:")
-        self.segSAEdit = QtO.new_line_edit("surface_area")
+        edgeSurfaceAreaHeader = QLabel("Segment surface area:")
+        self.edgeSurfaceAreaKey = QtO.new_line_edit("surface_area")
 
         QtO.add_form_rows(
             rightColumn,
             [
                 columnHeader,
-                [segRadiusHeader, self.segRadiusEdit],
-                [segLengthHeader, self.segLengthEdit],
-                [segTortHeader, self.segTortuosityEdit],
-                [segVolumeHeader, self.segVolumeEdit],
-                [segSAHeader, self.segSAEdit],
-                [sourceHeader, self.sourceEdit],
-                [targetHeader, self.targetEdit],
+                [edgeRadiusHeader, self.edgeRadiusKey],
+                [edgeLengthHeader, self.edgeLengthKey],
+                [edgeTortuosityHeader, self.edgeTortuosityKey],
+                [edgeVolumeHeader, self.edgeVolumeKey],
+                [edgeSurfaceAreaHeader, self.edgeSurfaceAreaKey],
+                [edgeSourceHeader, self.edgeSourceKey],
+                [edgeTargetHeader, self.edgeTargetKey],
             ],
         )
 
@@ -154,68 +163,73 @@ class GraphOptions(QWidget):
             boxLayout, [0, leftColumn, line0, self.middleColumn, line1, rightColumn, 0]
         )
 
-    def update_graph_options(self):
-        enable_csv_info = False
-        if self.graphFormat.currentText() == "CSV":
-            if self.fileTable:
+    def update_graph_type_options(self):
+        """Update activations for the widgets associated with CSV/non-CSV graphs."""
+        enable_csv_info = self.graphFormat.currentText() == "CSV"
+
+        if self.fileTable is not None:
+            if enable_csv_info:
                 self.fileTable.apply_csv_layout()
-            enable_csv_info = True
-        else:
-            if self.fileTable:
+            else:
                 self.fileTable.apply_default_layout()
 
-        self.delimiterCombo.setEnabled(enable_csv_info)
-        self.vertexRadiusEdit.setEnabled(enable_csv_info)
-        self.sourceEdit.setEnabled(enable_csv_info)
-        self.targetEdit.setEnabled(enable_csv_info)
-        self.update_graph_type()
+        self.csvDelimiterCombo.setEnabled(enable_csv_info)
+        self.edgeSourceKey.setEnabled(enable_csv_info)
+        self.edgeTargetKey.setEnabled(enable_csv_info)
         return
 
-    def update_graph_type(self):
-        type = self.graphType.currentText()
-        enabled = False
-        if type == "Centerlines":
-            enabled = True
+    def update_graph_key_options(self):
+        """Update w associated with branch/centerline keys."""
+        centerline_graph = self.graphType.currentText() == "Centerlines"
 
         # Centerline enabled
-        self.vertexRadiusEdit.setEnabled(enabled)
+        self.vertexRadiusKey.setEnabled(centerline_graph)
 
         # Centerline disabled
-        self.segRadiusEdit.setDisabled(enabled)
-        self.segLengthEdit.setDisabled(enabled)
-        self.segTortuosityEdit.setDisabled(enabled)
-        self.segVolumeEdit.setDisabled(enabled)
-        self.segSAEdit.setDisabled(enabled)
+        self.edgeRadiusKey.setDisabled(centerline_graph)
+        self.edgeLengthKey.setDisabled(centerline_graph)
+        self.edgeTortuosityKey.setDisabled(centerline_graph)
+        self.edgeVolumeKey.setDisabled(centerline_graph)
+        self.edgeSurfaceAreaKey.setDisabled(centerline_graph)
         return
 
     def prepare_options(self):
-        # Prepare attribute key
-        a_key = IC.AttributeKey(
-            self.xEdit.text(),
-            self.yEdit.text(),
-            self.zEdit.text(),
-            self.vertexRadiusEdit.text(),
-            self.segRadiusEdit.text(),
-            self.segLengthEdit.text(),
-            self.segVolumeEdit.text(),
-            self.segSAEdit.text(),
-            self.segTortuosityEdit.text(),
-            self.sourceEdit.text(),
-            self.targetEdit.text(),
+        """Return the analysis options for the input graph.
+
+        Returns:
+        GraphAnalysisOptions
+
+        """
+        # Prepare the attribute_key
+        attribute_key = GraphAttributeKey(
+            self.vertexXPosKey.text(),
+            self.vertexYPosKey.text(),
+            self.vertexZPosKey.text(),
+            self.vertexRadiusKey.text(),
+            self.edgeRadiusKey.text(),
+            self.edgeLengthKey.text(),
+            self.edgeVolumeKey.text(),
+            self.edgeSurfaceAreaKey.text(),
+            self.edgeTortuosityKey.text(),
+            self.edgeSourceKey.text(),
+            self.edgeTargetKey.text(),
         )
 
-        delimiter = self.delimiterCombo.currentText()
-        if len(delimiter) > 1:
-            if delimiter[0] == "S":
-                delimiter = " "
-            elif delimiter[0] == "T":
-                delimiter = "\t"
-        graph_options = IC.GraphOptions(
+        # Identify the csv_delimiter (may not end up being used)
+        csv_delimiter = self.csvDelimiterCombo.currentText()
+        if len(csv_delimiter) > 1:
+            if "Space" in csv_delimiter:
+                csv_delimiter = " "
+            elif "Tab" in csv_delimiter:
+                csv_delimiter = "\t"
+
+        graph_options = GraphAnalysisOptions(
             self.graphFormat.currentText(),
             self.graphType.currentText(),
             self.cliqueFiltering.isChecked(),
             self.centerlineSmoothing.isChecked(),
-            a_key,
-            delimiter,
+            attribute_key,
+            csv_delimiter,
         )
+
         return graph_options
