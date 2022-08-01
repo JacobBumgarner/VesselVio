@@ -5,6 +5,7 @@ per-file-ignores =
     library/volume_visualization.py:F401
     library/gui/visualization_page.py:F401
     library/gui/movie_widgets.py:F401
+    library/gui/options_widgets/graph_options_widget.py:F821  # Typing
     __init__.py:F401,F403
 ignore =
     # Double quotes found but single quotes preferred. Deffering to black here
