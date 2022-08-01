@@ -17,13 +17,21 @@ from library.gui import qt_objects as QtO
 
 ## File loading
 class CSVGraphFileLoader(QDialog):
-    """Widget used to load CSV-based graphs."""
+    """Widget used to load CSV-based graphs.
+
+    Attributes:
+    main_files : list
+
+    associated_files = list
+
+    """
+
+    main_files = []
+    associated_files = []
 
     def __init__(self):
         """Build the CSV file loader."""
         super().__init__()
-        self.main_files = None
-        self.associated_files = None
 
         # Dialog contains a form layout with a cancel button
         windowLayout = QtO.new_layout(orient="V")
@@ -92,13 +100,19 @@ class AnnotationFileLoader(QDialog):
     annotation_type : str
         Must be either ``"ID"`` or ``"RGB"``
 
+    Attributes:
+    main_files : list
+
+    associated_files = list
+
     """
 
-    def __init__(self, annotation_type):
+    main_files = []
+    associated_files = []
+
+    def __init__(self, annotation_type: str):
         """Build the file loading widget."""
         super().__init__()
-        self.main_files = None
-        self.associated_files = None
         self.annotation_type = annotation_type
 
         # Dialog contains a form layout with a cancel button
