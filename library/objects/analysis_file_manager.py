@@ -13,13 +13,24 @@ from library.annotation import tree_processing
 
 
 class AnalysisFileManager:
-    """The class that stores and manages the input files used for analyses."""
+    """The class that stores and manages the input files used for analyses.
+
+    Attributes:
+    main_files : list
+
+    associated_files : list
+
+    annotation_data : dict
+
+    analyzed : bool
+        Indicates whether the loaded files have been analyzed. Default ``False``."""
 
     def __init__(self):
         """Initialize the manager."""
         self.main_files = []
         self.associated_files = []
         self.annotation_data = None
+        self.analyzed = False
 
     # File addition
     def add_main_files(self, files: list):
@@ -105,6 +116,9 @@ class AnalysisFileManager:
         """
         self.remove_main_files(selected)
         self.remove_associated_files(selected)
+
+    def check_file_parity(self):
+        """Return whether equal main and associated files have been loaded."""
 
     # Resetting
     def clear_analysis_files(self):
