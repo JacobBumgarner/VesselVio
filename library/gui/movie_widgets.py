@@ -560,7 +560,8 @@ class MovieDialogue(QDialog):
                 "720p Square",
                 "1080p Square",
                 "1440p Square",
-                "2160p Square" "Current",
+                "2160p Square",
+                "Current",
             ],
             120,
         )
