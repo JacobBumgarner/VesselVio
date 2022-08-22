@@ -107,7 +107,7 @@ class OrbitWidget(QWidget):
                 self.plotter.remove_actor(actor, reset_camera=False)
                 del actor
 
-    def export_path(self, framerate):
+    def generate_path(self, framerate):
         """Generates an orbital path with with the requested frame count
 
         Parameters
@@ -478,7 +478,7 @@ class FlythroughWidget(QWidget):
         )
         warning.exec_()
 
-    def export_path(self, framerate):
+    def generate_path(self, framerate):
         """Exports the created keyframes into a path for movie rendering"""
         camera_path = MovProc.generate_flythrough_path(
             self.pathTable.key_frames,
@@ -630,7 +630,7 @@ class MovieDialogue(QDialog):
         renderingButtonsWidget = QtO.new_widget(260)
         renderingButtonsWidgetLayout = QtO.new_layout(renderingButtonsWidget)
         cancelButton = QtO.new_button("Cancel", self.closeEvent)
-        renderButton = QtO.new_button("Render", self.return_movie_path)
+        renderButton = QtO.new_button("Render", self.render_movie)
         QtO.add_widgets(
             renderingButtonsWidgetLayout, [0, cancelButton, renderButton, 0]
         )
@@ -674,7 +674,7 @@ class MovieDialogue(QDialog):
         else:
             self.flythroughWidget.default_setup()
 
-    def return_movie_path(self):
+    def render_movie(self):
         """Return the generated path, if created."""
         if self.savePathEdit.text() in ["None", "Select save path"]:
             self.save_path_warning()
@@ -686,12 +686,12 @@ class MovieDialogue(QDialog):
         # Get the plotter path
         framerate = int(self.movieFPS.currentText())
         if self.movieType.currentText() == "Orbit":
-            self.path = self.orbitWidget.export_path(framerate)
+            self.path = self.orbitWidget.generate_path(framerate)
         elif self.movieType.currentText() == "Flythrough":
             if not self.flythroughWidget.keyframe_check():
                 self.flythroughWidget.keyframe_warning()
                 return
-            self.path = self.flythroughWidget.export_path(framerate)
+            self.path = self.flythroughWidget.generate_path(framerate)
 
         self.movie_settings = IC.MovieOptions(
             self.savePathEdit.text(),
@@ -710,7 +710,7 @@ class MovieDialogue(QDialog):
         if not filename:
             return
 
-        movie_options = MovProc.load_options(filename)
+        movie_options = MovProc.load_movie_options(filename)
 
         type_index = 0 if movie_options.movie_type == "Orbit" else 1
         self.movieType.setCurrentIndex(type_index)

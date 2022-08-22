@@ -467,20 +467,20 @@ if __name__ == "__main__":
     ######################
     ### Run files here ###
     ######################
-    file1 = "volume_file.nii"
+    file1 = "/Users/jacobbumgarner/Desktop/Vasculature Demos/1.nii"
 
     iteration = 0
 
     # Use "no_anno" in place of "anno_options" if there are no annotations
     process_volume(file1, gen_options, no_anno, vis_options, iteration, verbose)
 
-    ### Graph files
-    # Follow the format below to load csv-based graphs.
-    vertices = "vertices.csv"
-    edges = "edges.csv"
-    graph0 = {"Vertices": vertices, "Edges": edges}
+    # ### Graph files
+    # # Follow the format below to load csv-based graphs.
+    # vertices = "vertices.csv"
+    # edges = "edges.csv"
+    # graph0 = {"Vertices": vertices, "Edges": edges}
 
-    # iGraph compatible format
-    graph1 = "example.graphml"
+    # # iGraph compatible format
+    # graph1 = "example.graphml"
 
     # process_graph(graph0, gen_options, graph_options, vis_options, verbose)
