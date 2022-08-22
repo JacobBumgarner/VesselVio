@@ -7,11 +7,13 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
+import glob
 import json
 import os
 import sys
 
 from library import os_checks
+from natsort import natsorted
 from PyQt5.QtWidgets import QFileDialog
 
 
@@ -162,3 +164,23 @@ def set_results_dir(return_path: bool = False) -> str:
     if not results_dir or not return_path:
         results_dir = None
     return results_dir
+
+
+def get_directory_image_files(filepath: str, ext: str = ".png") -> list:
+    """Return a list of the image files in the directory.
+
+    Parameters
+    ----------
+    filepath : str
+        The path of the folder to examine.
+    ext : str, optional
+        The extension of the image files to load, by default ".png"
+
+    Returns
+    -------
+    list
+        A sorted list of the input image files.
+    """
+    files = glob.glob(os.path.join(filepath, "*" + ext))
+    files = natsorted(files)
+    return files

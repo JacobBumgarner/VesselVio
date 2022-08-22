@@ -28,9 +28,12 @@ def build_roi_array(roi_dict: dict, annotation_type: str = "ID") -> np.ndarray:
         The type of annotation. Options [`"ID"`, `"RGB"`]. Default `"ID"`.
 
     Returns:
-    np.array : roi_Array
-        An array of (n,m) shape, where `n` is the number of parents, and `m` is
-        the largest number of children that an individual parent has.
+    np.array : roi_array
+        An array of (n,m) shape, where n is the number of ROIs, and m is
+        the largest number of children that an individual ROI has. Each row of the array
+        contains the IDs of the children in the array. If the row has fewer children
+        than the length of the array, the rest of the elements after the final child are
+        filled with zeros. This array is necessary for Numba processing.
     """
     # isolate the ROIs
     if not isinstance(annotation_type, str):
@@ -101,7 +104,7 @@ def find_max_children_count(parent_tree: list) -> int:
 
 
 @njit(cache=True)
-def prep_roi_array(roi_array: np.ndarray) -> typing.Tuple[dict, set]:
+def construct_id_dict(roi_array: np.ndarray) -> typing.Tuple[dict, set]:
     """Use the roi_array to prepare the objects for a segmentation.
 
     Parameters:
@@ -114,7 +117,7 @@ def prep_roi_array(roi_array: np.ndarray) -> typing.Tuple[dict, set]:
         A dict where each key points to the row number of the parent structure
         that it is related to.
 
-    id_keys : set
+    id_dict_keyset : set
         The unique set of ids.
     """
     id_dict = dict()
@@ -124,9 +127,9 @@ def prep_roi_array(roi_array: np.ndarray) -> typing.Tuple[dict, set]:
                 break  # Break if we're at the end of the ids
             id_dict[roi_array[n, roi_id]] = n
 
-    id_keys = set(roi_array.flatten())
-    id_keys.remove(0)
-    return id_dict, id_keys
+    id_dict_keyset = set(roi_array.flatten())
+    id_dict_keyset.remove(0)
+    return id_dict, id_dict_keyset
 
 
 @njit(cache=True)

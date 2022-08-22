@@ -11,15 +11,16 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
-import typing
 from time import perf_counter as pf
+from typing import Tuple, Union
 
 import cv2
 import numba
 import numpy as np
-
 from library import image_processing as ImProc
 from library.annotation import segmentation_prep
+
+from library.file_processing.path_processing import get_directory_image_files
 from numba import njit, prange
 
 
@@ -27,29 +28,25 @@ from numba import njit, prange
 ### General Labeling ###
 ########################
 @njit(cache=False)
-def update_bounds(
+def update_ROI_bounds(
     minima: np.ndarray, maxima: np.ndarray, z: int, y: int, x: int, index: int
-) -> typing.Tuple[np.ndarray, np.ndarray]:
-    """Given XYZ coordinates, update the bounds for the current region.
+) -> None:
+    """Update the current ROI bounds array based on input point coordinates.
 
-    Parameters:
+    Parameters
+    ----------
     minima : np.ndarray
-
+        The array containing the ROI minima.
     maxima : np.ndarray
-
+        The array containing the ROI maxima.
     z : int
-
+        The z position of the point.
     y : int
-
+        The y position of the point.
     x : int
-
+        The x position of the point.
     index : int
-        The index of the minima/maxima array to update.
-
-    Returns:
-    np.ndarray : minima
-
-    np.ndarray : maxima
+        The index of the current ROI. Used to update the minima and maxima arrays.
     """
     if z < minima[index, 0]:
         minima[index, 0] = z
@@ -77,50 +74,62 @@ def label_slice(
     annotation_slice: np.ndarray,
     slice_volumes: np.ndarray,
     volume_updates: np.ndarray,
-    roi_dict: numba.typed.typeddict.Dict,
-    roi_keys: np.ndarray,
+    id_dict: numba.typed.typeddict.Dict,
+    id_dict_keyset: np.ndarray,
     minima: np.ndarray,
     maxima: np.ndarray,
     z: int,
-):
-    """Label a single slice of a volume with an annotation volume.
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Label a slice of vasculature with a corresponding annotation volume slice.
 
-    Iterates through the annotation array while searching for annotation_ids
-    that match the ids input by the user. If an id is found, the non-zero
-    corresponding volume voxels are labeled with keyed id.
-
-    Parameters:
+    Parameters
+    ----------
     volume : np.ndarray
-
-    annotation : np.ndarray
-
+        The 3D input volume to annotate.
+    annotation_slice : np.ndarray
+        The slice of annotation volume used to label a slice of the input volume.
     slice_volumes : np.ndarray
-
+        An empty array used to store the volumes of the individual ROIs in annotation slice.
     volume_updates : np.ndarray
+        An identity matrix used to update the slice volumes. This matrix is needed
+        because Numba can only keep track of array slice updates in parallel.
+    id_dict : numba.typed.typeddict.Dict
+        The dictionary where each item is the index of the ROIs in the `slice_volumes`,
+        `minima`, and `maxima` arrays. The keys for these items are the annotation ROI
+        IDs.
+    id_dict_keyset : np.ndarray
+        The set of the ID keys used in the id_dict. Must be passed as a np.ndarray and
+        then converted to set for this function.
+    minima : np.ndarray
+        The array containing the bounds minima for the regions.
+    maxima : np.ndarray
+        The array containing the bounds minima for the regions.
+    z : int
+        The z index of the input volume.
 
-    roi_dict : numba.typed.typeddict.Dict
-
-    roi_keys : np.ndarray
-
-    minima: np.ndarray
-
-    maxima: np.ndarray
-
-    z: int
-        Used to access the slice of the input volume and to update the
-        ``minima`` and ``maxima`` bounding arrays.
+    Returns
+    -------
+    volume : np.ndarray
+        The input volume with the newly labeled slice.
+    slice_volumes : np.ndarray
+        The filled array indicating the voxel volumes of the individual ROIs in the
+        annotated slice.
+    minima : np.ndarray
+        The updated array containing the ROI minima.
+    maxima : np.ndarray
+        The updated array containing the ROI maxima.
     """
-    roi_keys = set(roi_keys)
+    id_dict_keyset = set(id_dict_keyset)  # convert from list to set
     for y in prange(volume.shape[1]):
         for x in range(volume.shape[2]):
             # get the value of the element
             point_value = annotation_slice[y, x]
-            if point_value and point_value in roi_keys:  # check if its valid
-                roi_id = roi_dict[point_value]
+            if point_value and point_value in id_dict_keyset:  # check if its valid
+                roi_id = id_dict[point_value]
                 slice_volumes += volume_updates[roi_id]
                 if volume[z, y, x]:
                     volume[z, y, x] = roi_id + 1  # roi_ids start at 0
-                    update_bounds(minima, maxima, z, y, x, roi_id)
+                    update_ROI_bounds(minima, maxima, z, y, x, roi_id)
             elif volume[z, y, x]:  # if the point is non-zero, set it to 0
                 volume[z, y, x] = 0
 
@@ -131,100 +140,131 @@ def label_slice(
 ### RGB-Specific ###
 ####################
 @njit(cache=False)
-def convert_bgr_to_int(rgb_array: np.ndarray) -> np.ndarray:
-    """Collapse an RGB array into a single value along the RGB dimension.
+def convert_bgr_to_int(bgr_array: np.ndarray) -> np.ndarray:
+    """Collapse an BGR array into a single value along the last dimension.
 
     This function conducts bitwise shifts of the RGB values to identify the
     unique integer value associated with each color. This serves to consolidate
     the RGB and ID-based annotation analysis pipelines.
 
-    Parameters:
-    rgb_array : np.ndarray
-        An n-dimensional array containing RGB values along the last axis.
+    Parameters
+    ----------
+    bgr_array : np.ndarray
+        A BGR input array loaded with cv2.imread(). This array contains the colorized
+        annotations for the input volumes. Should be of dimensions (m, n, 3)
 
-    Returns:
+    Returns
+    -------
     np.ndarray
-        An n-1 dimensional array, where the RGB values have been collapsed into
-        a single integer value.
+        An (m, n) dimensional array, where the final dimension of the input BGR image
+        has been converted to the unique bitshifted integer associated with the RGB
+        values.
     """
     # We want to actually do this as RGB, so swap 0,1,2
-    int_array = (rgb_array[..., 2] << 16) | (rgb_array[..., 1] << 8) | rgb_array[..., 0]
+    int_array = (bgr_array[..., 2] << 16) | (bgr_array[..., 1] << 8) | bgr_array[..., 0]
     return int_array.astype(np.uint32)
 
 
-def RGB_labeling_input(
+def volume_sliced_labeling(
     volume: np.ndarray,
-    annotation_folder: str,
+    annotation: Union[np.memmap, str],
     roi_array: np.ndarray,
+    id_labeling: bool = False,
     verbose: bool = False,
-) -> typing.Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Label a vasculature volume from a folder of RGB annotation images.
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Label a vasculature volume slice-by-slice with an input annotation dataset.
+
+    This function handles annotation labeling or both RGB-based annotation volumes and
+    annotation volumes with dtypes that are not compatible with Numba.
 
     RGB annotations can be constructed manually or can be created using programs
     like QuickNII or VisuAlign.
 
-    Parameters:
-    volume : np.ndarray
+    ID-based annotations often come from annotation atlases such as the
+    "p56 Adult Mouse Brain" atlas from the Allen Institute, or from manual
+    segmentations made in programs like 3DSlicer or ITK-Snap.
 
-    annotation_folder : str
+    Parameters
+    ----------
+    volume : np.ndarray
+        The input vasculature volume that will be labeled for subsequent ROI
+        segmentations and analyses.
+    annotation : Union[np.memmap, str]
+        Depending on the type of annotation volume, this argument should either be
+        a np.memmap if the volume has int-based annotations, or a str of the annotation
+        image file directory if the volume has RGB-based annotations.
         The filepath to the folder that contains the RGB images with the labeled
         regions of interest.
-
     roi_array : np.ndarray
         The ROI_array built with the ``segmentation_prep.build_roi_array``
         function. Contains the family of int-based RGB values that represent
         each of the ROIs.
-
+    id_labeling : bool, optional
+        Whether the annotation volume is ID-based. If False, converts to an RGB-based
+        labeling. Defaults to False.
     verbose : bool, optional
-        Default ``False``.
+        Defaults to False.
 
-    Returns:
-    np.ndarray : volume
+    Returns
+    -------
+    volume : np.ndarray
         The labeled volume.
-
-    np.ndarray : roi_volumes
-        The number of voxels present in each ROI.
-
-    np.ndarray : minima
+    roi_volumes : np.ndarray
+        The an (n,) dimensional array where each element represents the number of voxels
+        present in each ROI. The index of these elements corresponds with the index of
+        the ROIs from the input roi_array.
+    minima : np.ndarray
         An (n,3) shaped array containing the minima for each ROI. Used for
         segmentation bounding.
-
-    np.ndarray : maxima
+    maxima : np.ndarray
         An (n,3) shaped array containing the maxima for each ROI. Used for
         segmentation bounding.
     """
-    # Load the images from the RGB annotation folder
-    annotation_images = ImProc.dir_files(annotation_folder)
+    # If we're using an RGB volume, first load the RGB folder images
+    if not id_labeling:
+        annotation_images = get_directory_image_files(annotation)
 
-    if not ImProc.RGB_dim_check(annotation_images, volume.shape, verbose=verbose):
-        return None, None, None, None
+        # Check dimensions. This was already done for the ID volume.
+        if not ImProc.RGB_dim_check(annotation_images, volume.shape, verbose=verbose):
+            return None, None, None, None
 
     # Prepare all of the necessary objects
-    id_dict, id_keys = segmentation_prep.prep_roi_array(roi_array)
+    id_dict, id_dict_keyset = segmentation_prep.construct_id_dict(roi_array)
 
     roi_volumes, volume_updates = segmentation_prep.prep_volume_arrays(roi_array)
     slice_volumes = roi_volumes.copy()
 
-    # Convert RGB_keys back into np.array
-    id_keys = np.asarray(list(id_keys))
+    id_dict_keyset = np.asarray(list(id_dict_keyset))  # Numba needs this as an array
 
     minima, maxima = segmentation_prep.build_minima_maxima_arrays(volume, roi_array)
 
-    for i, file in enumerate(annotation_images):
+    # Label each slice of the vasculature volume slice-by-slice
+    slices = volume.shape[0] if id_labeling else len(annotation_images)
+    for i in range(slices):
         t = pf()
-        image = cv2.imread(file)
-        RGB_hash = convert_bgr_to_int(image)  # convert the RGB
+
+        # First prep the input slice
+        if id_labeling:
+            annotation_slice = ImProc.get_annotation_slice(annotation, i)
+        else:
+
+            image = cv2.imread(annotation_images[i])
+            annotation_slice = convert_bgr_to_int(image)  # convert the RGB
+
+        # Label the corresponding slice of vasculature
         volume, slice_volumes, minima, maxima = label_slice(
             volume,
-            RGB_hash,
+            annotation_slice,
             slice_volumes,
             volume_updates,
             id_dict,
-            id_keys,
+            id_dict_keyset,
             minima,
             maxima,
             i,
         )
+
+        # Update the ROI volumes
         roi_volumes += slice_volumes
         slice_volumes *= 0
 
@@ -241,94 +281,12 @@ def RGB_labeling_input(
 ###########################
 ### ID Volume Labeling ####
 ###########################
-def nn_id_labeling(
-    volume: np.ndarray,
-    annotation_memmap: np.memmap,
-    roi_array: np.ndarray,
-    verbose: bool = False,
-) -> typing.Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Label a vasculature volume from a numba incompatible ID annotation.
-
-    This function is built specifically for annotation volumes that have dtypes
-    that are incompatible with Numba.
-
-    ID-based annotations often come from annotation atlases such as the
-    "p56 Adult Mouse Brain" atlas from the Allen Institute, or from manual
-    segmentations made in programs like 3DSlicer or ITK-Snap.
-
-    Parameters:
-    volume : np.ndarray
-
-    annotation_memmap : np.memmap
-        The annoa.
-
-    roi_array : np.ndarray
-        The ROI_array built with the ``segmentation_prep.build_roi_array``
-        function. Contains the family of int-based RGB values that represent
-        each of the ROIs.
-
-    verbose : bool, optional
-        Default ``False``.
-
-    Returns:
-    np.ndarray : volume
-        The labeled volume.
-
-    np.ndarray : roi_volumes
-        The number of voxels present in each ROI.
-
-    np.ndarray : minima
-        An (n,3) shaped array containing the minima for each ROI. Used for
-        segmentation bounding.
-
-    np.ndarray : maxima
-        An (n,3) shaped array containing the maxima for each ROI. Used for
-        segmentation bounding.
-    """
-    # Prepare all of the necessary objects
-    id_dict, id_keys = segmentation_prep.prep_roi_array(roi_array)
-
-    roi_volumes, volume_updates = segmentation_prep.prep_volume_arrays(roi_array)
-    slice_volumes = roi_volumes.copy()
-
-    # Convert id_keys back into np.array
-    id_keys = np.asarray(list(id_keys))
-
-    minima, maxima = segmentation_prep.build_minima_maxima_arrays(volume, roi_array)
-
-    # Process slice by slice
-    for i in range(volume.shape[0]):
-        t = pf()
-        a_slice = ImProc.get_annotation_slice(annotation_memmap, i)
-        volume, slice_volumes, minima, maxima = label_slice(
-            volume,
-            a_slice,
-            slice_volumes,
-            volume_updates,
-            id_dict,
-            id_keys,
-            minima,
-            maxima,
-            i,
-        )
-        roi_volumes += slice_volumes
-        slice_volumes *= 0
-
-        if verbose:
-            print(
-                f"Slice {i+1}/{volume.shape[0]} segmented in {pf() - t:0.2f} seconds.",
-                end="\r",
-            )
-
-    return volume, roi_volumes, minima, maxima
-
-
 ### Numba dtype compatible segmentation
 @njit(parallel=True, nogil=True, cache=False)
-def numba_id_labeling(
+def volume_labeling(
     volume: np.ndarray, annotation_memmap: np.memmap, roi_array: np.ndarray
-) -> typing.Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Label a vasculature volume from a numba compatible ID annotation volume.
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Label a vasculature volume from a Numba compatible ID annotation volume.
 
     This function is built specifically for annotation volumes that have dtypes
     that are compatible with Numba.
@@ -337,32 +295,33 @@ def numba_id_labeling(
     "p56 Adult Mouse Brain" atlas from the Allen Institute, or from manual
     segmentations made in programs like 3DSlicer or ITK-Snap.
 
-    Parameters:
+    Parameters
+    ----------
     volume : np.ndarray
-
+        The input volume to be labeled.
     annotation_memmap : np.memmap
-
+        The memory-mapped annotatino volume.
     roi_array : np.ndarray
         The ROI_array built with the ``segmentation_prep.build_roi_array``
         function. Contains the family of int-based RGB values that represent
         each of the ROIs.
 
-    Returns:
-    np.ndarray : volume
+    Returns
+    -------
+    volume : np.ndarray
         The labeled volume.
-
-    np.ndarray : roi_volumes
-        The number of voxels present in each ROI.
-
-    np.ndarray : minima
+    roi_volumes : np.ndarray
+        The an (n,) dimensional array where each element represents the number of voxels
+        present in each ROI. The index of these elements corresponds with the index of
+        the ROIs from the input roi_array.
+    minima : np.ndarray
         An (n,3) shaped array containing the minima for each ROI. Used for
         segmentation bounding.
-
-    np.ndarray : maxima
+    maxima : np.ndarray
         An (n,3) shaped array containing the maxima for each ROI. Used for
         segmentation bounding.
     """
-    id_dict, id_keys = segmentation_prep.prep_roi_array(roi_array)
+    id_dict, id_dict_keyset = segmentation_prep.construct_id_dict(roi_array)
     roi_volumes, volume_updates = segmentation_prep.prep_volume_arrays(roi_array)
 
     minima, maxima = segmentation_prep.build_minima_maxima_arrays(volume, roi_array)
@@ -371,12 +330,12 @@ def numba_id_labeling(
         for y in range(annotation_memmap.shape[1]):
             for x in range(annotation_memmap.shape[2]):
                 point_value = annotation_memmap[z, y, x]
-                if point_value and point_value in id_keys:
+                if point_value and point_value in id_dict_keyset:
                     roi_id = id_dict[point_value]
                     roi_volumes += volume_updates[roi_id]
                     if volume[z, y, x]:
                         volume[z, y, x] = roi_id + 1
-                        update_bounds(minima, maxima, z, y, x, id_dict[point_value])
+                        update_ROI_bounds(minima, maxima, z, y, x, id_dict[point_value])
                 elif volume[z, y, x]:
                     volume[z, y, x] = 0
 
@@ -389,38 +348,34 @@ def id_labeling_input(
     annotation_file: str,
     roi_array: np.ndarray,
     verbose: bool = False,
-) -> typing.Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Label an input volume with a corresponding ID .nii annotation volume.
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Label an input volume with a corresponding ID-based .nii annotation volume.
 
-    Returns a list of None is the annotation file is incompatible. Doesn't raise
-    and error as to not crash the application.
-
-    Parameters:
+    Parameters
+    ----------
     volume : np.ndarray
-
+        The input volume that will be labeled.
     annotation_file : str
-        The filepath to the ".nii" type annotation.
-
+        The filepath to the NIfTI annotation volume.
     roi_array : np.ndarray
-        The ROI_array built with the ``segmentation_prep.build_roi_array``
-        function. Contains the family of int-based RGB values that represent
-        each of the ROIs.
-
+        The ROI array constructed with the ``segmentation_prep.buile_roi_array``
+        function. Contains the family of int values that represent each structure in the
+        ROIs.
     verbose : bool, optional
-        Default ``False``.
+        Print the status of the analysis, by default False
 
-    Returns:
-    np.ndarray : volume
+    Returns
+    -------
+    volume : np.ndarray
         The labeled volume.
-
-    np.ndarray : roi_volumes
-        The number of voxels present in each ROI.
-
-    np.ndarray : minima
+    roi_volumes : np.ndarray
+        The an (n,) dimensional array where each element represents the number of voxels
+        present in each ROI. The index of these elements corresponds with the index of
+        the ROIs from the input roi_array.
+    minima : np.ndarray
         An (n,3) shaped array containing the minima for each ROI. Used for
         segmentation bounding.
-
-    np.ndarray : maxima
+    maxima : np.ndarray
         An (n,3) shaped array containing the maxima for each ROI. Used for
         segmentation bounding.
     """
@@ -435,12 +390,12 @@ def id_labeling_input(
     numba_seg = ImProc.dtype_check(annotation_memmap)
 
     if numba_seg:
-        labeled_volume, roi_volumes, minima, maxima = numba_id_labeling(
+        labeled_volume, roi_volumes, minima, maxima = volume_labeling(
             volume, annotation_memmap, roi_array
         )
     else:
-        labeled_volume, roi_volumes, minima, maxima = nn_id_labeling(
-            volume, annotation_memmap, roi_array, verbose=verbose
+        labeled_volume, roi_volumes, minima, maxima = volume_sliced_labeling(
+            volume, annotation_memmap, roi_array, id_labeling=True, verbose=verbose
         )
 
     return labeled_volume, roi_volumes, minima, maxima
@@ -457,48 +412,47 @@ def volume_labeling_input(
     annotation_type: str,
     cache_directory: str = None,
     verbose: bool = False,
-):
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Label an input volume with a corresponding annotation volume.
 
-    The input function used to label vasculature volumes. Dispatches the
-    labeling to the appropriate function based on whether the annotation
-    is based on IDs or RGB values. After the volume has been labeled, an
-    ``.npy`` copy of the labeled volume will be saved.
+    This is the input function used to label vasculature volumes with annotations. The
+    function dispatches the input arguments to the appropriate argument, which depends
+    on whether the annotation volumes are ID or RGB based and whether they have Numba
+    compatible dtypes.
 
-    Parameters:
+    After the volume has been labeled, an .npy copy of the labeled volume will be
+    cached onto the disk. Disk space availability should be pre-checked before this
+    function is called, as this is not a forward-facing function.
+
+    Parameters
+    ----------
     volume : np.ndarray
-
+        The input volume to be labeled. This volume will be cached as a .npy file after
+        it has been labeled.
     annotation_file : str
-        The filepath to the ".nii" type annotation.
-
+        The filepath to the input annotation volume. This path should point to either
+        a NIfTI file or a directory of RGB images.
     roi_array : np.ndarray
-        The ROI_array built with the ``segmentation_prep.build_roi_array``
-        function. Contains the family of int-based RGB values that represent
-        each of the ROIs.
-
+        _description_
     annotation_type : str
-        The type of annotation. Options are ``["ID", "RGB"]``.
-
-    cache_dir : str, optional
-        The directory where an .npy copy of the labeled_volume will be cached.
-        Default ``None``, which leads to a save in the ``library/cache/``
-        folder.
-
+        The ROI array constructed with the ``segmentation_prep.buile_roi_array``
+        function. Contains the family of int values that represent each structure in the
+        ROIs.
+    cache_directory : str, optional
+        The directory where the labeled volume should be cached, by default None
     verbose : bool, optional
-        Default ``False``.
+        Print the status of the labeling, by default False
 
-    Returns:
-    np.ndarray : volume
-        The labeled volume.
-
-    np.ndarray : roi_volumes
-        The number of voxels present in each ROI.
-
-    np.ndarray : minima
+    Returns
+    -------
+    roi_volumes : np.ndarray
+        The an (n,) dimensional array where each element represents the number of voxels
+        present in each ROI. The index of these elements corresponds with the index of
+        the ROIs from the input roi_array.
+    minima : np.ndarray
         An (n,3) shaped array containing the minima for each ROI. Used for
         segmentation bounding.
-
-    np.ndarray : maxima
+    maxima : np.ndarray
         An (n,3) shaped array containing the maxima for each ROI. Used for
         segmentation bounding.
     """
@@ -512,7 +466,7 @@ def volume_labeling_input(
             volume, annotation_file, roi_array, verbose=verbose
         )
     elif annotation_type == "RGB":
-        labeled_volume, roi_volumes, minima, maxima = RGB_labeling_input(
+        labeled_volume, roi_volumes, minima, maxima = volume_sliced_labeling(
             volume, annotation_file, roi_array, verbose=verbose
         )
 

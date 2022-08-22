@@ -66,15 +66,15 @@ test_roi_prep = [("Max Children Test.json", 552), ("Cortex Unique.json", 151)]
 
 
 @pytest.mark.parametrize("datafile, expected_keys", test_roi_prep)
-def test_prep_roi_array(datafile, expected_keys):
+def test_construct_id_dict(datafile, expected_keys):
     annotation_data = tree_processing.load_vesselvio_annotation_file(
         os.path.join(ANNOTATION_DIR, datafile)
     )
 
     roi_array = segmentation_prep.build_roi_array(annotation_data, "ID")
-    id_dict, id_keys = segmentation_prep.prep_roi_array.py_func(roi_array)
-    assert isinstance(id_keys, set)
-    assert len(id_keys) == expected_keys
+    id_dict, id_dict_keyset = segmentation_prep.construct_id_dict.py_func(roi_array)
+    assert isinstance(id_dict_keyset, set)
+    assert len(id_dict_keyset) == expected_keys
     return
 
 
