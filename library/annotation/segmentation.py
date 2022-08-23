@@ -23,24 +23,23 @@ def segment_roi(
     maxima: np.ndarray,
     segmentation_id: int,
 ) -> np.ndarray:
-    """Given a labeled volume and ROI bounds, segment the loaded id.
+    """Return a segmented region of interest from a labeled vasculature volume.
 
-    Parameters:
+    Parameters
+    ----------
     labeled_volume : np.ndarray
-        An ndim=3 array containing labeled regions.
+        The labeled vasculature volume.
+    minima : np.ndarray
+        The minima of the ROI in [z, y, x] format.
+    maxima : np.ndarray
+        The maxima of the ROI in [z, y, x] format.
+    segmentation_id : int
+        The integer-based ID of the ROI that will be segmented from the labeled volume.
 
-    mins : np.ndarray
-        An (3,) array containing the lower bounds of the ROI.
-
-    mins : np.ndarray
-        An (3,) array containing the upper bounds of the ROI.
-
-    segmentation_id: int
-        An int id of the volume to segment
-
-    Returns:
-    np.ndarray : volume
-        The segmented and bounded region of interest.
+    Returns
+    -------
+    volume : np.ndarray
+        The segmented ROI from the input volume.
     """
     # Isolate the segmented region from the main volume
     volume = labeled_volume[
@@ -67,30 +66,25 @@ def roi_segmentation_input(
     labeled_volume_fname: str = None,
     verbose: bool = False,
 ) -> np.ndarray:
-    """Load the cached labeled volume and segment the desired ROI.
+    """The input function used to segment an ROI from a cached labeled volume.
 
-    This is a higher-level input function that is used during backend
-    dataset processing. A cache of the labeled volume is stored prior to
-    segmentation
-
-    Parameters:
+    Parameters
+    ----------
     minima : np.ndarray
-
+        The minima of the ROI to be segmented in [z, y, x] format.
     maxima : np.ndarray
-
+        The maxima of the ROI to be segmented in [z, y, x] format.
     segmentation_id : int
-        The integer-id of the ROI that will be segmented.
-
+        The integer-based ID of the ROI that will be segmented from the labeled volume.
     labeled_volume_fname : str, optional
-        The filepath pointing to the labeled volume.
-
+        The filepath to the cached labeled volume, by default None
     verbose : bool, optional
-        Default ``False``.
+        Print the status of the ROI segmentation, by default False
 
-    Returns:
-    np.ndarray : volume
-        The segmented and bounded region of interest.
-
+    Returns
+    -------
+    np.ndarray
+        _description_
     """
     if verbose:
         t = pf()
