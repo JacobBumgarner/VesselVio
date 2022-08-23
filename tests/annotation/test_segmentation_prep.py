@@ -14,18 +14,20 @@ ANNOTATION_DIR = os.path.join(FIXTURE_DIR, "test_files", "annotation_data")
 
 
 @pytest.mark.datafiles(ANNOTATION_DIR)
-def test_build_roi_array(datafiles):
+def test_construct_roi_array(datafiles):
     annotation_dict = tree_processing.load_vesselvio_annotation_file(
         os.path.join(datafiles, "Cortex Unique.json")
     )
 
     # ID Check
-    roi_array = segmentation_prep.build_roi_array(annotation_dict, annotation_type="ID")
+    roi_array = segmentation_prep.construct_roi_array(
+        annotation_dict, annotation_type="ID"
+    )
     assert roi_array.shape == (6, 78)
     assert np.issubdtype(roi_array.dtype, np.uint32)
 
     # RGB Check
-    roi_array = segmentation_prep.build_roi_array(
+    roi_array = segmentation_prep.construct_roi_array(
         annotation_dict, annotation_type="RGB"
     )
     assert roi_array.shape == (6, 2)
@@ -35,12 +37,12 @@ def test_build_roi_array(datafiles):
 
 
 @pytest.mark.datafiles(ANNOTATION_DIR)
-def test_convert_hex_list_to_int(datafiles):
+def test_convert_hex_list_to_int_list(datafiles):
     annotation_dict = tree_processing.load_vesselvio_annotation_file(
         os.path.join(datafiles, "Cortex Unique.json")
     )
     hex_ROIs = [annotation_dict[key]["colors"] for key in annotation_dict.keys()]
-    int_ROIs = segmentation_prep.convert_hex_list_to_int(hex_ROIs)
+    int_ROIs = segmentation_prep.convert_hex_list_to_int_list(hex_ROIs)
     assert len(int_ROIs) == 6
     assert len(int_ROIs[0]) == 1
     assert isinstance(int_ROIs[0][0], int)
@@ -71,7 +73,7 @@ def test_construct_id_dict(datafile, expected_keys):
         os.path.join(ANNOTATION_DIR, datafile)
     )
 
-    roi_array = segmentation_prep.build_roi_array(annotation_data, "ID")
+    roi_array = segmentation_prep.construct_roi_array(annotation_data, "ID")
     id_dict, id_dict_keyset = segmentation_prep.construct_id_dict.py_func(roi_array)
     assert isinstance(id_dict_keyset, set)
     assert len(id_dict_keyset) == expected_keys
@@ -79,27 +81,28 @@ def test_construct_id_dict(datafile, expected_keys):
 
 
 @pytest.mark.datafiles(ANNOTATION_DIR)
-def test_prep_volume_arrays(datafiles):
+def test_construct_roi_volume_arrays(datafiles):
     annotation_data = tree_processing.load_vesselvio_annotation_file(
         os.path.join(datafiles, "Cortex Unique.json")
     )
 
-    roi_array = segmentation_prep.build_roi_array(annotation_data, "ID")
-    roi_volumes, volume_updates = segmentation_prep.prep_volume_arrays.py_func(
-        roi_array
-    )
+    roi_array = segmentation_prep.construct_roi_array(annotation_data, "ID")
+    (
+        roi_volumes,
+        volume_update_array,
+    ) = segmentation_prep.construct_roi_volume_arrays.py_func(roi_array)
 
     assert isinstance(roi_volumes, np.ndarray)
     assert roi_volumes.shape == (6,)
-    assert volume_updates.shape == (6, 6)
+    assert volume_update_array.shape == (6, 6)
 
 
-def test_build_minima_maxima_arrays():
+def test_construct_minima_maxima_arrays():
     volume = np.zeros((5, 10, 10))
     roi_array = np.zeros((10, 5))
 
-    minima, maxima = segmentation_prep.build_minima_maxima_arrays.py_func(
-        volume, roi_array
+    minima, maxima = segmentation_prep.construct_minima_maxima_arrays.py_func(
+        volume.shape, roi_array.shape[0]
     )
     assert minima.shape == (roi_array.shape[0], 3)
     assert maxima.shape == (roi_array.shape[0], 3)

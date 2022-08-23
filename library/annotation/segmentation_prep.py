@@ -7,34 +7,46 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
-import typing
+from typing import Tuple, Union
 
 import numpy as np
 from numba import njit
 
 
-def build_roi_array(roi_dict: dict, annotation_type: str = "ID") -> np.ndarray:
-    """Convert a list of parent and child annotations into into an roi_array.
+def construct_roi_array(
+    annotation_dict: dict, annotation_type: str = "ID"
+) -> np.ndarray:
+    """Construct an ROI array where each row contains the children IDs of each ROI.
 
-    Given an roi_dict (Annotation Processing export), this function converts the
-    parent structure list into
-
-    Parameters:
-    roi_dict : dict
-        An roi_dict created from the Annotation Processing page. Must be pre-
-        loaded using the `load_annotation_file` function.
-
+    Parameters
+    ----------
+    annotation_dict : dict
+        A VesselVio annotation dictionary created with the
+        ``tree_processing.convert_annotation_data`` function or loaded with the
+        ``tree_processing.load_vesselvio_annotation_file`` function.
+        An example annotation_dict might look like this:
+        {"Eye": {"colors": ["#190000"], "ids": [1]}}
     annotation_type : str, optional
-        The type of annotation. Options [`"ID"`, `"RGB"`]. Default `"ID"`.
+        The type of annotation data to be pulled from the annotation_dict. Must be either
+        "ID" or "RGB", by default "ID"
 
-    Returns:
-    np.array : roi_array
+    Returns
+    -------
+    roi_array : np.ndarray
         An array of (n,m) shape, where n is the number of ROIs, and m is
         the largest number of children that an individual ROI has. Each row of the array
         contains the IDs of the children in the array. If the row has fewer children
         than the length of the array, the rest of the elements after the final child are
         filled with zeros. This array is necessary for Numba processing.
+
+    Raises
+    ------
+    TypeError
+        Raised error if the ``annotation_type`` is not a string.
+    ValueError
+        Raised error if the ``annotation_type`` is not either "ID" or "RGB".
     """
+
     # isolate the ROIs
     if not isinstance(annotation_type, str):
         raise TypeError("annotation_type must be a string.")
@@ -42,10 +54,10 @@ def build_roi_array(roi_dict: dict, annotation_type: str = "ID") -> np.ndarray:
         raise ValueError("annotation_type must be one of the follow: 'ID', 'RGB'.")
 
     dict_key = "ids" if annotation_type.lower() == "id" else "colors"
-    ROIs = [roi_dict[key][dict_key] for key in roi_dict.keys()]
+    ROIs = [annotation_dict[key][dict_key] for key in annotation_dict.keys()]
 
     if annotation_type == "RGB":
-        ROIs = convert_hex_list_to_int(ROIs)
+        ROIs = convert_hex_list_to_int_list(ROIs)
 
     ### REMOVE BEFORE FLIGHT ###
     ### REMOVE BEFORE FLIGHT ###
@@ -65,18 +77,24 @@ def build_roi_array(roi_dict: dict, annotation_type: str = "ID") -> np.ndarray:
     return roi_array
 
 
-def convert_hex_list_to_int(hex_family_tree: list) -> list:
+def convert_hex_list_to_int_list(hex_family_tree: list) -> list:
     """Convert a list of hex colors into a list of int values.
 
-    Given an (n,m) list of hex-based annotation representations, return an
-    (n,m) shaped list of integer-RGB representations.
+    Parameters
+    ----------
+    hex_family_tree : list
+        An (m, n) shaped list, where each m index is an individual ROI, and each n
+        element is the hex color associated with the ROI child.
 
-    Parameters:
-    hex_list : list
-
-    Returns:
+    Returns
+    -------
     list
+        An (m, n) shaped list where the child hex colors have been converted to their
+        corresponding unique integer value. These int_lists are used to identify the
+        children in the int-converted RGB values in the ``labeling.convert_bgr_to_int``
+        function.
     """
+
     int_family_tree = [
         [int(hex_child, base=16) for hex_child in parent_tree]
         for parent_tree in hex_family_tree
@@ -103,23 +121,54 @@ def find_max_children_count(parent_tree: list) -> int:
     return max_children
 
 
+"""Use the roi_array to prepare the objects for a segmentation.
+
+Parameters:
+roi_array : np.ndarray
+    The roi_array created with the ``construct_roi_array` function. Stores the
+    ids associated with each parent region.
+
+Returns:
+id_dict : dict
+    A dict where each key points to the row number of the parent structure
+    that it is related to.
+
+id_dict_keyset : set
+    The unique set of ids.
+"""
+
+
 @njit(cache=True)
-def construct_id_dict(roi_array: np.ndarray) -> typing.Tuple[dict, set]:
-    """Use the roi_array to prepare the objects for a segmentation.
+def construct_id_dict(roi_array: np.ndarray) -> Tuple[dict, set]:
+    """Construct an ID dictionary from an input roi_array.
 
-    Parameters:
+    Each key in this dictionary represents the ID of the selected ROI, and each key
+    points to the row that the ROI is located in the roi_array.
+
+    For example, the "Eye" region ID might have children IDs `1` and `2`, and it may
+    represent the third ROI selected for the analysis. The entries for the "Eye" ROI
+    in this ID dictionary would be: ``1:2`` and ``2:2``. If either of ID values are
+    identified in an analysis, the corresponding vasculature will be labeled with ``3``
+    and the third row of the ROI volumes array will be updated appropriately.
+
+    Parameters
+    ----------
     roi_array : np.ndarray
-        The roi_array created with the ``build_roi_array` function. Stores the
-        ids associated with each parent region.
+        The ROI array constructed with a VesselVio annotation dict file sent to
+        ``construct_roi_array``.
 
-    Returns:
+    Returns
+    -------
     id_dict : dict
-        A dict where each key points to the row number of the parent structure
-        that it is related to.
-
+        The ID dictionary.
     id_dict_keyset : set
-        The unique set of ids.
+        A set of the keys in the dictionary. This object is returned in order to ensure
+        that any 0s from the ROI array are removed from the dict keys.
+
+    Tuple[dict, set]
+        _description_
     """
+
     id_dict = dict()
     for n in range(roi_array.shape[0]):
         for roi_id in range(roi_array.shape[1]):
@@ -133,48 +182,63 @@ def construct_id_dict(roi_array: np.ndarray) -> typing.Tuple[dict, set]:
 
 
 @njit(cache=True)
-def prep_volume_arrays(roi_array) -> typing.Tuple[np.ndarray, np.ndarray]:
-    """Prepare the arrays used to record ROI volumes.
+def construct_roi_volume_arrays(
+    roi_array: np.ndarray,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Return an empty array used to record volume values and an identity array.
 
-    Parameters:
+    These arrays are used to record the volumes of ROIs in the labeled volume. Because
+    Numba can only keep track of array slice updates in parallel and not individual
+    element updates, the ROI volumes array is updated with a slice of an identity
+    matrix, where the slice is determined by the index of the ROI.
+
+    Parameters
+    ----------
     roi_array : np.ndarray
-        The ROI array created with the ``build_roi_array`` function.
+        The ROI array created with the ``construct_roi_array`` function. Used to inform
+        the shape of the ROI volume and identity arrays.
 
-    Returns:
-    np.ndarray : roi_volumes
+    Returns
+    -------
+    roi_volume : np.ndarray
         An empty np.zeros() array used to add the ROI volume to.
 
-    np.ndarray : volume_updates
-        This is a complicated one... Hold on. Numba does not keep track of
-        updates to individual numpy array elements in parallel processing.
-        However, numba does keep track of whole-array updates during parallel
-        processing. As such, volume_updates is an ``np.identity`` array used
-        to update the element of interest during ``slice_labeling``.
+    volume_update_array : np.ndarray
+        An ``np.identity`` array used to update the element of interest during
+        ``labeling.volume_slice_labeling``.
     """
     roi_volumes = np.zeros(roi_array.shape[0])
-    volume_updates = np.identity(roi_array.shape[0])
-    return roi_volumes, volume_updates
+    volume_update_array = np.identity(roi_array.shape[0])
+    return roi_volumes, volume_update_array
 
 
 @njit(cache=True)
-def build_minima_maxima_arrays(
-    volume: np.ndarray, roi_array: np.ndarray
-) -> typing.Tuple[np.ndarray, np.ndarray]:
-    """Return minima and maxima arrays for segmentation bounding.
+def construct_minima_maxima_arrays(
+    volume_shape: Union[np.ndarray, list], n_rois: int
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Return arrays used to record the minima and maxima of each ROI.
 
-    The maxima array starts with 0 values, and the minima array starts with the
+    The arrays are returned by default with inverted values. I.e., the maxima array is
+    filled with zeros, and the minima array is filled with the maximum index of the
+    volume. During volume labeling, the location of each ROI voxel is compared to these
+    arrays, and the arrays are updated as necessary.
 
-
-    Parameters:
+    Parameters
+    ----------
     volume : np.ndarray
+        The shape of the volume that is going to be labeled.
+    n_rois : int
+        The number of ROIs to record minima and maxima for.
 
-    roi_array : np.ndarray
-
-    Returns:
-    np.ndarray : minima
-
-    np.ndarray : maxima
+    Returns
+    -------
+    minima : np.ndarray
+        An (m, 3) array used to record the [z, y, x] minima of each ROI, where each
+        value is by default the largest index of each array.
+    maxima : np.ndarray
+        An (m, 3) array used to record the [z, y, x] maxima of each ROI, where each
+        value is by default zero.
     """
-    minima = np.ones((roi_array.shape[0], 3), dtype=np.int_) * np.array(volume.shape)
-    maxima = np.zeros((roi_array.shape[0], 3), dtype=np.int_)
+    minima = np.ones((n_rois, 3), dtype=np.int_) * np.array(volume_shape)
+    maxima = np.zeros((n_rois, 3), dtype=np.int_)
     return minima, maxima

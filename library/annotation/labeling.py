@@ -196,7 +196,7 @@ def volume_sliced_labeling(
         The filepath to the folder that contains the RGB images with the labeled
         regions of interest.
     roi_array : np.ndarray
-        The ROI_array built with the ``segmentation_prep.build_roi_array``
+        The ROI_array built with the ``segmentation_prep.construct_roi_array``
         function. Contains the family of int-based RGB values that represent
         each of the ROIs.
     id_labeling : bool, optional
@@ -231,12 +231,16 @@ def volume_sliced_labeling(
     # Prepare all of the necessary objects
     id_dict, id_dict_keyset = segmentation_prep.construct_id_dict(roi_array)
 
-    roi_volumes, volume_updates = segmentation_prep.prep_volume_arrays(roi_array)
+    roi_volumes, volume_update_array = segmentation_prep.construct_roi_volume_arrays(
+        roi_array
+    )
     slice_volumes = roi_volumes.copy()
 
     id_dict_keyset = np.asarray(list(id_dict_keyset))  # Numba needs this as an array
 
-    minima, maxima = segmentation_prep.build_minima_maxima_arrays(volume, roi_array)
+    minima, maxima = segmentation_prep.construct_minima_maxima_arrays(
+        volume.shape, roi_array.shape[0]
+    )
 
     # Label each slice of the vasculature volume slice-by-slice
     slices = volume.shape[0] if id_labeling else len(annotation_images)
@@ -256,7 +260,7 @@ def volume_sliced_labeling(
             volume,
             annotation_slice,
             slice_volumes,
-            volume_updates,
+            volume_update_array,
             id_dict,
             id_dict_keyset,
             minima,
@@ -302,7 +306,7 @@ def volume_labeling(
     annotation_memmap : np.memmap
         The memory-mapped annotatino volume.
     roi_array : np.ndarray
-        The ROI_array built with the ``segmentation_prep.build_roi_array``
+        The ROI_array built with the ``segmentation_prep.construct_roi_array``
         function. Contains the family of int-based RGB values that represent
         each of the ROIs.
 
@@ -322,9 +326,13 @@ def volume_labeling(
         segmentation bounding.
     """
     id_dict, id_dict_keyset = segmentation_prep.construct_id_dict(roi_array)
-    roi_volumes, volume_updates = segmentation_prep.prep_volume_arrays(roi_array)
+    roi_volumes, volume_update_array = segmentation_prep.construct_roi_volume_arrays(
+        roi_array
+    )
 
-    minima, maxima = segmentation_prep.build_minima_maxima_arrays(volume, roi_array)
+    minima, maxima = segmentation_prep.construct_minima_maxima_arrays(
+        volume.shape, roi_array.shape[0]
+    )
 
     for z in prange(annotation_memmap.shape[0]):
         for y in range(annotation_memmap.shape[1]):
@@ -332,7 +340,7 @@ def volume_labeling(
                 point_value = annotation_memmap[z, y, x]
                 if point_value and point_value in id_dict_keyset:
                     roi_id = id_dict[point_value]
-                    roi_volumes += volume_updates[roi_id]
+                    roi_volumes += volume_update_array[roi_id]
                     if volume[z, y, x]:
                         volume[z, y, x] = roi_id + 1
                         update_ROI_bounds(minima, maxima, z, y, x, id_dict[point_value])

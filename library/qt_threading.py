@@ -71,7 +71,7 @@ class VolumeThread(QThread):
         if gen_options.annotation_type == "None":
             annotation_data = {None: None}
         else:
-            roi_array = segmentation_prep.build_roi_array(
+            roi_array = segmentation_prep.construct_roi_array(
                 annotation_data, annotation_type=gen_options.annotation_type
             )
 
@@ -432,7 +432,7 @@ class VolumeVisualizationThread(QThread):
         if annotation_type == "None":
             annotation_data = {None: None}
         else:
-            roi_array = segmentation_prep.build_roi_array(
+            roi_array = segmentation_prep.construct_roi_array(
                 annotation_data, annotation_type=annotation_type
             )
 

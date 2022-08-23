@@ -141,7 +141,7 @@ def find_family(tree: list, region_name: str, tree_keys: JSON_Options) -> dict:
 def convert_annotation_data(
     regions: list, annotation_file: str = None, tree_keys=None
 ) -> list:
-    """Convert a list of names into a VesselVio annotation list.
+    """Convert a list of names into a VesselVio annotation dictionary.
 
     Given an annotation tree and a list of region names, identify the ids and
     colors associated with each of the regions.

@@ -32,7 +32,9 @@ def prepped_data():
     rgb_roi_array = np.array([[255, 0], [65280, 0]])
     id_roi_dict, id_roi_keys = segmentation_prep.construct_id_dict(id_roi_array)
     rgb_roi_dict, rgb_roi_keys = segmentation_prep.construct_id_dict(rgb_roi_array)
-    roi_volumes, volume_updates = segmentation_prep.prep_volume_arrays(id_roi_array)
+    roi_volumes, volume_update_array = segmentation_prep.construct_roi_volume_arrays(
+        id_roi_array
+    )
     minima = [(1, 3, 0), (2, 0, 0)]
     maxima = [(3, 4, 2), (4, 1, 4)]
     expected_volumes = [18, 30]
@@ -45,7 +47,7 @@ def prepped_data():
         "rgb_roi_dict": rgb_roi_dict,
         "rgb_roi_keys": rgb_roi_keys,
         "roi_volumes": roi_volumes,
-        "volume_updates": volume_updates,
+        "volume_updates": volume_update_array,
         "expected_minima": minima,
         "expected_maxima": maxima,
         "expected_volumes": expected_volumes,
@@ -71,8 +73,8 @@ def test_update_ROI_bounds():
 def test_label_slice(prepped_data):
     volume = VOLUME.copy()
 
-    minima, maxima = segmentation_prep.build_minima_maxima_arrays(
-        volume, prepped_data["id_roi_array"]
+    minima, maxima = segmentation_prep.construct_minima_maxima_arrays(
+        volume.shape, prepped_data["id_roi_array"].shape[0]
     )
 
     slice_volumes = prepped_data["roi_volumes"].copy()

@@ -141,7 +141,7 @@ def process_volume(
     if ann_options.annotation_type == "None":
         annotation_data = {None: None}
     else:
-        roi_array = segmentation_prep.build_roi_array(
+        roi_array = segmentation_prep.construct_roi_array(
             annotation_data, annotation_type=ann_options.annotation_type
         )
 
