@@ -9,7 +9,7 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 import json
 import os
-import typing
+from typing import Tuple
 
 from library import helpers
 
@@ -17,19 +17,24 @@ from library import helpers
 class JSON_Options:
     """Options class carrying keys for loading JSON annotation trees.
 
-    Parameters:
-    name : str
-        The key that points to the name of the region.
-    children : str
-        The key that points to the name of the region's children.
-    color : str
-        They key that points to the hex-based color of the region.
-    id : str
-        The key that points to the int-based id of the region.
+    Parameters
+    ----------
+    name_key : str
+        The key used in the JSON to point to the name of regions.
+    children_key : str
+        The key that points to the name of individual regions' children.
+    color_key : str
+        The key used to point to the color that is represented by each region.
+    id_key : str
+        The key used to point to the int or float ID that represents each region.
     """
 
     def __init__(
-        self, name="name", children="children", color="color_hex_triplet", id="id"
+        self,
+        name: str = "name",
+        children: str = "children",
+        color: str = "color_hex_triplet",
+        id: str = "id",
     ):
         """Build the options class."""
         self.name = name
@@ -38,58 +43,75 @@ class JSON_Options:
         self.color = color
 
 
-def check_annotation_data_origin(file: str) -> bool:
-    """Confirm that a loaded annotation data JSON comes from VesselVio.
+def check_annotation_data_origin(filepath: str) -> bool:
+    """Return whether the selected file is a VesselVio annotation data file.
 
-    Parameters:
-    file : str
+    Parameters
+    ----------
+    filepath : str
+        The filepath to the annotation data file. Should be a JSON, False returned if
+        not.
 
-    Returns:
-    bool : compatible_data
-        A tree structure dict containing the name, color, id, and children of
-        each region.
+    Returns
+    -------
+    bool
+        Whether the file is a VesselVio annotation data file.
     """
-    with open(file) as f:
+    if not os.path.splitext(filepath)[0].lower() == ".json":
+        return False
+
+    with open(filepath) as f:
         annotation_data = json.load(f)
     return "VesselVio Annotations" in annotation_data.keys()
 
 
 def load_vesselvio_annotation_file(file: str) -> dict:
-    """Load a VesselVio Annotation file.
+    """Load a vesselvio annotation data file.
 
-    Parameters:
+    Parameters
+    ----------
     file : str
+        The path pointing to the VesselVio annotation data file.
 
-    Returns:
-    dict : annotation_data
-        A tree structure dict containing the name, color, id, and children of
-        each region.
+    Returns
+    -------
+    annotation_data : dict
+        The annotation data file. Example return may be:
+        ``{"Eye": {"colors": ["#190000"], "ids": [1]}}``
     """
     with open(file) as f:
         annotation_data = json.load(f)["VesselVio Annotations"]
     return annotation_data
 
 
-def find_children(sub_tree, ids, colors, tree_keys) -> typing.Tuple[list, list]:
-    """Identify the hex colors and ids of the input parent region.
+def find_children(
+    sub_tree: list, ids: list, colors: list, tree_keys: JSON_Options
+) -> Tuple[list, list]:
+    """Recursively identify the hex colors and ids of the children of a parent region.
 
-    Recursively index through the children of the parent region and their
+    Recursively indexes through the children of the parent region and their
     children to find all of the hex colors and ids associated with the parent
     region.
 
-    Parameters:
+    Parameters
+    ----------
     sub_tree : list
-        A list that contains the dict information of the children regions. The
-        list may be empty.
-
+        An list of all of the children of the parent ROI. Each of these elements will
+        be a dictionary.
     colors : list
-        A single list containing all of the related colors.
-
+        An list of all of the children IDs of the parent ROI. The list may be empty.
     ids : list
-        A single list containing all of the related ids.
-
+        An list of all of the children colors of the parent ROI. The list may be empty.
     tree_keys : JSON_Options
+        A JSON_Options class that carries the key information that points to the IDs,
+        colors for the dict elements in the ``sub_tree` list.
 
+    Returns
+    -------
+    ids : list
+        An updated list of all of the children IDs of the parent ROI.
+    colors : list
+        An updated list of all of the children colors of the parent ROI.
     """
     for child in sub_tree:
         ids.append(child[tree_keys.id])
@@ -102,20 +124,23 @@ def find_children(sub_tree, ids, colors, tree_keys) -> typing.Tuple[list, list]:
 
 
 def find_family(tree: list, region_name: str, tree_keys: JSON_Options) -> dict:
-    """Return the family of the input annotation region.
+    """Return the family information of an input annotation region.
 
-    Parameters:
+    Parameters
+    ----------
     annotation_tree : list
         A list of dicts, where each dict is a region with the associated
-        information.
-
+        information. This dict typically comes from a tree annotation file, such as
+        the Allen Intitute mouse brain tree.
     region_name : str
         The name of the region whose family will be found.
-
     tree_keys : JSON_Options
+        A JSON_Options class that carries the key information that points to the IDs,
+        colors for the dict elements in family.
 
-    Returns:
-    dict
+    Returns
+    -------
+    family : dict
         A dict with two keys: [``"colors"``, ``"ids"``]. The items of the keys
         represent all of ids and colors of the family, including the parent's.
 
@@ -146,20 +171,21 @@ def convert_annotation_data(
     Given an annotation tree and a list of region names, identify the ids and
     colors associated with each of the regions.
 
-    Parameters:
+    Parameters
+    ----------
     regions : list
-
+        The regions to be extracted from the tree.
     annotation_file : str, optional
         The filepath to the annotation tree. The tree must contain a
-        'root' parent. Defaults to the ``"p56 Mouse Brain.json"`` file from
-        the Allen Institute.
-
+        'root' parent. The default file is from the the Allen Institute, defaults to
+        ``"p56 Mouse Brain.json"``.
     tree_keys : JSON_Options, optional
         The keys to find the id, name, color, and children of each region in the
-        annotation file. Default ``JSON_Options()``
+        annotation file, defaults to ``JSON_Options()``
 
-    Returns:
-    dict : annotation_info
+    Returns
+    -------
+    annotation_info : dict
         A dict where each key is the region name, and the time is a second
         dict containing the all of the family ids and colors of the parent
         region.
@@ -194,7 +220,7 @@ def convert_annotation_data(
 ###########
 ### RGB ###
 ###########
-def RGB_duplicates_check(annotation_data) -> bool:
+def RGB_duplicates_check(annotation_data: dict) -> bool:
     """Determine whether duplicate colors exist among annotation regions.
 
     For RGB processing, it is important to determine whether individual regions
@@ -204,16 +230,19 @@ def RGB_duplicates_check(annotation_data) -> bool:
     regions were selected for separate analyses, the results would include
     vessels from both regions.
 
-    Parameters:
+    Parameters
+    ----------
     annotation_data : dict
-        A dict output of the `Annotation Processing` export that has been pre-
-        processed using `prep_RGB_annotation`.
+        A dictionary output of the `Annotation Processing` export that has been
+        preprocessed using `prep_RGB_annotation`.
 
-    Returns:
-    bool : True if duplicates present, False otherwise
+    Returns
+    -------
+    duplicates_present : bool
+        True if duplicates present, False otherwise
     """
     nested_hexes = [annotation_data[key]["colors"] for key in annotation_data.keys()]
     hexes = [color for nested_colors in nested_hexes for color in nested_colors]
 
-    duplicates = len(hexes) != len(set(hexes))
-    return duplicates
+    duplicates_present = len(hexes) != len(set(hexes))
+    return duplicates_present

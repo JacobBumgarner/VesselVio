@@ -66,7 +66,7 @@ def roi_segmentation_input(
     labeled_volume_fname: str = None,
     verbose: bool = False,
 ) -> np.ndarray:
-    """The input function used to segment an ROI from a cached labeled volume.
+    """Input function used to segment an ROI from a cached labeled volume.
 
     Parameters
     ----------
@@ -83,8 +83,9 @@ def roi_segmentation_input(
 
     Returns
     -------
-    np.ndarray
-        _description_
+    volume : np.ndarray
+        The segmented region of interest.
+
     """
     if verbose:
         t = pf()

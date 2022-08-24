@@ -46,7 +46,6 @@ def construct_roi_array(
     ValueError
         Raised error if the ``annotation_type`` is not either "ID" or "RGB".
     """
-
     # isolate the ROIs
     if not isinstance(annotation_type, str):
         raise TypeError("annotation_type must be a string.")
@@ -94,7 +93,6 @@ def convert_hex_list_to_int_list(hex_family_tree: list) -> list:
         children in the int-converted RGB values in the ``labeling.convert_bgr_to_int``
         function.
     """
-
     int_family_tree = [
         [int(hex_child, base=16) for hex_child in parent_tree]
         for parent_tree in hex_family_tree
@@ -168,7 +166,6 @@ def construct_id_dict(roi_array: np.ndarray) -> Tuple[dict, set]:
     Tuple[dict, set]
         _description_
     """
-
     id_dict = dict()
     for n in range(roi_array.shape[0]):
         for roi_id in range(roi_array.shape[1]):
