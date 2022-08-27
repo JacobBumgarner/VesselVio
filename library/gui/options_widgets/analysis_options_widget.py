@@ -19,10 +19,12 @@ class AnalysisOptionsWidget(QWidget):
     Also dictates the results export settings during batch analysis
     and visualization.
 
-    Parameters:
-    visualizing : bool
-        Determines whether to add the Segment Results Export and Save Graph
-        options to the analysis page.
+    Parameters
+    ----------
+    visualizing : bool, optional
+        Determines whether to add the "Segment Results Export" and "Save Graph"
+        options. These options are not available on the visualization page during the
+        initial visualization generation. Defaults to ``False``.
     """
 
     def __init__(self, visualizing=False):
@@ -145,8 +147,7 @@ class AnalysisOptionsWidget(QWidget):
 
         Represents either 2D or 3D units.
 
-        Calls self.update_units() to ensure that the degree of units is
-        appropriate.
+        Calls self.update_units() to ensure that the degree of units is appropriate.
         """
         if self.imageDimension.currentText() == "2D":
             self.anisoResolutionWidget.setVisible(False)
@@ -185,19 +186,18 @@ class AnalysisOptionsWidget(QWidget):
     def prepare_options(self, results_folder=None, visualization=False):
         """Prepare the input options for an anlaysis or visualization.
 
-        Parameters:
+        Parameters
+        ----------
         results_folder : str, optional
-            Default: None
-            The folder where the results will be exported.
-
+            The folder where the results will be exported. Defaults to ``None``.
         visualization : bool, optional
-            Default: False
             Indicates whether the results will be used for an analysis or
-            visualization
+            visualization. Defaults to ``False``.
 
-        Returns:
-        input_classes.AnalysisOptions
-
+        Returns
+        -------
+        analysis_options : input_classes.AnalysisOptions
+            The AnalysisOptions class that carries the selected analysis information.
         """
         # resolution
 

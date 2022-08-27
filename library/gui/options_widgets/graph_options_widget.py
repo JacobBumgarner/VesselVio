@@ -20,8 +20,13 @@ from library.objects import GraphAnalysisOptions, GraphAttributeKey
 class GraphOptionsWidget(QWidget):
     """An options widget for graph analysis settings and graph feature keys.
 
-    Parameters:
-    fileTable : AnalysisFileTable
+    Parameters
+    ----------
+    fileTable : AnalysisFileTable, optional
+        The file table that shows the loaded vasculature files. This option is available
+        for the Analysis Page and is passed to this object in order to update the
+        column headers for CSV graphs. If non-CSV graphs are loaded, the file table
+        will only have two columns. Otherwise, it will have three. Defaults to ``None``.
 
     """
 
@@ -197,8 +202,10 @@ class GraphOptionsWidget(QWidget):
         """Return the analysis options for the input graph.
 
         Returns:
-        GraphAnalysisOptions
-
+        --------
+        graph_options : input_classes.GraphAnalysisOptions
+            The input keys and selected parameters necessary to load and analyze a
+            pre-constructed vasculature graph.
         """
         # Prepare the attribute_key
         attribute_key = GraphAttributeKey(
