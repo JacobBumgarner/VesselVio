@@ -468,7 +468,7 @@ class VolumeVisualizationThread(QThread):
                         file_size = helpers.get_file_size(volume_file, GB=True)
                         self.analysis_status.emit(
                             [
-                                f"Visualization cancelled: Not enough disk space.<br>>{file_size:.f}GB of free space needed.",
+                                f"Visualization cancelled: Not enough disk space.<br>>{file_size:.2f}GB of free space needed.",
                                 0,
                             ]
                         )
