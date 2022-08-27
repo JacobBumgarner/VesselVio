@@ -19,10 +19,15 @@ from library.gui import qt_objects as QtO
 class CSVGraphFileLoader(QDialog):
     """Widget used to load CSV-based graphs.
 
-    Attributes:
+    Attributes
+    ----------
     main_files : list
-
-    associated_files = list
+        The csv files containing the graph vertex information. The list of these files
+        is called ``main_files`` to stay consistent with the other file loader classes.
+    associated_files : list
+        The csv files containing the graph edge information. The list of these files is
+        called ``associated_files`` to stay consistent with the other files loader
+        classes.
 
     """
 
@@ -32,6 +37,10 @@ class CSVGraphFileLoader(QDialog):
     def __init__(self):
         """Build the CSV file loader."""
         super().__init__()
+
+        # Set up main & associated file objects
+        self.main_files = []
+        self.associated_files = []
 
         # Dialog contains a form layout with a cancel button
         windowLayout = QtO.new_layout(orient="V")
@@ -96,15 +105,21 @@ class CSVGraphFileLoader(QDialog):
 class AnnotationFileLoader(QDialog):
     """Widget used to load annotation files.
 
-    Parameters:
+    Parameters
+    ----------
     annotation_type : str
-        Must be either ``"ID"`` or ``"RGB"``
+        Must be either ``"ID"`` or ``"RGB"``. Indicates the type of annotation files
+        that will be loaded for the analysis. The RGB type generates a
+        QFileLoadingWidget that seeks directories (of RGB images), and the ID type
+        generates a widget that seeks image file types.
 
-    Attributes:
+    Attributes
+    ----------
     main_files : list
-
-    associated_files = list
-
+        The main vasculature files to be analyzed.
+    associated_files : list
+        The vasculature annotation files. These files can either be folders of RGB
+        series or image files with int- or float-based region annotations.
     """
 
     main_files = []
@@ -113,6 +128,9 @@ class AnnotationFileLoader(QDialog):
     def __init__(self, annotation_type: str):
         """Build the file loading widget."""
         super().__init__()
+        if not annotation_type.lower() in ["rgb", "id"]:
+            raise ValueError("``annotation_type`` must either be 'ID' or 'RGB'.")
+
         self.annotation_type = annotation_type
 
         # Dialog contains a form layout with a cancel button
