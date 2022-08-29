@@ -83,3 +83,26 @@ class IncompleteFileLoadingWarning(MessageBoxTemplate):
         """
         super().__init__(message, window_title)
         self.exec_()
+
+
+class DiskSpaceWarning(MessageBoxTemplate):
+    """A warning inicating insufficient disk space for an annotation analysis.
+
+    Parameters
+    ----------
+    needed_space : float
+        The amount of needed disk space in GB.
+
+    """
+
+    def __init__(self, needed_space: float):
+        window_title = "Disk Space Error"
+        message = (
+            "<center>During the analysis, one or more files were unable to be",
+            "analyzed because of insufficient free disk memory.<br><br>",
+            "<center>To analyze annotated volume datasets, VesselVio will need",
+            f"at least <u>{needed_space:.1f} GB</u> of free space.",
+        )
+
+        super().__init__(message, window_title)
+        self.exec_()
