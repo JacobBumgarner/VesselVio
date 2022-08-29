@@ -1,6 +1,4 @@
-"""
-The QTableWidget used to visualize the loaded files.
-"""
+"""The QTableWidget used to visualize the loaded files."""
 
 __author__ = "Jacob Bumgarner <jrbumgarner@mix.wvu.edu>"
 __license__ = "GPLv3 - GNU General Pulic License v3 (see LICENSE)"
@@ -22,9 +20,10 @@ class AnalysisFileTable(QTableWidget):
     """
     QTableWidget used to view the loaded datasets and their analysis status.
 
-    Parameters:
+    Parameters
+    ----------
     file_manager : objects.AnalysisFileManager
-        The file manager that manages the files for an analysis.
+        The manager of all of the files for an analysis.
     """
 
     def __init__(self, file_manager: AnalysisFileManager):
@@ -56,9 +55,12 @@ class AnalysisFileTable(QTableWidget):
     def clear_selected_files(self, selected_rows: Union[int, list] = None):
         """Clear the selected files from the table.
 
-        Parameters:
-        selected_rows : list
-            A reverse sorted list of row indices.
+        Parameters
+        ----------
+        selected_rows : int, list
+            A reverse sorted list of row indices, or a single int that indicates
+            which row should be removed. The list should be reverse sorted, as the
+            row removal has to happen from the back. Default is None.
         """
         if not selected_rows:
             selected_rows = self.get_selected_row_indices()
@@ -77,11 +79,12 @@ class AnalysisFileTable(QTableWidget):
         Column 1 shows file names.
         Column 2 shows the analysis status of the file.
 
-        Parameters:
+        Parameters
+        ----------
         startup : bool
             Adjust the column sizes to the default width, emperically determined.
             This necessary because the widget is resized after creation when being
-            built on startup, thereby destroying the default sizing.
+            built on startup, thereby destroying the default sizing. Default is False.
         """
         self.layout_type = "Default"
 
@@ -141,10 +144,10 @@ class AnalysisFileTable(QTableWidget):
     def set_table_layout(self, header: list, widths: list):
         """Update the layout of the file table.
 
-        Parameters:
+        Parameters
+        ----------
         header : list
             A list of strings used for the headers of each column.
-
         widths : list
             A list of integers with the file widths
         """
@@ -175,7 +178,7 @@ class AnalysisFileTable(QTableWidget):
     # File status updates
     @property
     def file_rows(self):
-        """The number of rows that the loaded files occupy."""
+        """Return the number of rows that the loaded files occupy."""
         rows = max(
             len(self.file_manager.main_files), len(self.file_manager.associated_files)
         )
@@ -211,11 +214,12 @@ class AnalysisFileTable(QTableWidget):
     def update_file_queue_status(self, annotation_updates: bool = True):
         """Add a 'queued' status to each of the loaded files.
 
-        Parameters:
+        Parameters
+        ----------
         body_update : bool, optional
             Determines whether the annotation column needs to also be updated.
             This isn't necessary when ``update_body`` is the call source.
-            Default ``True``.
+            Default is True.
         """
         last_column = self.columnCount() - 1
         for i in range(self.rowCount()):
@@ -242,9 +246,11 @@ class AnalysisFileTable(QTableWidget):
     def update_analysis_file_status(self, update_status: StatusUpdate):
         """Update the analysis status of a file.
 
-        Parameters:
-        status : list
-
+        Parameters
+        ----------
+        status : StatusUpdate
+            A StatusUpdate object that carries the current status of the analysis or
+            the visualization.
         """
         # the analysis status will always be in the last column
         update_column = self.columnCount() - 1
@@ -270,8 +276,10 @@ class AnalysisFileTable(QTableWidget):
     def update_row_selection(self, row: int):
         """Update the selected row of the table.
 
-        Parameters:
+        Parameters
+        ----------
         row : int
+            The index of the row that was selected.
         """
         if row not in self.get_selected_row_indices():
             self.selectRow(row)
@@ -280,8 +288,10 @@ class AnalysisFileTable(QTableWidget):
     def get_selected_row_indices(self) -> list:
         """Return a list of the selected rows.
 
-        Returns:
+        Returns
+        -------
         list : selected_rows
+            The list of currently selected rows.
         """
         selected_rows = self.selectionModel().selectedRows()
         if len(selected_rows):
