@@ -57,7 +57,7 @@ def check_annotation_data_origin(filepath: str) -> bool:
     bool
         Whether the file is a VesselVio annotation data file.
     """
-    if not os.path.splitext(filepath)[0].lower() == ".json":
+    if not os.path.splitext(filepath)[1].lower() == ".json":
         return False
 
     with open(filepath) as f:
