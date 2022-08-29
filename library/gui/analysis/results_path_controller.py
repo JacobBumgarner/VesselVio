@@ -1,6 +1,4 @@
-"""
-The results export path manager.
-"""
+"""The results export path manager."""
 
 __author__ = "Jacob Bumgarner <jrbumgarner@mix.wvu.edu>"
 __license__ = "GPLv3 - GNU General Pulic License v3 (see LICENSE)"
@@ -16,13 +14,12 @@ from library.gui import qt_objects as QtO
 
 
 class ResultsPathController(QWidget):
-    """Widget used to manage the results export directory.
+    """Widget that manages the results directory.
 
     By default, the results export directory is empty, and the user has
     to select one. Once a directory has been selected, it will then be stored
-    in the preferences.json and pulled again in the future. If it no longer
+    in the preferences.json and used again in the future. If it no longer
     exists, the ``None` default will be selected.
-
     """
 
     def __init__(self):
