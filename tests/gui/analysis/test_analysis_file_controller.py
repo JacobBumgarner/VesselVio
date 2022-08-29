@@ -98,7 +98,7 @@ def test_file_loading_dispatch_csv_graphs(
     qtbot.keyClicks(controller.datasetType, "Graph")
     qtbot.keyClicks(controller.graphOptions.graphFormat, "CSV")
 
-    # test loading annotation files
+    # test loading csv files
     mocker.patch.object(CSVGraphFileLoader, "exec_", return_value=True)
     mocker.patch.object(CSVGraphFileLoader, "main_files", CSV_PATHS[0])
 

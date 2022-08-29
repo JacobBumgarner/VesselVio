@@ -28,7 +28,6 @@ class CSVGraphFileLoader(QDialog):
         The csv files containing the graph edge information. The list of these files is
         called ``associated_files`` to stay consistent with the other files loader
         classes.
-
     """
 
     main_files = []
@@ -37,10 +36,6 @@ class CSVGraphFileLoader(QDialog):
     def __init__(self):
         """Build the CSV file loader."""
         super().__init__()
-
-        # Set up main & associated file objects
-        self.main_files = []
-        self.associated_files = []
 
         # Dialog contains a form layout with a cancel button
         windowLayout = QtO.new_layout(orient="V")
