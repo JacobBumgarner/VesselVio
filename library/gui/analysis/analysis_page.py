@@ -1,11 +1,4 @@
-"""
-The analysis page for the application.
-"""
-
-
-"""
-The PyQt5 code used to build the analysis page for the program.
-"""
+"""The analysis page for the application."""
 
 __author__ = "Jacob Bumgarner <jrbumgarner@mix.wvu.edu>"
 __license__ = "GPLv3 - GNU General Pulic License v3 (see LICENSE)"
@@ -14,7 +7,7 @@ __webpage__ = "https://jacobbumgarner.github.io/VesselVio/"
 __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 
-from PyQt5.QtWidgets import QMessageBox, QTabWidget, QWidget
+from PyQt5.QtWidgets import QTabWidget, QWidget
 
 from library import qt_threading as QtTh
 from library.gui import qt_objects as QtO
@@ -36,10 +29,10 @@ from library.objects import AnalysisFileManager
 class AnalysisPage(QWidget):
     """The page for batch analysis of volumes and graphs.
 
-        Provides a GUI for users to load multiple datasets, including binary
-        volumes, annotated volumes, and graphs. Analysis and result export
-        options can be set, and batch analyses on the loaded datasets can be run.
-    s
+    Provides a GUI for users to load vasculature datasets for batch analyses.
+    These datasets can including binary volumes, annotated volumes, and pre-constructed
+    vascular graph networks. On this page, analysis and result export options can be
+    set, and batch analyses on the loaded datasets can be run.
     """
 
     def __init__(self):
@@ -110,7 +103,6 @@ class AnalysisPage(QWidget):
         selection signals.
 
         3. Start the QThread
-
         """
         # Make sure everything is prepped correctly
         if not self.pre_analysis_check():
@@ -134,9 +126,21 @@ class AnalysisPage(QWidget):
     def pre_analysis_check(self) -> bool:
         """Check that the necessary steps have been completed for an analysis.
 
-        Returns:
+        - Checks to ensure that the loaded data have not already been analyzed.
+
+        - Checks to see if annotation volumes have been appropriately loaded for
+        annotation analyses.
+
+        - Checks to see if the appropriate graph files have been loaded for CSV graph
+        analyses.
+
+        - Checks to see that a results path export option has been appropriately
+        selected.
+
+        Returns
+        ------
         bool
-            True if prepped correctly, False otherwise.
+            True if the analysis has been prepared correctly, False otherwise.
         """
         # If an analysis has already been run, make sure new files are loaded.
         if self.fileController.analyzed:
@@ -154,7 +158,7 @@ class AnalysisPage(QWidget):
             dataset_type == "Graph"
             and self.graphOptions.graphFormat.currentText() == "CSV"
         )
-        print(annotation_check, graph_check)
+
         if not any_loaded or annotation_check or graph_check:
             IncompleteFileLoadingWarning()
             return False
@@ -213,38 +217,21 @@ class AnalysisPage(QWidget):
     def button_locking(self, lock_state):
         """Toggle button locking during the analysis.
 
-        Also serves to trigger any relevant log.
+        True values lock:
+            - Analyze button
+            - File manager buttons (e.g., Clear All)
+            - Results path controller
+        True values enable:
+            - Cancel button
 
-        Parameters:
+        Parameters
+        ----------
         lock_state : bool
-            Enables/Disables the relevant buttons based on the lock state.
-            Some buttons will be disabled, some will be enabled.
-            The lock_state bool status is relevant for the 'setEnabled' or
-            'setDisabled' call.
+            Enables or disables relevant buttons based on the lock state. See above
+            for the specific buttons that are toggled.
         """
         self.cancelButton.setEnabled(lock_state)
         self.fileManager.setDisabled(lock_state)
         self.resultsPathController.changeFolder.setDisabled(lock_state)
         self.analyzeButton.setDisabled(lock_state)
         return
-
-    # Warnings
-    def analysis_warning(self):
-        """Create an incomplete file loading error."""
-        msgBox = QMessageBox()
-        message = "Load all files to run analysis."
-        msgBox.setText(message)
-        msgBox.exec_()
-
-    def disk_space_warning(self, needed_space: float):
-        """Create a disk space warning error."""
-        msgBox = QMessageBox()
-        msgBox.setWindowTitle("Disk Space Error")
-        message = (
-            "<center>During the analysis, one or more files were unable to be",
-            "analyzed because of insufficient free disk memory.<br><br>",
-            "<center>To analyze annotated volume datasets, VesselVio will need",
-            f"at least <u>{needed_space:.1f} GB</u> of free space.",
-        )
-        msgBox.setText(message)
-        msgBox.exec_()
