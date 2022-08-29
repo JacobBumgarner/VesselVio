@@ -22,16 +22,18 @@ from library.objects import AnalysisFileManager
 class AnalysisFileController(QWidget):
     """The controller that manages file loading for the analysis page.
 
-    Parameters:
+    Parameters
+    ----------
     file_manager : AnalysisFileManager
-
+        The model that contains and controls the files for an analysis or visualiation.
     fileTable : AnalysisFileTable
-
+        The file table that displays the selected files and their analysis statuses.
     graphOptions : GraphOptions
-
+        The graph options widget. This widget should be passed in order to control
+        the view of the file table when various graph types are selected
     optionsBox : QTabWidget
         The QGroupBox that contains the AnalysisOptions and GraphOptions widgets.
-        Needed to control access to the GraphOptions tab.
+        This widget is needed to control access to the GraphOptions tab.
     """
 
     def __init__(
@@ -108,10 +110,11 @@ class AnalysisFileController(QWidget):
     def file_loading_dispatch(self):
         """Load the main files for the analysis.
 
-        Depending on the the dataset type and annotation type, open a QFileDialog
-        or build a FileLoadingDialog.
+        Depending on the the dataset type and annotation type, this dispatcher either
+        opens a QFileDialog or builds a FileLoadingDialog.
 
-        If files are loaded, the controller then updates AnalysisFileManager model and updates the AnalysisFileTable.
+        If any files are loaded, the controller then updates AnalysisFileManager model
+        and updates the AnalysisFileTable.
         """
         # collect shorthand copies of the relevant settings
         dataset_type = self.datasetType.currentText()
@@ -133,8 +136,17 @@ class AnalysisFileController(QWidget):
 
         self.fileTable.update_body()
 
-    def load_main_files(self, dataset_type: str, graph_format: str):
-        """Call the relevant function to load the specified main filetypes."""
+    def load_main_files(self, dataset_type: str, graph_format: str = None):
+        """Call the relevant function to load the specified main filetypes.
+
+        Parameters
+        ----------
+        dataset_type : str
+            The type of dataset that is being loaded for an analysis. Must be either
+            "Volume" or "Graph".
+        graph_format : str, optional
+            The format of the graph file that will be loaded. Default is None.
+        """
         if dataset_type == "Volume":
             main_files = dataset_io.load_volume_files()
         elif dataset_type == "Graph":
@@ -161,8 +173,13 @@ class AnalysisFileController(QWidget):
     def update_main_files(self, main_files: list):
         """Update the model and view with the loaded main files.
 
-        Parameters:
+        Parameters
+        ----------
         main_files : list
+            A list of files that were loaded from a call to the ``load_main_files``
+            function. These files are added to the FileManager's "main" file column.
+            These will represent either the main vasculature volumes, graph files,
+            or CSV vertex graph files.
         """
         self.file_manager.add_main_files(main_files)
         self.fileTable.update_main_file_list()
@@ -170,8 +187,12 @@ class AnalysisFileController(QWidget):
     def update_associated_files(self, associated_files: list):
         """Update the model and view with the loaded associated files.
 
-        Parameters:
+        Parameters
+        ----------
         associated_files : list
+            A list of files that were loaded from a call to the
+            ``open_multi_file_loader`` function. These associated files will either
+            represent vasculature volume annotation files or CSV edge graph files.
         """
         self.file_manager.add_associated_files(associated_files)
         self.fileTable.update_associated_file_list()
@@ -250,7 +271,9 @@ class AnalysisFileController(QWidget):
     def update_loaded_JSON_text(self, filename="None"):
         """Update the loadedJSON QLineEdit text.
 
-        Parameters:
+        Parameters
+        ----------
         filename : str
+            The name of the loaded VesselVio annotation file. Default is "None".
         """
         self.loadedJSON.setText(os.path.basename(filename))
