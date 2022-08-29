@@ -16,11 +16,14 @@ from library.gui import qt_objects as QtO
 class AnalysisController(QWidget):
     """The analysis controller widget.
 
-    Parameters:
+    Parameters
+    ----------
     start_function : function
-
+        A function that will be connected to the click of the controllers "Analyze"
+        button.
     end_function : function
-
+        A function that will be connected to the click of the controllers "Cancel"
+        button.
     """
 
     def __init__(self, start_function=None, end_function=None):
