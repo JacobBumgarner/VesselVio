@@ -15,18 +15,25 @@ from library.annotation import tree_processing
 class AnalysisFileManager:
     """The class that stores and manages the input files used for analyses.
 
-    Attributes:
+    Attributes
+    ----------
     main_files : list
-
+        The primary files for an analysis. These will be image files with segmented
+        vasculature, pre-constructe graph vascular networks, or CSV-based graph files
+        with information about the graph vertices. Defaults to empty list.
     associated_files : list
-
+        The associated files for a vasculature analysis. These files will either be
+        images with vasculature annotation information or CSV-based graph files with
+        information about the graph edges. Defaults to empty list.
     annotation_data : dict
-
+        The annotation data that will carry information about which annotation regions
+        will be analyzed. Default is None.
     analyzed : bool
-        Indicates whether the loaded files have been analyzed. Default ``False``."""
+        Indicates whether the loaded files have been analyzed. Default is False.
+    """
 
     def __init__(self):
-        """Initialize the manager."""
+        """Build the model."""
         self.main_files = []
         self.associated_files = []
         self.annotation_data = None
@@ -36,30 +43,41 @@ class AnalysisFileManager:
     def add_main_files(self, files: list):
         """Add main file(s) to the file list.
 
-        Parameters:
+        Updates the self.main_files attribute.
+
+        Parameters
+        ----------
         files : list
-            A list of str file paths. Updates the self.column1_files attribute.
+            A list of file path strings.
         """
         self.main_files.extend(files)
+        return
 
     def add_associated_files(self, files: list):
         """Add associated file(s) to the file list.
 
-        Parameters:
+        Updates the self.associated_files attribute.
+
+        Parameters
+        ----------
         files : list
-            A list of str file paths. Updates the self.column1_files attribute.
+            A list of file path strings.
         """
         self.associated_files.extend(files)
+        return
 
     def add_annotation_JSON(self, annotation_file: str) -> bool:
         """Add an annotation file to the dataset.
 
-        Parameters:
+        Parameters
+        ----------
         annotation_file : str
             The filepath to the JSON-based annotation file.
 
-        Returns:
-        bool : added
+        Returns
+        -------
+        bool
+            True if the file was compatible and loaded successfully. False otherwise.
         """
         if not tree_processing.check_annotation_data_origin(annotation_file):
             return False
@@ -71,12 +89,13 @@ class AnalysisFileManager:
 
     # File removal
     def remove_main_files(self, selected: Union[int, list]):
-        """Remove the indicated files from the main files list.
+        """Remove the indicated file(s) from the main files list.
 
-        Parameters:
+        Parameters
+        ----------
         indices : int, list
-            The single selection or top and bottom indices of the selection
-            of files to be removed from the list. The top index will be removed.
+            The single selection or reverse-sorted list of row indices that will be
+            removed from the main files list.
         """
         if not self.main_files:
             return
@@ -89,12 +108,13 @@ class AnalysisFileManager:
         return
 
     def remove_associated_files(self, selected: Union[int, list]):
-        """Remove the indicated files from the associated files list.
+        """Remove the indicated file(s) from the associated files list.
 
-        Parameters:
+        Parameters
+        ----------
         indices : int, list
-            The single selection or top and bottom indices of the selection
-            of files to be removed from the list.
+            The single selection or reverse-sorted list of row indices that will be
+            removed from the associated files list.
         """
         if not self.associated_files:
             return
@@ -109,28 +129,30 @@ class AnalysisFileManager:
     def clear_selected_files(self, selected: Union[int, list]):
         """Remove the indicated files from the file lists.
 
-        Parameters:
+        Parameters
+        ----------
         indices : int, list
             The single selection or top and bottom indices of the selection
             of files to be removed from the list.
         """
         self.remove_main_files(selected)
         self.remove_associated_files(selected)
-
-    def check_file_parity(self):
-        """Return whether equal main and associated files have been loaded."""
+        return
 
     # Resetting
     def clear_analysis_files(self):
         """Clear the files from the table."""
         self.main_files = []
         self.associated_files = []
+        return
 
     def clear_annotation_data(self):
         """Clear the input annotation JSON file."""
         self.annotation_data = None
+        return
 
     def clear_all_files(self):
         """Reset the object and clear all files."""
         self.clear_analysis_files()
         self.clear_annotation_data()
+        return
