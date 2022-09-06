@@ -201,9 +201,9 @@ def volume_sliced_labeling(
         each of the ROIs.
     id_labeling : bool, optional
         Whether the annotation volume is ID-based. If False, converts to an RGB-based
-        labeling. Defaults to False.
+        labeling. Default is False.
     verbose : bool, optional
-        Defaults to False.
+        Default is False.
 
     Returns
     -------

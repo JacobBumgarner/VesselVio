@@ -54,29 +54,6 @@ class VisualizationFiles:
         self.annotation_data = None
 
 
-class AnalysisOptions:
-    def __init__(
-        self,
-        results_folder,
-        resolution,
-        prune_length,
-        filter_length,
-        max_radius,
-        save_segment_results,
-        save_graph,
-        image_dimensions=3,
-    ):
-        self.results_folder = results_folder
-        self.resolution = resolution
-        self.prune_length = prune_length
-        self.filter_length = filter_length
-        self.max_radius = max_radius
-        self.save_seg_results = save_segment_results
-        self.save_graph = save_graph
-        self.image_dimensions = image_dimensions
-        self.graph_file = False
-
-
 class VisualizationOptions:
     def __init__(
         self,

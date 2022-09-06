@@ -5,8 +5,8 @@ VESSELVIO_DIR = Path.cwd()
 sys.path.insert(1, str(VESSELVIO_DIR))
 
 
-from library import input_classes as IC
 from library.gui.options_widgets.analysis_options_widget import AnalysisOptionsWidget
+from library.objects import AnalysisOptions
 from PyQt5.QtCore import Qt
 
 
@@ -70,15 +70,14 @@ def test_options_export(qtbot):
     qtbot.addWidget(widget)
 
     options = widget.prepare_options()
-    assert isinstance(options, IC.AnalysisOptions)
-    assert options.filter_length == 10
-    assert options.prune_length == 5
-    assert options.image_dimensions == 3
-    assert options.max_radius == 150
+    assert isinstance(options, AnalysisOptions)
     assert options.results_folder is None
-    assert options.save_graph is False
-    assert options.save_seg_results is False
     assert options.resolution == 1
+    assert options.prune_length == 5
+    assert options.filter_length == 10
+    assert options.image_dimensionality == 3
+    assert options.save_segment_results is False
+    assert options.save_graph_file is False
 
     # Adjust the options
     qtbot.keyClicks(widget.resolutionType, "Anisotropic")
@@ -86,12 +85,11 @@ def test_options_export(qtbot):
     qtbot.mouseClick(widget.filterCheckBox, Qt.LeftButton)
 
     options = widget.prepare_options()
-    assert isinstance(options, IC.AnalysisOptions)
-    assert options.filter_length == 0
-    assert options.prune_length == 0
-    assert options.image_dimensions == 3
-    assert options.max_radius == 150
+    assert isinstance(options, AnalysisOptions)
     assert options.results_folder is None
-    assert options.save_graph is False
-    assert options.save_seg_results is False
     assert options.resolution == [1, 1, 1]
+    assert options.prune_length == 0
+    assert options.filter_length == 0
+    assert options.image_dimensionality == 3
+    assert options.save_segment_results is False
+    assert options.save_graph_file is False

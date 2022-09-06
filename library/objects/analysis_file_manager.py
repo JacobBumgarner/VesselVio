@@ -20,11 +20,11 @@ class AnalysisFileManager:
     main_files : list
         The primary files for an analysis. These will be image files with segmented
         vasculature, pre-constructe graph vascular networks, or CSV-based graph files
-        with information about the graph vertices. Defaults to empty list.
+        with information about the graph vertices. Default is empty list.
     associated_files : list
         The associated files for a vasculature analysis. These files will either be
         images with vasculature annotation information or CSV-based graph files with
-        information about the graph edges. Defaults to empty list.
+        information about the graph edges. Default is empty list.
     annotation_data : dict
         The annotation data that will carry information about which annotation regions
         will be analyzed. Default is None.

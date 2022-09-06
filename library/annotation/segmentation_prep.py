@@ -42,9 +42,9 @@ def construct_roi_array(
     Raises
     ------
     TypeError
-        Raised error if the ``annotation_type`` is not a string.
+        Raised error if the annotation_typ is not a string.
     ValueError
-        Raised error if the ``annotation_type`` is not either "ID" or "RGB".
+        Raised error if the annotation_type is not either "ID" or "RGB".
     """
     # isolate the ROIs
     if not isinstance(annotation_type, str):
@@ -123,7 +123,7 @@ def find_max_children_count(parent_tree: list) -> int:
 
 Parameters:
 roi_array : np.ndarray
-    The roi_array created with the ``construct_roi_array` function. Stores the
+    The roi_array created with the ``construct_roi_array`` function. Stores the
     ids associated with each parent region.
 
 Returns:
@@ -145,8 +145,8 @@ def construct_id_dict(roi_array: np.ndarray) -> Tuple[dict, set]:
 
     For example, the "Eye" region ID might have children IDs `1` and `2`, and it may
     represent the third ROI selected for the analysis. The entries for the "Eye" ROI
-    in this ID dictionary would be: ``1:2`` and ``2:2``. If either of ID values are
-    identified in an analysis, the corresponding vasculature will be labeled with ``3``
+    in this ID dictionary would be: 1:2 and 2:2. If either of ID values are
+    identified in an analysis, the corresponding vasculature will be labeled with 3
     and the third row of the ROI volumes array will be updated appropriately.
 
     Parameters
@@ -201,7 +201,7 @@ def construct_roi_volume_arrays(
         An empty np.zeros() array used to add the ROI volume to.
 
     volume_update_array : np.ndarray
-        An ``np.identity`` array used to update the element of interest during
+        An np.identity array used to update the element of interest during
         ``labeling.volume_slice_labeling``.
     """
     roi_volumes = np.zeros(roi_array.shape[0])

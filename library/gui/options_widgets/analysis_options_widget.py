@@ -9,8 +9,9 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 
 from PyQt5.QtWidgets import QLabel, QWidget
 
-from library import input_classes as IC
 from library.gui import qt_objects as QtO
+
+from library.objects import AnalysisOptions
 
 
 class AnalysisOptionsWidget(QWidget):
@@ -24,7 +25,7 @@ class AnalysisOptionsWidget(QWidget):
     visualizing : bool, optional
         Determines whether to add the "Segment Results Export" and "Save Graph"
         options. These options are not available on the visualization page during the
-        initial visualization generation. Defaults to ``False``.
+        initial visualization generation. Default is False.
     """
 
     def __init__(self, visualizing=False):
@@ -183,20 +184,22 @@ class AnalysisOptionsWidget(QWidget):
         self.pruneLength.setSuffix(unit)
         return
 
-    def prepare_options(self, results_folder=None, visualization=False):
+    def prepare_options(
+        self, results_folder=None, visualization=False
+    ) -> AnalysisOptions:
         """Prepare the input options for an anlaysis or visualization.
 
         Parameters
         ----------
         results_folder : str, optional
-            The folder where the results will be exported. Defaults to ``None``.
+            The folder where the results will be exported. Default is ``None``.
         visualization : bool, optional
             Indicates whether the results will be used for an analysis or
-            visualization. Defaults to ``False``.
+            visualization. Default is ``False``.
 
         Returns
         -------
-        analysis_options : input_classes.AnalysisOptions
+        analysis_options : objects.AnalysisOptions
             The AnalysisOptions class that carries the selected analysis information.
         """
         # resolution
@@ -221,22 +224,19 @@ class AnalysisOptionsWidget(QWidget):
         else:
             filter_length = 0
 
-        max_radius = 150  # Vestigial
-
         save_seg_results = (
             False if visualization else self.saveSegmentResults.isChecked()
         )
         save_graph = False if visualization else self.saveGraph.isChecked()
 
-        analysis_options = IC.AnalysisOptions(
+        analysis_options = AnalysisOptions(
             results_folder,
             resolution,
             prune_length,
             filter_length,
-            max_radius,
+            image_dim,
             save_seg_results,
             save_graph,
-            image_dim,
         )
 
         return analysis_options

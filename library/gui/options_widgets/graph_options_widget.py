@@ -26,7 +26,7 @@ class GraphOptionsWidget(QWidget):
         The file table that shows the loaded vasculature files. This option is available
         for the Analysis Page and is passed to this object in order to update the
         column headers for CSV graphs. If non-CSV graphs are loaded, the file table
-        will only have two columns. Otherwise, it will have three. Defaults to ``None``.
+        will only have two columns. Otherwise, it will have three. Default is None.
 
     """
 

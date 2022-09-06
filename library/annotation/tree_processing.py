@@ -177,11 +177,11 @@ def convert_annotation_data(
         The regions to be extracted from the tree.
     annotation_file : str, optional
         The filepath to the annotation tree. The tree must contain a
-        'root' parent. The default file is from the the Allen Institute, defaults to
+        'root' parent. The default file is from the the Allen Institute, Default is
         ``"p56 Mouse Brain.json"``.
     tree_keys : JSON_Options, optional
         The keys to find the id, name, color, and children of each region in the
-        annotation file, defaults to ``JSON_Options()``
+        annotation file, Default is ``JSON_Options()``
 
     Returns
     -------
