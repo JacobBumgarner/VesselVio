@@ -52,6 +52,8 @@ def get_dir(location):
         load_dir = os.path.join(os.path.expanduser("~"), location)
     elif sys_os == "Windows":
         load_dir = os.path.join(os.path.join(os.environ["USERPROFILE"]), location)
+    elif sys_os == "Linux":
+        load_dir = os.path.join(os.path.expanduser("~"), location)
     load_dir = std_path(load_dir)
     return load_dir
 
@@ -309,7 +311,7 @@ def check_storage(volume_file):
     volume_file: file path to the loaded volume
     returns False if the volume is larger than the available disk space.
     """
-    desktop = get_dir("desktop")
+    desktop = get_dir("Desktop")
     disk_info = os.statvfs(desktop)
     free_space = disk_info.f_frsize * disk_info.f_bavail
     volume_size = get_file_size(volume_file)
