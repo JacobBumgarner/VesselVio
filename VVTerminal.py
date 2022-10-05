@@ -134,14 +134,13 @@ def process_volume(
     # Make sure the resolution is in the proper format
     resolution = ImProc.prep_resolution(gen_options.resolution)
 
-    annotation_data = tree_processing.convert_annotation_data(
-        ann_options.annotation_regions, ann_options.annotation_atlas
-    )
-
     if ann_options.annotation_type == "None":
         annotation_data = {None: None}
     else:
-        roi_array = segmentation_prep.construct_roi_array(
+        annotation_data = tree_processing.convert_annotation_data(
+            ann_options.annotation_regions, ann_options.annotation_atlas
+        )
+        roi_array = segmentation_prep.build_roi_array(
             annotation_data, annotation_type=ann_options.annotation_type
         )
 
@@ -372,14 +371,14 @@ if __name__ == "__main__":
     ######################
     # region
     # Filepath to the annotation. RGB series folder OR .nii Allen brain atlas file
-    annotation_file = ""
+    annotation_file = "ANNOTATION_VOLUME_FILE.nii"
 
     atlas = "library/annotations/annotation_trees/p56 Mouse Brain.json"
     annotation_type = "ID"  # 'RGB' or 'ID'
 
     annotation_regions = ["Dentate gyrus, molecular layer"]
 
-    anno_options = IC.AnnotationOptions(
+    annotation_options = IC.AnnotationOptions(
         annotation_file, atlas, annotation_type, annotation_regions
     )
 
@@ -440,7 +439,7 @@ if __name__ == "__main__":
     image_dimensions = 3  # 2 or 3. Affects features extraction. 2D datasets can be treated as if they were 3D.
 
     # Results/graph export
-    save_segment_results = True  # Save individual segment features to csv file
+    save_segment_results = False  # Save individual segment features to csv file
     results_folder = "Results/Path/Here"
     save_graph = False  # Save reduced graph export?
     verbose = True
@@ -461,18 +460,18 @@ if __name__ == "__main__":
     ### RUN THIS FILE ###
     #####################
     # Use this key in place of 'ann_options' if you aren't analyzing annotated datasets.
-    no_anno = IC.AnnotationOptions(None, None, "None", None)
-    process_volume(compiler_file, gen_options, no_anno, vis_options, 0, verbose)
+    no_annotation = IC.AnnotationOptions(None, None, "None", None)
+    process_volume(compiler_file, gen_options, no_annotation, vis_options, 0, verbose)
 
     ######################
     ### Run files here ###
     ######################
-    file1 = "volume_file.nii"
+    file1 = "VOLUME_FILE.nii"
 
     iteration = 0
 
     # Use "no_anno" in place of "anno_options" if there are no annotations
-    process_volume(file1, gen_options, no_anno, vis_options, iteration, verbose)
+    process_volume(file1, gen_options, no_annotation, vis_options, iteration, verbose)
 
     ### Graph files
     # Follow the format below to load csv-based graphs.
