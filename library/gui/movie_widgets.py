@@ -68,7 +68,7 @@ class OrbitWidget(QWidget):
         formLayout = QtO.new_form_layout()
 
         pathLabel = QLabel("Camera Path")
-        updateOrbit = QtO.new_button("Update", self.update_orbit)
+        self.updateOrbitButton = QtO.new_button("Update", self.update_orbit)
 
         lengthLabel = QLabel("Movie Duration")
         self.movieLength = QtO.new_doublespin(
@@ -76,11 +76,12 @@ class OrbitWidget(QWidget):
         )
 
         QtO.add_form_rows(
-            formLayout, [[pathLabel, updateOrbit], [lengthLabel, self.movieLength]]
+            formLayout,
+            [[pathLabel, self.updateOrbitButton], [lengthLabel, self.movieLength]],
         )
         QtO.add_widgets(widgetLayout, [0, formLayout, 0])
 
-        self.update_orbit()
+        self.default_setup()
 
     def update_orbit(self):
         """Update the orbit path for the movie based on the current plotter position."""
