@@ -20,6 +20,7 @@ from library import (
     helpers,
     image_processing as ImProc,
     input_classes as IC,
+    movie_processing,
     qt_threading as QtTh,
 )
 from library.annotation.tree_processing import RGB_duplicates_check
@@ -1047,7 +1048,7 @@ class ScreenshotDialogue(QDialog):
         self.captureMessage.show()
         resolution = self.imageResolution.currentText()
         if resolution != "Current":
-            X, Y = helpers.get_resolution(resolution)
+            X, Y = movie_processing.get_resolution(resolution)
             self.plotter.resize(X, Y)
             self.plotter.render()
         QTimer.singleShot(750, self.take_screenshot)
