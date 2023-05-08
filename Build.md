@@ -113,7 +113,7 @@ To avoid this mess, we use the popular python environment manager: pyenv. If you
 brew install pyenv
 brew install pyenv-virtualenv
 ```
-   - The , configure your shell's environment for pyenv and virtualenv (we use Zsh, see <a target="_blank" ref="noopener noreferrer" href"https://github.com/pyenv/pyenv#homebrew-on-macos">here</a> if you use Bash or Fish). To do this, paste the following commands into your terminal to modify the .zprofile and .zshrc
+   - Then, configure your shell's environment for pyenv and virtualenv (we use Zsh, see <a target="_blank" ref="noopener noreferrer" href="https://github.com/pyenv/pyenv#homebrew-on-macos">here</a> if you use Bash or Fish). To do this, paste the following commands into your terminal to modify the .zprofile and .zshrc
 ```markdown
 echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
 echo 'eval "$(pyenv init -)"' >> ~/.zshrc
