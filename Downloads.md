@@ -5,10 +5,10 @@ rank: 5
 ---
 
 ## Info
-VesselVio is available for download use in research as a stand-alone application. If you use the application for any work in your publications, please cite our [pre-print publication](https://www.researchsquare.com/article/rs-608609/v1).
+VesselVio is available for download use in research as a stand-alone application. If you use the application for any work in your publications, please cite our [publication](https://www.sciencedirect.com/science/article/pii/S2667237522000443?via%3Dihub).
 
 ## Download Links
-Currently the stand-alone VesselVio application is available for Windows 10 and MacOS 11.6+.
+The stand-alone VesselVio application is available for Windows 10 and MacOS 11.6+.
 
   | VesselVio Version |  Windows 10 | MacOS 11.6+|
   |:-------------:|:---------------:|:---------------:|
@@ -20,7 +20,7 @@ Please feel free to [email me](mailto:vesselvio@gmail.com) or [create an issue](
 
 # NOTICE
 
-- If using Windows, make sure to unzip the package before running. If the shortcut isn't working, you can create a new shortcut by going to VesselVio>Contents>VesselVio.exe.
+- If you're using Windows, make sure to unzip the package before running. If the shortcut isn't working, you can create a new shortcut by going to VesselVio>Contents>VesselVio.exe.
 
 - The software packages are unsigned at the moment. This means that depending on your system settings, you'll likely have to approve the application for run. We will work to sign the application with authentication certificates in the near future.
 
