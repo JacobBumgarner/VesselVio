@@ -46,7 +46,7 @@ If you are looking for help with segmenting your vasculature, there are numerous
 Contributions to VesselVio are absolutely welcome! The [guide](https://github.com/JacobBumgarner/VesselVio/blob/main/CONTRIBUTING.md) to contributing should be read and followed. Briefly, [Issues](https://github.com/JacobBumgarner/VesselVio/issues) should be used for bug reports and feature requests. [Discussions](https://github.com/JacobBumgarner/VesselVio/discussions) and [Slack](https://communityinviter.com/apps/vesselvio/join-vesselvio-on-slack) should be used for general support or tutorial requests. Pull-requests should follow the guidelines described in the contributing document. Thank you!
 
 ## Other
-Any suggestions, improvements, or comments should be directed to [Jacob Bumgarner](mailto:jrbumgarner@mix.wvu.edu).
+Any suggestions, improvements, or comments should be directed to [Jacob Bumgarner](mailto:jacobbum21@gmail.com).
 
 Feel free to join us on [Slack](https://communityinviter.com/apps/vesselvio/join-vesselvio-on-slack) for general communication or troubleshooting purposes!
 
