@@ -473,13 +473,13 @@ if __name__ == "__main__":
     # Use "no_anno" in place of "anno_options" if there are no annotations
     process_volume(file1, gen_options, no_annotation, vis_options, iteration, verbose)
 
-    ### Graph files
-    # Follow the format below to load csv-based graphs.
-    vertices = "vertices.csv"
-    edges = "edges.csv"
-    graph0 = {"Vertices": vertices, "Edges": edges}
+    # ### Graph files
+    # # Follow the format below to load csv-based graphs.
+    # vertices = "vertices.csv"
+    # edges = "edges.csv"
+    # graph0 = {"Vertices": vertices, "Edges": edges}
 
-    # iGraph compatible format
-    graph1 = "example.graphml"
+    # # iGraph compatible format
+    # graph1 = "example.graphml"
 
     # process_graph(graph0, gen_options, graph_options, vis_options, verbose)

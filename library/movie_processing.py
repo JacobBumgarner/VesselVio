@@ -10,6 +10,7 @@ __download__ = "https://jacobbumgarner.github.io/VesselVio/Downloads"
 import json
 
 from math import ceil
+from typing import Sequence, Tuple, Union
 
 import numpy as np
 import pyvista as pv
@@ -22,49 +23,42 @@ from scipy import interpolate
 ################################
 ### Generate Path Processing ###
 ################################
-def path_actor_scaling(seed_point):
-    """Given a camera position seed point and the current position of the
-    plotter relative to the focal point, generate a scaling factor for the
-    path actors.
+def path_actor_scaling(seed_point: Union[pv.CameraPosition, np.ndarray, list]) -> float:
+    """Generate a scaling factor for the plotter path actors.
+
+    Subtracts the focal point from the camera position and then generates a scaling
+    factor based on the emperically determined equation `max(1, distance/100)`.
 
     Parameters
     ----------
-    seed_point: PyVista.CameraPosition, list, tuple, np.array
-        An (n,3,3) shaped iterable containing:
-            - The plotter camera position
-            - The plotter focal poin
-            - The plotter view 'up' vector
+    seed_point : Union[pv.CameraPosition, np.ndarray, list]
+        A (3,3) shaped iterable containing a PyVista camera position.
 
     Returns
     -------
-    resize_factor : float
+    float
+        The resizing factor.
     """
-    # focal_pos - camera_pos
-    radius = np.linalg.norm(seed_point[1] - seed_point[0])
+    radius = np.linalg.norm(seed_point[1] - seed_point[0])  # focal_pos - camera_pos
     resize_factor = max(1, radius / 100)  # emperically determined scaling
     return float(resize_factor)
 
 
-def load_path_basis(seed_point):
-    """Returns new basis vectors based on an input
-    PyVista.Plotter.camera_position
+def load_path_basis(
+    seed_point: Union[np.ndarray, pv.CameraPosition, list, tuple]
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Return a new basis vector based on an input camera position.
 
     Parameters
     ----------
-    seed_point: PyVista.CameraPosition, list, tuple, np.array
-        An (n,3,3) shaped iterable containing:
-            - The plotter camera position
-            - The plotter focal poin
-            - The plotter view 'up' vector
+    seed_point : Union[np.ndarray, pv.CameraPosition, list, tuple]
+        A (3,3) shaped iterable containing the camera position, focal point, and viewup
+        vectors.
 
     Returns
     -------
-    b1 : list
-
-    b2 : list
-
-    b3 : list
-
+    Tuple[np.ndarray, np.ndarray, np.ndarray]
+        Three (3,) shaped arrays representing the new basis vectors of the camera.
     """
     if isinstance(seed_point, (pv.CameraPosition, tuple, list)):
         seed_point = np.array([pos for pos in seed_point])
@@ -82,7 +76,18 @@ def load_path_basis(seed_point):
 
 
 # Taken directly from https://docs.pyvista.org/examples/00-load/create-spline.html
-def polyline_from_points(points):
+def polyline_from_points(points: np.ndarray) -> pv.PolyData:
+    """Generate a polyline from input points.
+
+    Parameters
+    ----------
+    points : np.ndarray
+        The point array to convert to a polyline.
+
+    Returns
+    -------
+    pv.PolyData
+    """
     poly = pv.PolyData()
     poly.points = points
     the_cell = np.arange(0, len(points), dtype=np.int_)
@@ -91,18 +96,22 @@ def polyline_from_points(points):
     return poly
 
 
-def post_path_plotter_update(plotter, seed_position, orbit=True):
-    """Given the plotter and a seed point, update the plotter's view to be
-    shifted slightly up and back from that view. This function is useful to
-    avoid placing the plotter at the exact seed_position, which might place
-    it inside of path camera actors during movie creation.
+def post_path_plotter_update(
+    plotter: pv.Plotter, seed_position: pv.CameraPosition, orbit: bool = True
+) -> None:
+    """Move the plotter camera position slightly behind the seed position.
+
+    This function is serves to prevent placing the plotter inside the path actors during
+    movie path creation.
 
     Parameters
     ----------
-    plotter : PyVista.Plotter
-
-    seed_position : PyVista.Plotter.camera_position
-
+    plotter : pv.Plotter
+        _description_
+    seed_position : pv.CameraPosition
+        _description_
+    orbit : bool, optional
+        _description_, by default True
     """
     seed_position = np.array([pos for pos in seed_position])
 
@@ -121,8 +130,8 @@ def post_path_plotter_update(plotter, seed_position, orbit=True):
     return
 
 
-def load_options(filepath):
-    """Given a save path, load a movie options file.
+def load_movie_options(filepath: str) -> IC.MovieExportOptions:
+    """Load a movie options file.
 
     Parameters
     ----------
@@ -131,7 +140,7 @@ def load_options(filepath):
 
     Returns
     -------
-    movie_options : MovieOptions
+    IC.MovieExportOptions
     """
     with open(filepath) as f:
         data = json.load(f)
@@ -174,49 +183,54 @@ def export_options(filepath, movie_options: IC.MovieExportOptions):
 ###############################
 ### Orbital Path Processing ###
 ###############################
-def time_to_frames(framerate, movie_time):
-    """Given a framerate and a frame count, return the number
-    of frames for the orbit
+def time_to_frames(framerate: float, movie_duration: float) -> int:
+    """Convert a movie duration in time and a framerate to a frame count.
 
     Parameters
     ----------
-    framerate: int
+    framerate : float
 
-    movie_time: float
+    movie_duration : float
 
     Returns
     -------
-    frames : int
-
+    int
+        The number of frames in the movie.
     """
-    frames = ceil(framerate * movie_time)
+    frames = ceil(framerate * movie_duration)
     return int(frames)
 
 
-def generate_orbital_path(camera_position, n_points=100):
-    """Given a seed PyVista plotter camera position, creates an orbital path
+def generate_orbital_path(
+    camera_position: Union[pv.CameraPosition, np.ndarray, list],
+    n_path_points: int = 100,
+) -> np.ndarray:
+    """Generate an orbital path from a seed camera position.
 
     Parameters
     ----------
-    camera_position: PyVista.CameraPosition or tuple
-        (3,3) tuple containing the plotter camera: position, focal point, and
-        viewup. Should be passed directly from PyVista.camera_position
+    camera_position : Union[pv.CameraPosition, np.ndarray, list]
 
-    n_points: int
-        The number of points that the orbit will contain
+    n_path_points : int, optional
+        The number of points in the resulting path, by default 100.
 
     Returns
     -------
-    orbital_path : np.array
-        An (n,3,3) array containing a time-series of camera_positions
-    """
+    np.ndarray
+        The (n,3,3) orbital path.
 
-    if not isinstance(camera_position, (pv.CameraPosition)):
-        raise TypeError("A PyVista.Plotter.camera_position should be passed into the ")
-    camera_position = np.asarray([p for p in camera_position])
+    Raises
+    ------
+    ValueError
+        Raises an error if the input camera position isn't of (3,3) shape.
+    """
+    if not isinstance(camera_position, np.ndarray):
+        camera_position = np.asarray([p for p in camera_position])
+
     if camera_position.shape != (3, 3):
         raise ValueError(
-            "A (3,3) array containing the camera position, focal point, and viewup should be passed."
+            "A (3,3) array containing the camera position, focal point, "
+            "and viewup should be passed."
         )
 
     radius = np.linalg.norm(camera_position[0] - camera_position[1])
@@ -224,29 +238,29 @@ def generate_orbital_path(camera_position, n_points=100):
         center=camera_position[1],
         radius=radius,
         normal=camera_position[2],
-        n_sides=n_points,
+        n_sides=n_path_points,
     )
 
-    focal = np.repeat([camera_position[1]], n_points, axis=0)
-    viewup = np.repeat([camera_position[2]], n_points, axis=0)
+    focal = np.repeat([camera_position[1]], n_path_points, axis=0)
+    viewup = np.repeat([camera_position[2]], n_path_points, axis=0)
     return np.stack([path.points, focal, viewup], axis=1)
 
 
-def generate_orbit_path_actors(plotter, path):
-    """Generate actors that help the user visualize the orbital movie path
+def generate_orbit_path_actors(
+    plotter: pv.Plotter, path: Sequence[pv.CameraPosition]
+) -> IC.OrbitActors:
+    """Generate path actors to visualize the orbital camera path.
 
     Parameters
     ----------
-    plotter : PyVista.Plotter
+    plotter : pv.Plotter
 
-    path : list
-        An (n,3,3) list where each n index represents a
-        pyvista.plotter.camera_position
+    path : Sequence[pv.CameraPosition]
+        An iterable of pv.CameraPosition objects.
 
     Returns
     -------
-    OrbitPathActors
-
+    IC.OrbitActors
     """
     seed_point = path[0]
     camera_pos = seed_point[0]
@@ -259,6 +273,8 @@ def generate_orbit_path_actors(plotter, path):
 
     # Add the camera actors
     actors = IC.OrbitActors()
+
+    # Create the camera
     camera = pv.Line(
         camera_pos - b1 * 2 * resize_factor, camera_pos + b1 * 2 * resize_factor
     )
@@ -300,7 +316,7 @@ def generate_orbit_path_actors(plotter, path):
         legs, color="383838", smooth_shading=True, reset_camera=False
     )
 
-    # Create the line
+    # Create the orbit path
     line_path = polyline_from_points(path[1:-1, 0])
     line_path = line_path.tube(radius=0.5 * resize_factor, capping=True)
     actors.path = plotter.add_mesh(
@@ -325,23 +341,21 @@ def generate_orbit_path_actors(plotter, path):
 ##############################
 ### Fly Through Processing ###
 ##############################
-def prep_keyframes(key_frames):
-    """Given a list of keyframes for a flythrough movie, this function iterates
-    through and makes sure that no pair of keyframes share the same plotter
-    position. If two adjacent frames share identical positions, the position
-    is altered by a minute amount.
+def prep_keyframes(key_frames: Sequence[pv.CameraPosition]) -> np.ndarray:
+    """Prepare a set of keyframes for a flythrough movie.
+
+    Ensures that no two sequential camera positions are identical. Adds a minuscule
+    value to the second camera position if the previous position is found to be
+    identical.
 
     Parameters
     ----------
-    key_frames : list
-        (n,3,3) list where each n index contains a
-        PyVista.Plotter.camera_position
+    key_frames : Sequence[pv.CameraPosition]
+        An iterable of pv.CameraPosition objects.
 
     Returns
     -------
-    key_frames : np.array
-        An (n,3,3) shaped array with updated keyframes without any sequentially
-        duplicated frames
+    np.ndarray
     """
     # The keyframes will come as a list of CameraPositions
     # Convert them to an array
@@ -359,20 +373,36 @@ def prep_keyframes(key_frames):
     return key_frames
 
 
-def generate_3D_spline_path(input_path, path_points=40):
-    """Given a series of keyframes, generate a quadratic b-spline curve that
-    passes through all of the original input points.
+def generate_3D_spline_path(
+    input_path: Union[np.ndarray, list, tuple], path_points: int = 40
+) -> np.ndarray:
+    """Generate an interpolate spline path a for an input iterable of keyframes.
+
+    The path is a cubic b-spline that passes through all of the input keyframes.
 
     Parameters
     ----------
-    input_path : list, tuple, np.array
-        (n,3) Shaped array
+    input_path : Union[np.ndarray, list, tuple]
+
+    path_points : int, optional
+        The number of points to evaluate along the path, by default 40.
 
     Returns
     -------
-    path : np.array
-        (n,3) shaped array containing the
+    np.ndarray
+        The interpolated path.
+
+    Raises
+    ------
+    TypeError
+        Raises an error if the input path isn't one of the correct types.
     """
+    if not isinstance(input_path, [np.ndarray, list, tuple]):
+        raise TypeError(
+            "The input_path must be an iterable of keyframes.\n"
+            "Pass the path as an np.ndarray, a list, or a tuple of shape (n,3,3)."
+        )
+
     if not isinstance(input_path, np.ndarray):
         input_path = np.asarray(input_path)
     tck, u = interpolate.splprep(
@@ -386,29 +416,36 @@ def generate_3D_spline_path(input_path, path_points=40):
     return path
 
 
-def interpolate_linear_path(position_a, position_b, n_points, endpoint=False):
-    """Given two points, create a linearly interpolated path between them.
+def interpolate_linear_path(
+    position_a: Union[pv.CameraPosition, np.ndarray, list],
+    position_b: Union[pv.CameraPosition, np.ndarray, list],
+    n_points: int,
+    endpoint: bool = False,
+):
+    """Return linearly interpolated path between two input camera positions.
 
     Parameters
     ----------
-    position_a : PyVista.CameraPosition, np.array, list
-        (n,3,3) shape
-
-    position_b : PyVista.CameraPosition, np.array, list
-        (n,3,3) shape
-
+    position_a : Union[pv.CameraPosition, np.ndarray, list]
+        _description_
+    position_b : Union[pv.CameraPosition, np.ndarray, list]
+        (3,3) shaped iteratable containing the camera's position, focal point, and
+        viewup.
     n_points : int
         The number of points to be interpolated between the two positions
-
-    endpoint : bool
-        Add the position_b to the end of the interpolation
+    endpoint : bool, optional
+        Add the position_b to the end of the interpolation, by default False
 
     Returns
     -------
-    path : np.array
-        (n_points,3,3) Shaped array of the interpolated path, where each
-        n_point index represents a PyVista.CameraPosition
+    _type_
+        (n,3,3) Shaped array of the interpolated path, where each `n` index
+        stores a PyVista.CameraPosition array.
 
+    Raises
+    ------
+    TypeError
+        If `n_points` is not passed as an integer.
     """
     position_a = np.array([list(pos) for pos in position_a])
     position_b = np.array([list(pos) for pos in position_b])
@@ -418,7 +455,7 @@ def interpolate_linear_path(position_a, position_b, n_points, endpoint=False):
             "n_points must be passed as an integer value for point interpolation"
         )
 
-    # god numpy is amazing
+    # linearly interpolate the camera, focal, and viewup at once
     path = np.linspace(position_a, position_b, num=n_points, endpoint=endpoint)
     return path
 
@@ -486,7 +523,7 @@ def generate_flythrough_path(
     return path
 
 
-def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
+def generate_flythrough_actors(plotter, key_frames, path_type):
     """Given a series of keyframes, creates a path actor tube that helps the
     user visualize the proposed path of the movie.
 
@@ -515,7 +552,7 @@ def generate_flythrough_actors(plotter, key_frames, path_type, current_index=0):
 
     path = generate_flythrough_path(key_frames, path_type=path_type)
     path_points = path[:, 0]  # only pull the camera position
-    line = pv.Spline(path_points)
+    line = pv.Spline(path_points, n_points=path_points.shape[0])
 
     # Create the path actor
     line_path = line.tube(radius=2, capping=True)

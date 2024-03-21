@@ -48,22 +48,19 @@ from PyQt5.QtWidgets import (
 ### Orbit widgets ###
 #####################
 class OrbitWidget(QWidget):
-    """The dialogue used to create an orbital movie around a mesh. Allows users
-    to move the plotter around the visaulized meshes and generate orbital paths
-    in the plane orthogonal to the viewup angle.
+    """The dialogue used to create an orbital movie around a mesh.
+
+    Allows users to move the plotter around the visaulized meshes and generate orbital
+    paths in the plane orthogonal to the viewup angle.
 
     Parameters
     ----------
-    plotter: PyVista.Plotter
-
-    Returns
-    -------
-    QWidget
-        The widget used to update the orbit options for the movie
-
+    plotter : PyVista.Plotter
+        The plotter currently being used for the main application.
     """
 
     def __init__(self, plotter):
+        """Build the widget."""
         super().__init__()
         self.plotter = plotter
         self.orbitPathActors = IC.OrbitActors()
@@ -71,7 +68,7 @@ class OrbitWidget(QWidget):
         formLayout = QtO.new_form_layout()
 
         pathLabel = QLabel("Camera Path")
-        updateOrbit = QtO.new_button("Update", self.update_orbit)
+        self.updateOrbitButton = QtO.new_button("Update", self.update_orbit)
 
         lengthLabel = QLabel("Movie Duration")
         self.movieLength = QtO.new_doublespin(
@@ -79,40 +76,39 @@ class OrbitWidget(QWidget):
         )
 
         QtO.add_form_rows(
-            formLayout, [[pathLabel, updateOrbit], [lengthLabel, self.movieLength]]
+            formLayout,
+            [[pathLabel, self.updateOrbitButton], [lengthLabel, self.movieLength]],
         )
         QtO.add_widgets(widgetLayout, [0, formLayout, 0])
 
-        self.update_orbit()
+        self.default_setup()
 
     def update_orbit(self):
-        """Updates the orbit path for the movie based on the current
-        plotter position
-        """
+        """Update the orbit path for the movie based on the current plotter position."""
         path_seed = self.plotter.camera_position
         self.orbit_path = MovProc.generate_orbital_path(path_seed)
         self.update_path_actors()
 
     def update_path_actors(self):
-        """Updates the position of the orbital path actor"""
+        """Update the position of the orbital path actor."""
         self.remove_path_actors()
         self.orbitPathActors = MovProc.generate_orbit_path_actors(
             self.plotter, self.orbit_path
         )
 
     def remove_path_actors(self):
-        """Eliminates all path actors from the scene and destroys them"""
+        """Eliminate and destroy all path actors."""
         for actor in self.orbitPathActors.iter_actors():
             if actor:
                 self.plotter.remove_actor(actor, reset_camera=False)
                 del actor
 
-    def export_path(self, framerate):
-        """Generates an orbital path with with the requested frame count
+    def generate_path(self, framerate: int):
+        """Generate an orbital path with with the requested frame count.
 
         Parameters
         ----------
-        framerate: int
+        framerate : int
             framerate used to generate the output frames
 
         Returns
@@ -127,11 +123,11 @@ class OrbitWidget(QWidget):
         return MovProc.generate_orbital_path(self.plotter.camera_position, frames)
 
     def reset(self):
-        """Resets the widget"""
+        """Reset the widget."""
         self.remove_path_actors()
 
     def default_setup(self):
-        """Provides a default orbit for the widget when called"""
+        """Provide a default orbit for the widget when called."""
         self.update_orbit()
 
 
@@ -139,28 +135,25 @@ class OrbitWidget(QWidget):
 ### Flythrough widgets ###
 ##########################
 class FlyThroughTable(QTableWidget):
-    """The table widget used to keep track of and modify the keyframes for the
-    flythrough movie. As long as there is at least one column in the table, it will
-    be selected. Also contains a key_frame list that keeps track of the keyframe
+    """A table widget used to keep track of/modify keyframes for flythrough movies.
+
+    As long as there is at least one column in the table, it will be selected.
+    Also contains a key_frame list that keeps track of the keyframe
     plotter.camera_positions
 
     Parameters
     ----------
-    plotter: PyVista.Plotter
-
-    update_path_actors: Callable
+    plotter : PyVista.Plotter
+        The active plotter of the app.
+    update_path_actors : Callable
         The update_path_actors of the parent FlyThroughWidget should be passed
-
-    Returns
-    -------
-    QTableWidget
-
     """
 
     key_frames = []
     selected_column = 0
 
     def __init__(self, plotter, update_path_actors):
+        """Build the widget."""
         super().__init__()
         self.plotter = plotter
         self.update_path_actors = update_path_actors
@@ -192,12 +185,12 @@ class FlyThroughTable(QTableWidget):
 
     # Selection processing
     def default_selection(self):
-        """Selects the first column of the table by default"""
+        """Select the first column of the table by default."""
         if not self.selectionModel().hasSelection():
             self.selectColumn(0)
 
     def get_selected_column_index(self):
-        """Identifies the selected column of the model"""
+        """Identifie the selected column of the model."""
         if self.selectionModel().hasSelection():
             model = self.selectionModel()
             selection = model.selectedColumns()[0]
@@ -207,9 +200,7 @@ class FlyThroughTable(QTableWidget):
         return int(keyframe_index)
 
     def update_plotter_view(self):
-        """Updates the position of the plotter based on the current table
-        selection
-        """
+        """Update the position of the plotter based on the current table selection."""
         model = self.selectionModel()
         if not model.hasSelection():
             self.selected_column = 0
@@ -221,12 +212,8 @@ class FlyThroughTable(QTableWidget):
         )
 
     # column Processing
-    @pyqtSlot()
     def add_column(self):
-        """Inserts a column into the table at the current index, either before
-        or after the selected column. Uses a pyqtSlot to find the
-        currently selected column
-        """
+        """Inserts a column into the table at the current index."""
         column_index = self.get_selected_column_index()
 
         if "After" in self.sender().text() and self.columnCount() > 0:
@@ -249,7 +236,7 @@ class FlyThroughTable(QTableWidget):
         self.update_path_actors()
 
     def remove_column(self):
-        """Removes the actively selected column"""
+        """Remove the currently selected column."""
         index = self.currentColumn()
         if index >= 0:
             # update the selection, if there are columns left
@@ -269,13 +256,13 @@ class FlyThroughTable(QTableWidget):
             self.update_path_actors()
 
     def rename_columns(self):
-        """Renames the keyframes of the table by ascending order"""
+        """Renams the keyframes of the table by ascending order."""
         for i in range(self.columnCount()):
             item = self.item(0, i)
             item.setText(str(i + 1))
 
     def load_frames(self, key_frames):
-        """Loads keyframes from previously saved options"""
+        """Load keyframes from previously saved options."""
         self.key_frames = key_frames
 
         # Reset the columns, add new items
@@ -288,27 +275,28 @@ class FlyThroughTable(QTableWidget):
         self.update_path_actors()
 
     def reset(self):
-        """Resets the table to have zero columns"""
+        """Reset the table to have zero columns."""
         self.setColumnCount(0)
         self.key_frames = []
 
     # Force constant selection
     def mousePressEvent(self, event):
-        """Tracks mousepress events to ensure that a column is
-        always selected, so long as there is at least one column in the table"""
+        """Track mousepress events to ensure that a column is always selected."""
         if self.indexAt(event.pos()).isValid():
             QTableWidget.mousePressEvent(self, event)
 
 
 class FlythroughWidget(QWidget):
-    """The dialogue used to create a path-based movie of a mesh. Allows you to
-    add plotter keyframes to a manageable list, and lets you generate camera
-    paths from those keyframes. Linear or interpolated paths can be generated
-    to create flythrough videos of the rendered meshes.
+    """The dialogue used to create a path-based movie of a mesh.
+
+    Allows the user to add plotter keyframes to a manageable list. Also lets one
+    generate camera paths from those keyframes. Linear or interpolated paths can be
+    generated to create flythrough videos of the rendered meshes.
 
     Parameters
     ----------
-    plotter: PyVista.Plotter
+    plotter : PyVista.Plotter
+        The active plotter of the app.
 
     """
 
@@ -398,11 +386,12 @@ class FlythroughWidget(QWidget):
 
     # Frame movement
     def check_columns(self, columns_needed=1):
-        """Check that there are sufficient columns for the steps
+        """Check that there are sufficient columns for the steps.
 
         Returns
         -------
         bool
+            True if there are enough columns, False otherwise.
         """
         has_columns = False
         if self.pathTable.columnCount() >= columns_needed:
@@ -410,31 +399,32 @@ class FlythroughWidget(QWidget):
         return has_columns
 
     def step_start(self):
-        """Moves the plotter to the first keyframe"""
+        """Move the plotter to the first keyframe."""
         if self.check_columns():
             self.pathTable.selectColumn(0)
 
     def step_backward(self):
-        """Moves the plotter to the previous keyframe, if there is one"""
+        """Move the plotter to the previous keyframe, if there is one."""
         if self.check_columns(columns_needed=2):
             selected_column = self.pathTable.get_selected_column_index()
             if selected_column > 0:
                 self.pathTable.selectColumn(selected_column - 1)
 
     def step_forward(self):
-        """Moves the plotter to the next keyframe, if there is one"""
+        """Move the plotter to the next keyframe, if there is one."""
         if self.check_columns(columns_needed=2):
             selected_column = self.pathTable.get_selected_column_index()
             if selected_column < self.pathTable.columnCount() - 1:
                 self.pathTable.selectColumn(selected_column + 1)
 
     def step_end(self):
-        """Moves the plotter to the last keyframe"""
+        """Move the plotter to the last keyframe."""
         if self.check_columns():
             self.pathTable.selectColumn(self.pathTable.columnCount() - 1)
 
     # Path actor management
     def update_path_actors(self):
+        """Update the path actors when keyframes have been modified."""
         # remove the old path actors
         self.remove_path_actors()
 
@@ -450,6 +440,7 @@ class FlythroughWidget(QWidget):
             )
 
     def remove_path_actors(self):
+        """Remove the path actors from the scene."""
         for actor in self.flyThroughPathActors.iter_actors():
             if actor:
                 self.plotter.remove_actor(actor, reset_camera=False)
@@ -458,7 +449,7 @@ class FlythroughWidget(QWidget):
 
     # Export
     def keyframe_check(self):
-        """Checks to ensure that there are at least two keyframes.
+        """Check to ensure that there are at least two keyframes.
 
         Returns
         -------
@@ -469,8 +460,7 @@ class FlythroughWidget(QWidget):
         return key_frame_check
 
     def keyframe_warning(self):
-        """Throws a warning indicating that at least two keyframes
-        are needed to create a movie."""
+        """Raise an in-app warning to indicate that >=2 keyframes are needed."""
         warning = QMessageBox()
         warning.setWindowTitle("Keyframe Error")
         warning.setText(
@@ -478,8 +468,21 @@ class FlythroughWidget(QWidget):
         )
         warning.exec_()
 
-    def export_path(self, framerate):
-        """Exports the created keyframes into a path for movie rendering"""
+    def generate_path(self, framerate: int):
+        """Generate a flythrough path with the constructed keyframes.
+
+        Parameters
+        ----------
+        framerate : int
+            framerate used to generate the output frames
+
+        Returns
+        -------
+        list
+            (n,3,3) shaped list where each n index contains a
+            plotter.camera_position
+
+        """
         camera_path = MovProc.generate_flythrough_path(
             self.pathTable.key_frames,
             self.movieLength.value(),
@@ -490,11 +493,12 @@ class FlythroughWidget(QWidget):
 
     # Defaulting and resetting
     def default_setup(self):
-        """Creates a default setup for the widget. Resets the table"""
+        """Initialize the default setup for the widget."""
         self.pathTable.reset()
         self.insertFrameAfter.click()  # adds an initial frame
 
     def reset(self):
+        """Reset the widget."""
         self.remove_path_actors()
         self.pathTable.reset()
 
@@ -503,22 +507,27 @@ class FlythroughWidget(QWidget):
 ### Movie generation ###
 ########################
 class MovieDialogue(QDialog):
-    """A dialogue widget used to create movies. Movie rendering settings are
-    selected, a save path is selected, and the movie path is created.
+    """A dialogue widget used to create movies.
+
+    With this widget, movie rendering settings are selected, a file save path is
+    selected, and the movie path is created.
 
     Parameters
     ----------
-    plotter: PyVista.Plotter
+    plotter : PyVista.Plotter
+        The active plotter of the app.
 
-    movie_dir: The output directory that the movie will be saved to.
+    movie_dir : str
+        The output directory that the movie will be saved to.
 
-    mainWindow: QMainWindow
-        Needed to make sure that the rendering dialogue always remains in front
-        of all of the other windows.
+    mainWindow : QMainWindow
+        The main window of the app. This is needed to make sure that the rendering
+        dialogue always remains in front of all of the other windows.
 
     """
 
     def __init__(self, plotter: pv.Plotter, mainWindow: QMainWindow):
+        """Build the widget."""
         super().__init__(mainWindow)
         self.plotter = plotter
         self.movie_dir = helpers.load_movie_dir()
@@ -630,7 +639,7 @@ class MovieDialogue(QDialog):
         renderingButtonsWidget = QtO.new_widget(260)
         renderingButtonsWidgetLayout = QtO.new_layout(renderingButtonsWidget)
         cancelButton = QtO.new_button("Cancel", self.closeEvent)
-        renderButton = QtO.new_button("Render", self.return_movie_path)
+        renderButton = QtO.new_button("Render", self.render_movie)
         QtO.add_widgets(
             renderingButtonsWidgetLayout, [0, cancelButton, renderButton, 0]
         )
@@ -653,7 +662,7 @@ class MovieDialogue(QDialog):
 
     # Movie path processing
     def toggle_path_options(self):
-        """Toggle the visbiility of the rendering path options"""
+        """Toggle the visibility of the path rendering options."""
         show_orbit = True if self.movieType.currentText() == "Orbit" else False
 
         # Update the path options header
@@ -674,7 +683,7 @@ class MovieDialogue(QDialog):
         else:
             self.flythroughWidget.default_setup()
 
-    def return_movie_path(self):
+    def render_movie(self):
         """Return the generated path, if created."""
         if self.savePathEdit.text() in ["None", "Select save path"]:
             self.save_path_warning()
@@ -686,12 +695,12 @@ class MovieDialogue(QDialog):
         # Get the plotter path
         framerate = int(self.movieFPS.currentText())
         if self.movieType.currentText() == "Orbit":
-            self.path = self.orbitWidget.export_path(framerate)
+            self.path = self.orbitWidget.generate_path(framerate)
         elif self.movieType.currentText() == "Flythrough":
             if not self.flythroughWidget.keyframe_check():
                 self.flythroughWidget.keyframe_warning()
                 return
-            self.path = self.flythroughWidget.export_path(framerate)
+            self.path = self.flythroughWidget.generate_path(framerate)
 
         self.movie_settings = IC.MovieOptions(
             self.savePathEdit.text(),
@@ -705,12 +714,12 @@ class MovieDialogue(QDialog):
         self.accept()
 
     def load_options(self):
-        """Load previously saved movie options"""
+        """Load previously saved movie options."""
         filename = helpers.load_JSON(helpers.get_dir("Desktop"))
         if not filename:
             return
 
-        movie_options = MovProc.load_options(filename)
+        movie_options = MovProc.load_movie_options(filename)
 
         type_index = 0 if movie_options.movie_type == "Orbit" else 1
         self.movieType.setCurrentIndex(type_index)
@@ -742,7 +751,7 @@ class MovieDialogue(QDialog):
 
     # File path processing
     def get_movie_save_path(self):
-        """Get the save path of the movie"""
+        """Get the save path of the movie."""
         movie_format = self.movieFormat.currentText().lower()
         path = helpers.get_save_file("Save movie as...", self.movie_dir, movie_format)
 
@@ -761,24 +770,25 @@ class MovieDialogue(QDialog):
             self.savePathEdit.setText(path)
 
     def save_path_warning(self):
-        """Throw a warning if a save path hasn't been selected"""
+        """Raise an in-app warning if a save path hasn't been selected."""
         self.savePathEdit.setStyleSheet("border: 1px solid red;")
         self.savePathEdit.setText("Select save path")
 
     # Window management
     def keyPressEvent(self, event):
-        """Catch escape key press events to close the widget"""
+        """Catch escape key press events to close the widget."""
         if event.key() == Qt.Key_Escape:
             self.closeEvent()
         else:
             event.accept()
 
     def remove_path_actors(self):
-        """Remove all of the path actors and close the widget"""
+        """Remove all of the path actors and close the widget."""
         self.orbitWidget.remove_path_actors()
         self.flythroughWidget.remove_path_actors()
 
     def closeEvent(self, event=None):
+        """An app close event."""
         self.remove_path_actors()
         self.plotter.reset_camera()
         self.reject()
@@ -789,6 +799,7 @@ class MovieDialogue(QDialog):
 #################
 class RenderDialogue(QDialog):
     """The popup widget used to visualize the progress of the movie rendering.
+
     Allows users to terminate the rendering.
 
     Because VTK on Windows does not like when the renderer tries to capture
@@ -813,6 +824,7 @@ class RenderDialogue(QDialog):
     """
 
     def __init__(self, plotter: pv.Plotter, movie_options: IC.MovieOptions):
+        """Build the dialogue."""
         super().__init__()
         self.movie_options = movie_options
         self.plotter = plotter
@@ -864,7 +876,7 @@ class RenderDialogue(QDialog):
         self.movieRenderer.start()
 
     def advance_frame(self):
-        """Advances the current frame of the movie"""
+        """Advance the current frame of the movie."""
         self.current_frame += 1
         if self.current_frame < self.movie_options.frame_count:
             self.movieRenderer.update_frame(self.current_frame)
@@ -872,7 +884,7 @@ class RenderDialogue(QDialog):
             self.movieRenderer.rendering = False
 
     def write_frame(self):
-        """Captures a single frame adds it to the movie writer"""
+        """Capture a single frame adds it to the movie writer."""
         self.plotter.mwriter.append_data(self.plotter.image)
         self.current_frame += 1
         if self.current_frame < self.movie_options.frame_count:
@@ -882,7 +894,7 @@ class RenderDialogue(QDialog):
             self.movieRenderer.rendering = False
 
     def update_progress(self, progress):
-        """Updates the value shown on the progress bar"""
+        """Update the value shown on the progress bar."""
         if progress != self.movie_options.frame_count:
             message = (
                 f"<center>Writing frame {progress}/{self.movie_options.frame_count}..."
@@ -894,33 +906,20 @@ class RenderDialogue(QDialog):
         self.progressBar.setValue(progress)
 
     def keyPressEvent(self, event):
-        """Monitors keypress events to cancel the rendering if the 'escape' key
-        is pressed"""
+        """Monitor keypress events to catch 'escape' key presses to end the rendering."""
         if event.key() == Qt.Key_Escape:
             self.cancel()
         else:
             event.accept()
 
     def cancel(self):
-        """Stops the movie rendering."""
+        """Stop the movie rendering."""
         # Don't delete movie, just end it.
         self.movieRenderer.rendering = False
 
     def rendering_complete(self):
-        """Upon the completion of the rendering, closes the MovieThread, the
-        movie writer, and self."""
+        """Upon the completion of the rendering, terminate the thread and close self."""
         self.movieRenderer.quit()
         self.plotter.mwriter.close()
         self.plotter.reset_camera()
         self.accept()
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    p = pv.Plotter()
-    window = QMainWindow()
-    window.show()
-
-    demo = MovieDialogue(p, window)
-    demo.exec_()
-    sys.exit(app.exec_())
