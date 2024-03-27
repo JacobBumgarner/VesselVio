@@ -17,8 +17,8 @@ The first video above shows the vasculature found in a lymph node from a mouse. 
 
 <div align="center">
   <iframe width="560" height="315" src="https://www.youtube.com/embed/rqZo9q6hHC4?si=e8-9tWv9zyebsscK" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-The second video above shows how VesselVio can be used. Visualized is a tiny cube of vasculature from the cortex of a mouse.
 </div>
+The second video above shows how VesselVio can be used. Visualized is a tiny cube of vasculature from the cortex of a mouse.
 
 ## Analysis Output
 
