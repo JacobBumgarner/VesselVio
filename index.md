@@ -2,14 +2,8 @@
 ## Vasculature Dataset Analysis and Visualization
 VesselVio is an open-source application designed for the analysis and visualization of segmented vasculature datasets.  
 <div align="center">
- <video src="https://github.com/JacobBumgarner/VesselVio/assets/70919881/b7a0c717-6741-4802-b133-09fce74ba543" width="50%" controls autoplay muted loop></video>
+ <video src="https://github.com/JacobBumgarner/VesselVio/assets/70919881/bb4f4c70-5064-402b-add2-8e83fe4f81bf" width="50%" controls autoplay muted loop></video>
 </div>
-
-
-
-
-
-
 
 ## Using VesselVio
 VesselVio can be downloaded on [Windows and MacOS](https://jacobbumgarner.github.io/VesselVio/Downloads.html), or it can be run from a terminal with a single line of code after following our step-by-step [installation and build instructions](https://jacobbumgarner.github.io/VesselVio/Build.html). 
