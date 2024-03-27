@@ -27,5 +27,3 @@ Please feel free to [open an issue](https://github.com/JacobBumgarner/VesselVio/
 &nbsp;
 
 If you'd rather run the application/single analyses from your IDE, you can find our source-code on [GitHub](https://github.com/JacobBumgarner/VesselVio). If you need help with python environment setup, follow our [build instructions](https://jacobbumgarner.github.io/VesselVio/Build.html).
-
-Please feel free to [contact us](mailto:vesselvio@gmail.com) with any bug reports, download issues, or feature requests.
