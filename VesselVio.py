@@ -13,25 +13,23 @@ import sys
 
 os.environ["QT_MAC_WANTS_LAYER"] = "1"
 
+if os.environ.get("XDG_SESSION_TYPE") == "wayland":
+    os.environ["QT_QPA_PLATFORM"] = "xcb"
+
 from multiprocessing import freeze_support
 
 import pyvista as pv
-
-from library import image_processing as ImProc, qt_threading as QtTh
-from library.gui import (
-    analysis_page,
-    annotation_page,
-    left_menu,
-    qt_objects as QtO,
-    update_alert,
-    visualization_page,
-)
-from library.helpers import load_icon
-
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from pyvistaqt import QtInteractor
+
+from library import image_processing as ImProc
+from library import qt_threading as QtTh
+from library.gui import analysis_page, annotation_page, left_menu
+from library.gui import qt_objects as QtO
+from library.gui import update_alert, visualization_page
+from library.helpers import load_icon
 
 ######
 __version__ = "V 1.1.2"
@@ -97,6 +95,12 @@ class mainWindow(QMainWindow):
 
 if __name__ == "__main__":
     freeze_support()
+    if os.environ.get("QT_QPA_PLATFORM_PLUGIN_PATH", "").endswith("cv2/qt/plugins"):
+        from PyQt5.QtCore import QLibraryInfo
+
+        os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
+            QLibraryInfo.PluginsPath
+        )
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(load_icon()))
     main_app = mainWindow()
